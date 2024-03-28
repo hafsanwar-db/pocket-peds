@@ -1,0 +1,3 @@
+#if you have a virtual environment, pls add it to the .gitignore file
+venv/
+.venv/
