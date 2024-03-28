@@ -7,19 +7,13 @@ app = Flask(__name__)
 client = MongoClient('mongodb+srv://swastikagrawal3:swastik@ctrlf.9wvxvoo.mongodb.net/')
 db = client['PocketPeds']
 child_profiles = db['child_profiles']
-
-
-def try_ping():
-    print(child_profiles.find_one({'name': 'timmy'}))
-    print("Pinged your deployment. You successfully connected to MongoDB!")
-
-# Dummy user ID for demonstration purposes
-user_id = 1
+parent_profiles = db['parent_profiles']
 
 # API endpoint for creating a new child profile
-@app.route('/child-profiles', methods=['POST'])
+@app.route('/child-profiles', methods=['POST']) #
 def create_child_profile():
     # Add authentication and authorization logic here
+    # the data might have user details which can be matched with the parent profile
 
     # Validate incoming data
     data = request.get_json()
@@ -29,17 +23,21 @@ def create_child_profile():
     # Validate data format and content
     if 'name' not in data or 'age' not in data:
         return jsonify({'message': 'Missing required fields'}), 400
+    
+    #getting the parent Object_id
+    user_details = data['user']['username']
+    parent_id = parent_profiles.find_one({'username': user_details})['_id']
 
     # Create a new child profile
     child_profile = {
-        'user_id': user_id,
         'name': data['name'],
-        'age': data['age']
+        'age': data['age'],
+        'parent' : parent_id
     }
 
     # Add the child profile to the database
     child_profiles.insert_one(child_profile)
-
+    print("the parent of the child is:", parent_profiles.find_one({'_id': parent_id})['username'])
     return jsonify({'message': 'Child profile created successfully'}), 201
 
 # API endpoint for retrieving a child profile
@@ -93,7 +91,11 @@ def delete_child_profile(child_profile_id):
 
     return jsonify({'message': 'Child profile deleted successfully'}), 200
 
+def try_ping():
+    child_profiles = db['child_profiles']
+    print(child_profiles.find_one({'name': 'timmy'}))
+    print("Pinged your deployment. You successfully connected to MongoDB!")
 
 if __name__ == '__main__':
-    try_ping()
-    # app.run()
+    # try_ping()
+    app.run()

@@ -9,3 +9,7 @@ There are multiple factors influencing calculations. These factors include curre
 weight and/or body surface area, and chronic disease status or clinical condition.
 
 
+# note for devs 
+add in any python packages in requirements.txt
+
+
