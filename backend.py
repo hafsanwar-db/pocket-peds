@@ -9,6 +9,9 @@ db = client['PocketPeds']
 child_profiles = db['child_profiles']
 parent_profiles = db['parent_profiles']
 
+#dummy userid
+user_id = 1
+
 # API endpoint for creating a new child profile
 @app.route('/child-profiles', methods=['POST']) #
 def create_child_profile():
