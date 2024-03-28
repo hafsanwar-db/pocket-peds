@@ -1,10 +1,14 @@
-
 from flask import Flask, request, jsonify
 from pymongo.mongo_client import MongoClient
+from dotenv import load_dotenv
+import os
+
 app = Flask(__name__)
 
 # Connect to MongoDB Atlas
-client = MongoClient('mongodb+srv://swastikagrawal3:swastik@ctrlf.9wvxvoo.mongodb.net/')
+load_dotenv()
+connection_string = os.getenv('connection_string')
+client = MongoClient(connection_string)
 db = client['PocketPeds']
 child_profiles = db['child_profiles']
 parent_profiles = db['parent_profiles']

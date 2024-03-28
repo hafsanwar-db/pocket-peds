@@ -11,6 +11,4 @@ weight and/or body surface area, and chronic disease status or clinical conditio
 
 # note for devs 
 add in any python packages in requirements.txt
-
-
-checking github
+create a .env with mongodb `connection_string`
