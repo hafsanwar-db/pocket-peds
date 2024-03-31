@@ -2,3 +2,4 @@ pymongo[srv]==3.11
 flask
 python-dotenv
 passlib
+flask-jwt-extended

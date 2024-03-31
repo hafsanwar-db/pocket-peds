@@ -99,8 +99,6 @@ def get_user_profile(username):
 @jwt_required #Route requires authentication
 def create_child_profile():
     # Add authentication and authorization logic here
-    # the data might have user details which can be matched with the parent profile
-
     current_user = get_jwt_identity()
     
     # Validate incoming data
@@ -109,16 +107,14 @@ def create_child_profile():
         return jsonify({'message': 'Invalid data'}), 400
 
     # Validate data format and content
-    if 'name' not in data or 'age' not in data:
+    # The frontend will require it anyway
+    if 'name' not in data or 'age' not in data or 'date_of_birth' not in data or 'weight' not in data:
         return jsonify({'message': 'Missing required fields'}), 400
     
     #getting the parent username
     parent_profile = user_profiles.find_one({'username': current_user['username']})
     if not parent_profile:
         return jsonify({'error': 'Parent profile not found'}), 404
-    
-    
-    
 
     # Create a new child profile
     child_profile = {
@@ -126,8 +122,10 @@ def create_child_profile():
         'parent_id' : parent_profile['_id'],
         'name': data['name'],
         'age': data['age'],
+        'date_of_birth': data['date_of_birth'],
         'weight': data['weight'],
-        
+        'allergies': data.get('allergies', []),
+        'medications': data.get('medications', []),
     }
 
     # Add the child profile to the database
@@ -139,14 +137,16 @@ def create_child_profile():
 @app.route('/child-profiles/<child_profile_id>',endpoint='getChild', methods=['GET'])
 @jwt_required #Route requires authentication
 def get_child_profile(child_profile_id):
-    # Check if user is authenticated and authorized
-    # Add your authentication and authorization logic here
-    
     # Retrieve the child profile from the database
     child_profile = child_profiles.find_one({'_id': child_profile_id, 'user_id': user_id})
 
+    current_user = get_jwt_identity()    
     if not child_profile:
         return jsonify({'message': 'Child profile not found'}), 404
+    
+    #only view child's profile if user is parent, just in case
+    if child_profile['user_id'] != current_user['user_id']:
+        return jsonify({'error': 'Unauthorized to view this child profile'}), 403
 
     return jsonify(child_profile), 200
 
@@ -154,9 +154,6 @@ def get_child_profile(child_profile_id):
 @app.route('/child-profiles/<child_profile_id>', endpoint='updateChild',methods=['PUT'])
 @jwt_required #Route requires authentication
 def update_child_profile(child_profile_id):
-    # Check if user is authenticated and authorized
-    # Add your authentication and authorization logic here
-
     current_user = get_jwt_identity()
 
     # Validate incoming data
@@ -173,14 +170,20 @@ def update_child_profile(child_profile_id):
     if not child_profile:
         return jsonify({'error': 'Child profile not found'}), 404
 
-    # Check if the user is authorized to update the child profile
+    # Check if the user is authorized to update the child profile (Maybe not needed whem working with JWT)
     if child_profile['user_id'] != current_user['user_id']:
         return jsonify({'error': 'Unauthorized to update this child profile'}), 403
 
-
+    # appending allergies and medications
+    allergies = data.get('allergies', [])
+    allergies.extend(child_profile['allergies'])
+    data['allergies'] = allergies
+    medications = data.get('medications', [])
+    medications.extend(child_profile['medications'])
+    data['medications'] = medications
 
     # Update the child profile in the database
-    result = child_profiles.update_one({'_id': child_profile_id, 'user_id': user_id}, {'$set': {'name': data['name'], 'age': data['age']}})
+    result = child_profiles.update_one({'_id': child_profile_id, 'user_id': user_id}, {'$set': data})
 
     if result.modified_count == 0:
         return jsonify({'message': 'Child profile not found'}), 404
@@ -191,9 +194,12 @@ def update_child_profile(child_profile_id):
 @app.route('/child-profiles/<child_profile_id>', endpoint='deleteChild',methods=['DELETE'])
 @jwt_required #Route requires authentication
 def delete_child_profile(child_profile_id):
-    # Check if user is authenticated and authorized
-    # Add your authentication and authorization logic here
-
+    #only the parent of the child can delete their profile
+    current_user = get_jwt_identity()
+    child_profile = child_profiles.find_one({'_id': child_profile_id})
+    if child_profile['user_id'] != current_user['user_id']:
+        return jsonify({'error': 'Unauthorized to delete this child profile'}), 403
+    
     # Delete the child profile from the database
     result = child_profiles.delete_one({'_id': child_profile_id, 'user_id': user_id})
 
@@ -202,6 +208,7 @@ def delete_child_profile(child_profile_id):
 
     return jsonify({'message': 'Child profile deleted successfully'}), 200
 
+#for testing if mongoDb is connected or not
 def try_ping():
     child_profiles = db['child_profiles']
     print(child_profiles.find_one({'name': 'timmy'}))
