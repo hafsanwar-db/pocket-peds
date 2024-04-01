@@ -2,6 +2,10 @@ from flask import Flask, request, jsonify
 from pymongo.mongo_client import MongoClient
 from dotenv import load_dotenv
 import os
+import requests
+import xmltodict
+import json
+
 
 app = Flask(__name__)
 
@@ -98,6 +102,22 @@ def delete_child_profile(child_profile_id):
 
     return jsonify({'message': 'Child profile deleted successfully'}), 200
 
+@app.route('/process-upc', methods=['GET'])
+def process_upc():
+    upc = request.args.get('upc')
+    # Make a GET request to the given endpoint
+    upc_response = requests.get('https://api.fda.gov/drug/ndc.json?search={}'.format(upc))
+    upc_json = upc_response.json()
+
+    ndc = upc_json['results'][0]['product_ndc']
+    setId = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?ndc={}".format(ndc)).json()['data'][0]['setid']
+
+    spl = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/{}.xml".format(setId))
+    spl_xml = spl.text
+    spl_dict = xmltodict.parse(spl_xml)
+    spl_json = json.dumps(spl_dict)
+    return spl_json
+
 def try_ping():
     child_profiles = db['child_profiles']
     print(child_profiles.find_one({'name': 'timmy'}))
@@ -105,4 +125,4 @@ def try_ping():
 
 if __name__ == '__main__':
     # try_ping()
-    app.run()
+    app.run(debug = True)
