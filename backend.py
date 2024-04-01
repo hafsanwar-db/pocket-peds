@@ -114,9 +114,9 @@ def process_upc():
 
     spl = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/{}.xml".format(setId))
     spl_xml = spl.text
-    spl_dict = xmltodict.parse(spl_xml)
-    spl_json = json.dumps(spl_dict)
-    return spl_json
+    # spl_dict = xmltodict.parse(spl_xml)
+    # spl_json = json.dumps(spl_dict)
+    return spl_xml
 
 def try_ping():
     child_profiles = db['child_profiles']
