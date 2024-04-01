@@ -7,6 +7,10 @@ from passlib.hash import bcrypt
 from bson import ObjectId
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required,get_jwt_identity
 from datetime import datetime
+import requests
+import xmltodict
+import json
+
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "PocketPedsUMDADC" #every access token will be signed with this
@@ -222,7 +226,22 @@ def delete_child_profile(child_name):
 
     return jsonify({'message': 'Child profile deleted successfully'}), 200
 
-#for testing if mongoDb is connected or not
+@app.route('/process-upc', methods=['GET'])
+def process_upc():
+    upc = request.args.get('upc')
+    # Make a GET request to the given endpoint
+    upc_response = requests.get('https://api.fda.gov/drug/ndc.json?search={}'.format(upc))
+    upc_json = upc_response.json()
+
+    ndc = upc_json['results'][0]['product_ndc']
+    setId = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?ndc={}".format(ndc)).json()['data'][0]['setid']
+
+    spl = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/{}.xml".format(setId))
+    spl_xml = spl.text
+    # spl_dict = xmltodict.parse(spl_xml)
+    # spl_json = json.dumps(spl_dict)
+    return spl_xml
+
 def try_ping():
     print(user_profiles.find_one({'username': 'example_user'}))
     print("Pinged your deployment. You successfully connected to MongoDB!")
