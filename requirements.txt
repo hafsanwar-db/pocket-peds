@@ -4,3 +4,5 @@ python-dotenv
 passlib
 flask-jwt-extended
 bcrypt==4.0.1
+xmltodict
+requests
