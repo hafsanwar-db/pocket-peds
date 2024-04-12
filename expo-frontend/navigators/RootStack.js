@@ -12,7 +12,6 @@ import Signup from '../screens/Signup';
 import Welcome from '../screens/Welcome';
 
 const Stack = createStackNavigator();
-
 const RootStack = () => {
     return (
         <NavigationContainer>
@@ -30,9 +29,15 @@ const RootStack = () => {
                 }}
                 initialRouteName='Login'
             >
-                <Stack.Screen name="Login" component={Login} />
-                <Stack.Screen name="Signup" component={Signup} />
-                <Stack.Screen name="Welcome" component={Welcome} />
+                <Stack.Screen name="Login">
+                    {props => <Login {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="Signup">
+                    {props => <Signup {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="Welcome">
+                    {props => <Welcome {...props} />}
+                </Stack.Screen>
             </Stack.Navigator>
         </NavigationContainer>
     );
