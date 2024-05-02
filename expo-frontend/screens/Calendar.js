@@ -3,24 +3,25 @@ import {
   SafeAreaView,
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
 } from "react-native";
 
 import { Agenda } from "react-native-calendars";
 
 const MyCalendar = ({ navigation }) => {
+
   const [markedDates, setMarkedDates] = useState({});
   //api call to the endpoint
   const getCurrentDate = () => {
     const date = new Date().toLocaleDateString();
+    console.log(date)
     formattedDate = date.split("/");
     return formattedDate[2] + "-" + formattedDate[0] + "-" + formattedDate[1];
   };
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `http://0.0.0.0:8000/medication-history-all/60c7c2879e2f610c989e4a81`
+        `http://10.105.12.9:8000/medication-history-all/60c7c2879e2f610c989e4a81`
       ); // hard coded with a childId atm
       const data = await response.json();
       setMarkedDates(data);
@@ -31,8 +32,18 @@ const MyCalendar = ({ navigation }) => {
   useEffect(() => {
     fetchData();
   }, []);
+  
+  const EmptyDate = memo(() => {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text className="text-[20px] text-black">
+          No medications 
+        </Text>
+      </View>
+    );
+  });
 
-  const renderItem = useCallback((item, firstItem) => {
+  const MemoizedItem = memo(({item, firstItem}) => {
     return (
       <View
         className="bg-white rounded-lg p-4"
@@ -56,23 +67,30 @@ const MyCalendar = ({ navigation }) => {
         </View>
       </View>
     );
-  }, []);
-
+  });
+ 
   return (
     <View className="h-full bg-white">
       <SafeAreaView className="flex-1 bg-transparent">
         <Agenda
           items={markedDates}
-          scrollEnabled={true}
+          scrollEnabled={false}
           //to keep the view proper I need to render an extra month for some reason
           futureScrollRange={1}
-          pastScrollRange={3}
+
           maxDate={getCurrentDate()}
           // Specify how each item should be rendered in agenda
-          renderItem={renderItem}
+          renderItem={(item, firstItem) => {
+            return <MemoizedItem item={item} firstItem={firstItem} />
+          }}
           hideExtraDays={true}
           hideKnob={false}
           showClosingKnob={true}
+          scrollEventThrottle={16}
+          renderEmptyDate={() => {
+            console.log("empty date");
+            return <View />;
+          }}
           theme={{
             selectedDayBackgroundColor: "#FDB623",
             agendaDayTextColor: "black",
@@ -83,27 +101,13 @@ const MyCalendar = ({ navigation }) => {
             todayTextColor: "black",
             todayBackgroundColor: "#ffd98c",
           }}
-          renderEmptyData={() => {
-            return (
-              <View className="flex-1 justify-center items-center">
-                <Text className="text-[20px] text-black">
-                  No medications 
-                </Text>
-              </View>
-            );
-          }}
+          renderEmptyData={()=>{return <EmptyDate/>}}
         />
       </SafeAreaView>
       <CustomBackButton navigation={navigation} />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "transparent",
-  },
-});
 
 //button to navigate back, the header needed to be overridden
 const CustomBackButton = ({ navigation }) => {
@@ -121,4 +125,4 @@ const CustomBackButton = ({ navigation }) => {
   );
 };
 
-export default memo(MyCalendar);
+export default MyCalendar;

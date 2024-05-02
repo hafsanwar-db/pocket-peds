@@ -1,6 +1,5 @@
 #fastAPI and MongoDB dependencies
 from fastapi import FastAPI, HTTPException, Depends, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pymongo.mongo_client import MongoClient
 from pydantic import BaseModel
