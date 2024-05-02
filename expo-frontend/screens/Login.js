@@ -36,8 +36,9 @@ import { View } from 'react-native'
 
 // Keyboard Avoiding View
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
+import ReminderPickerButton from '../notifications/ReminderPickerButton';
 
-const Login = ({navigation}) => {
+const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPushNotification }) => {
     const [hidePassword, setHidePassword] = useState(true);
 
     return (
@@ -83,24 +84,30 @@ const Login = ({navigation}) => {
                                 hidePassword={hidePassword}
                                 setHidePassword={setHidePassword}
                             />
-
+                            <ReminderPickerButton
+                                reminderInterval={reminderInterval}
+                                setReminderInterval={setReminderInterval}
+                                onPress={handleLocalPushNotification}
+                            />
                             <MessageBox>...</MessageBox>
                             <StyledButton onPress={handleSubmit} >
                                 <ButtonText>Login</ButtonText>
                             </StyledButton>
 
                             <Line />
+                            
                             <StyledButton google={true} onPress={handleSubmit} >
                                 <Fontisto name="google" size={24} color={primary} />
                                 <ButtonText google={true}>Sign in with Google</ButtonText>
                             </StyledButton>
-
+                            
                             <ExtraView>
                                 <ExtraText>Don't have an account already? </ExtraText>
                                 <TextLink onPress={() => navigation.navigate('Signup')}>
                                     <TextLinkContent>Sign up!</TextLinkContent>
                                 </TextLink>
                             </ExtraView>
+                            
 
                             <ExtraView>
                                 <ExtraText>Calendar </ExtraText>
@@ -116,6 +123,7 @@ const Login = ({navigation}) => {
 
             </InnerContainer>
         </StyledContainer>
+        
         </KeyboardAvoidingWrapper>
     );
 };

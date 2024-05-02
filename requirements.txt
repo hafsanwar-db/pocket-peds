@@ -13,3 +13,5 @@ passlib[bcrypt]
 python-multipart
 sqlalchemy
 psycopg2-binary
+exponent_server_sdk
+rollbar

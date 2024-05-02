@@ -16,11 +16,16 @@ import  CalculatingScreen  from '../screens/CalculatingScreen';
 import  ShowData  from '../screens/ShowData';
 import DoseSettings from '../screens/DoseSettings';
 import MyCalendar from '../screens/Calendar';
+import ConfirmationScreen from '../screens/ConfirmationScreen';
+import DoseSettings from '../screens/DoseSettings';
+import { navigationRef } from '../NavigationService';
+
 
 const Stack = createStackNavigator();
-const RootStack = () => {
+const RootStack = ({ reminderInterval, setReminderInterval, handleLocalPushNotification }) => {
+    
     return (
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
             <Stack.Navigator
                 screenOptions={{
                     headerStyle: {
@@ -36,7 +41,9 @@ const RootStack = () => {
                 initialRouteName='Login'
             >
                 <Stack.Screen name="Login">
-                    {props => <Login {...props} />}
+                    {props => <Login reminderInterval={reminderInterval}
+                    setReminderInterval={setReminderInterval}
+                    handleLocalPushNotification={handleLocalPushNotification} />}
                 </Stack.Screen>
                 <Stack.Screen name="Signup">
                     {props => <Signup {...props} />}
@@ -61,6 +68,12 @@ const RootStack = () => {
                 </Stack.Screen>
                 <Stack.Screen name="MyCalendar" options={{ headerShown: false }}>
                     {props => <MyCalendar navigation = {props.navigation} {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="ConfirmationScreen"> 
+                    {props => <ConfirmationScreen {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="DoseSettings"> 
+                    {props => <DoseSettings {...props} />}
                 </Stack.Screen>
             </Stack.Navigator>
         </NavigationContainer>
