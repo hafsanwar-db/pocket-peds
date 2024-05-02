@@ -102,6 +102,14 @@ const Login = ({navigation}) => {
                                 </TextLink>
                             </ExtraView>
 
+                            <ExtraView>
+                                <ExtraText>Calendar </ExtraText>
+                                <TextLink onPress={() => navigation.navigate('MyCalendar')}>
+                                    <TextLinkContent>Click Here!</TextLinkContent>
+                                </TextLink>
+                            </ExtraView>
+
+
                         </StyledFormArea>
                     }
                 </Formik>

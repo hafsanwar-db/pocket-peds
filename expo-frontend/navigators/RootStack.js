@@ -15,6 +15,7 @@ import ShowUPC from '../screens/ShowUPC';
 import  CalculatingScreen  from '../screens/CalculatingScreen';
 import  ShowData  from '../screens/ShowData';
 import DoseSettings from '../screens/DoseSettings';
+import MyCalendar from '../screens/Calendar';
 
 const Stack = createStackNavigator();
 const RootStack = () => {
@@ -57,6 +58,9 @@ const RootStack = () => {
                 </Stack.Screen>
                 <Stack.Screen name="DoseSettings">
                     {props => <DoseSettings {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="MyCalendar" options={{ headerShown: false }}>
+                    {props => <MyCalendar navigation = {props.navigation} {...props} />}
                 </Stack.Screen>
             </Stack.Navigator>
         </NavigationContainer>
