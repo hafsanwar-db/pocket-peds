@@ -17,7 +17,6 @@ import  ShowData  from '../screens/ShowData';
 import DoseSettings from '../screens/DoseSettings';
 import MyCalendar from '../screens/Calendar';
 import ConfirmationScreen from '../screens/ConfirmationScreen';
-import DoseSettings from '../screens/DoseSettings';
 import { navigationRef } from '../NavigationService';
 
 
@@ -43,7 +42,7 @@ const RootStack = ({ reminderInterval, setReminderInterval, handleLocalPushNotif
                 <Stack.Screen name="Login">
                     {props => <Login reminderInterval={reminderInterval}
                     setReminderInterval={setReminderInterval}
-                    handleLocalPushNotification={handleLocalPushNotification} />}
+                    handleLocalPushNotification={handleLocalPushNotification} {...props}/>}
                 </Stack.Screen>
                 <Stack.Screen name="Signup">
                     {props => <Signup {...props} />}
@@ -72,9 +71,7 @@ const RootStack = ({ reminderInterval, setReminderInterval, handleLocalPushNotif
                 <Stack.Screen name="ConfirmationScreen"> 
                     {props => <ConfirmationScreen {...props} />}
                 </Stack.Screen>
-                <Stack.Screen name="DoseSettings"> 
-                    {props => <DoseSettings {...props} />}
-                </Stack.Screen>
+        
             </Stack.Navigator>
         </NavigationContainer>
     );

@@ -84,11 +84,11 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                                 hidePassword={hidePassword}
                                 setHidePassword={setHidePassword}
                             />
-                            <ReminderPickerButton
+                            {/* <ReminderPickerButton
                                 reminderInterval={reminderInterval}
                                 setReminderInterval={setReminderInterval}
                                 onPress={handleLocalPushNotification}
-                            />
+                            /> */}
                             <MessageBox>...</MessageBox>
                             <StyledButton onPress={handleSubmit} >
                                 <ButtonText>Login</ButtonText>
