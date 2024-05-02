@@ -102,6 +102,7 @@ const Login = ({navigation}) => {
                                 </TextLink>
                             </ExtraView>
 
+
                         </StyledFormArea>
                     }
                 </Formik>

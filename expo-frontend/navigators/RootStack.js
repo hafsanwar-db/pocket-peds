@@ -10,6 +10,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Login from '../screens/Login';
 import Signup from '../screens/Signup';
 import Welcome from '../screens/Welcome';
+import MyCalendar from '../screens/Calendar';
 
 const Stack = createStackNavigator();
 const RootStack = () => {
@@ -37,6 +38,9 @@ const RootStack = () => {
                 </Stack.Screen>
                 <Stack.Screen name="Welcome">
                     {props => <Welcome {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="MyCalendar" options={{ headerShown: false }}>
+                    {props => <MyCalendar navigation = {props.navigation} {...props} />}
                 </Stack.Screen>
             </Stack.Navigator>
         </NavigationContainer>
