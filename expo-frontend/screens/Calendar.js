@@ -32,16 +32,13 @@ const MyCalendar = ({ navigation }) => {
     fetchData();
   }, []);
 
-  const renderItem = useCallback((item) => {
+  const renderItem = useCallback((item, firstItem) => {
     return (
       <View
-        className="bg-white rounded-lg p-4 m-[10px]"
+        className="bg-white rounded-lg p-4"
         style={{
-          backgroundColor: "white",
-          borderRadius: 8,
-          padding: 12,
-          marginVertical: 4,
-          elevation: 4,
+          marginTop:firstItem?16:4,
+          borderTopWidth: firstItem? 2:0,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.2,
@@ -54,8 +51,8 @@ const MyCalendar = ({ navigation }) => {
         </View>
         
         <View className = 'flex-1 flex-row  justify-between'>
-          <Text className = "text-md"> Name: {item.name} </Text>
-          <Text className = "text-md"> Dose: {item.dosage} mg</Text>
+          <Text className = "text-md"><Text className="font-bold text-[#FDB623]">Name: </Text>{item.name} </Text>
+          <Text className = "text-md"><Text className="font-bold text-[#FDB623]"> Dose: </Text>{item.dosage} mg</Text>
         </View>
       </View>
     );
@@ -69,6 +66,7 @@ const MyCalendar = ({ navigation }) => {
           scrollEnabled={true}
           //to keep the view proper I need to render an extra month for some reason
           futureScrollRange={1}
+          pastScrollRange={3}
           maxDate={getCurrentDate()}
           // Specify how each item should be rendered in agenda
           renderItem={renderItem}
@@ -77,7 +75,7 @@ const MyCalendar = ({ navigation }) => {
           showClosingKnob={true}
           theme={{
             selectedDayBackgroundColor: "#FDB623",
-            agendaDayTextColor: "#FDB623",
+            agendaDayTextColor: "black",
             agendaDayNumColor: "black",
             agendaTodayColor: "black",
             agendaKnobColor: "#999593",
