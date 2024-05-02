@@ -10,36 +10,50 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Login from '../screens/Login';
 import Signup from '../screens/Signup';
 import Welcome from '../screens/Welcome';
+import UpdateProfile from '../screens/UpdateProfile';
+
+import WeightWarning from '../components/modal/WeightWarning';
 
 const Stack = createStackNavigator();
+
+// Credentials context
+import { CredentialsContext } from '../components/CredentialsContext';
+
 const RootStack = () => {
     return (
-        <NavigationContainer>
-            <Stack.Navigator
-                screenOptions={{
-                    headerStyle: {
-                        backgroundColor: 'transparent'
-                    },
-                    headerTintColor: tertiary,
-                    headerTransparent: true,
-                    headerTitle: '', 
-                    headerLeftContainerStyle: {
-                        paddingLeft: 20
-                    }
-                }}
-                initialRouteName='Login'
-            >
-                <Stack.Screen name="Login">
-                    {props => <Login {...props} />}
-                </Stack.Screen>
-                <Stack.Screen name="Signup">
-                    {props => <Signup {...props} />}
-                </Stack.Screen>
-                <Stack.Screen name="Welcome">
-                    {props => <Welcome {...props} />}
-                </Stack.Screen>
-            </Stack.Navigator>
-        </NavigationContainer>
+        <CredentialsContext.Consumer>
+            {({storedCredentials}) => (
+                <NavigationContainer>
+                    <Stack.Navigator
+                        screenOptions={{
+                            headerStyle: {
+                                backgroundColor: 'transparent'
+                            },
+                            headerTintColor: tertiary,
+                            headerTransparent: true,
+                            headerTitle: '', 
+                            headerLeftContainerStyle: {
+                                paddingLeft: 20
+                            }
+                        }}
+                        initialRouteName='Login'
+                    >
+                            <>
+                                <Stack.Screen name="Welcome" component={Welcome} />
+                                <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
+                                <Stack.Screen name="Login" component={Login} />
+                                <Stack.Screen name="Signup" component={Signup} />
+                            </>   
+
+                        <Stack.Screen
+                            name="WeightWarning"
+                            component={WeightWarning}
+                            options={{ presentation: 'modal' }}
+                        />
+                    </Stack.Navigator>
+                </NavigationContainer>
+            )}
+        </CredentialsContext.Consumer>
     );
 }
 
