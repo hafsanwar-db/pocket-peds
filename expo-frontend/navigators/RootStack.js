@@ -10,6 +10,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Login from '../screens/Login';
 import Signup from '../screens/Signup';
 import Welcome from '../screens/Welcome';
+import ScanBarcode from '../screens/ScanBarcode';
+import ShowUPC from '../screens/ShowUPC';
+import  CalculatingScreen  from '../screens/CalculatingScreen';
+import  ShowData  from '../screens/ShowData';
+import DoseSettings from '../screens/DoseSettings';
 
 const Stack = createStackNavigator();
 const RootStack = () => {
@@ -37,6 +42,21 @@ const RootStack = () => {
                 </Stack.Screen>
                 <Stack.Screen name="Welcome">
                     {props => <Welcome {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="ScanBarcode">
+                    {props => <ScanBarcode {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="ShowUPC">
+                    {props => <ShowUPC {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="CalculatingScreen">
+                    {props => <CalculatingScreen {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="ShowData">
+                    {props => <ShowData {...props} />}
+                </Stack.Screen>
+                <Stack.Screen name="DoseSettings">
+                    {props => <DoseSettings {...props} />}
                 </Stack.Screen>
             </Stack.Navigator>
         </NavigationContainer>

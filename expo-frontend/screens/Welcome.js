@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 
 // Import icons
@@ -32,7 +32,7 @@ import {
 // Colors
 const { primary, secondary, tertiary, darkLight, brand, green, red } = Colors;
 
-const Welcome = ({navigation}) => {
+const Welcome = ({ navigation }) => {
     return (
         <>
             <StatusBar style="light" />
@@ -47,11 +47,15 @@ const Welcome = ({navigation}) => {
                     <StyledFormArea>
                         <Avatar resizeMode="cover" source={require('../assets/img/peds-logo.png')} />
 
+
+                        <StyledButton onPress={() => navigation.navigate('ScanBarcode')}>
+                            <ButtonText>Scan Barcode</ButtonText>
+                        </StyledButton>
+
                         <Line />
                         <StyledButton onPress={() => navigation.navigate('Login')}>
                             <ButtonText>Logout</ButtonText>
                         </StyledButton>
-
                     </StyledFormArea>
                 </WelcomeContainer>
             </InnerContainer>

@@ -2,13 +2,13 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.responses import JSONResponse
 from pymongo.mongo_client import MongoClient
 from pydantic import BaseModel
 from typing import Annotated
 from jose import JWTError, jwt
 from passlib.hash import bcrypt
 from bson import ObjectId
-
 #miscellaneous dependencies
 from datetime import datetime, timedelta, timezone
 import requests
@@ -62,6 +62,10 @@ def get_userID(token: str) -> ObjectId:
     except JWTError:
         raise credentials_exception
     return ObjectId(user_id)
+
+@app.get('/')
+def hello():
+    return 'Hello, server is running!'
 
 # API endpoint for creating a new user profile
 @app.post('/register')
@@ -216,6 +220,12 @@ async def delete_child_profile(child_name: str, token: Annotated[str, Depends(oa
 
     return {'message': 'Child profile deleted successfully'}
 
+@app.get('/dummy-data')
+async def dummy_data():
+    return {
+        'dosage': 'dosage will go here'
+    }
+
 @app.get('/process-upc')
 async def process_upc(upc: str):
     # Make a GET request to the given endpoint
@@ -223,13 +233,22 @@ async def process_upc(upc: str):
     upc_json = upc_response.json()
 
     ndc = upc_json['results'][0]['product_ndc']
-    setId = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?ndc={}".format(ndc)).json()['data'][0]['setid']
+    setIdJson = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?ndc={}".format(ndc)).json()
+    setId = setIdJson['data'][0]['setid']
+    name = setIdJson['data'][0]['title']
 
     spl = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/{}.xml".format(setId))
     spl_xml = spl.text
+    media_details = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/{}/media.json".format(setId))
+    media_details = media_details.json()
+    if not media_details["data"]["media"]:
+        raise HTTPException(status_code=404, detail='Media details not found')
+    media_url = media_details["data"]["media"][0]["url"]
     # spl_dict = xmltodict.parse(spl_xml)
     # spl_json = json.dumps(spl_dict)
-    return spl_xml
+    #return spl_xml
+    media = {"media_url": media_url, "name": name}
+    return media
 
 def try_ping():
     print(user_profiles.find_one({'username': 'example_user'}))
