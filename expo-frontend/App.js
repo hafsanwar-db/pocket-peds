@@ -13,7 +13,7 @@ import { CredentialsContext } from './components/CredentialsContext';
 // Splash Screen
 import * as SplashScreen from 'expo-splash-screen';
 
-// Keep the splash screen visible while we fetch resources
+// Keep the splash screen visible while loading user info
 //SplashScreen.preventAutoHideAsync();
 
 export default function App() {
