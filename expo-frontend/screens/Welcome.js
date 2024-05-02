@@ -50,7 +50,7 @@ const Welcome = () => {
             })
             .catch((error) => console.log(error));
     }
-
+ 
     return (
         <>
             <StatusBar style="light" />
