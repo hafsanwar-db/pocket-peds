@@ -18,7 +18,7 @@ import DoseSettings from '../screens/DoseSettings';
 import MyCalendar from '../screens/Calendar';
 import ConfirmationScreen from '../screens/ConfirmationScreen';
 import { navigationRef } from '../NavigationService';
-
+import UpdateProfile from '../screens/UpdateProfile';
 
 const Stack = createStackNavigator();
 const RootStack = ({ reminderInterval, setReminderInterval, handleLocalPushNotification }) => {
@@ -71,11 +71,11 @@ const RootStack = ({ reminderInterval, setReminderInterval, handleLocalPushNotif
                 <Stack.Screen name="ConfirmationScreen"> 
                     {props => <ConfirmationScreen {...props} />}
                 </Stack.Screen>
-                <Stack.Screen
+                {/* <Stack.Screen
                             name="WeightWarning"
                             component={WeightWarning}
                             options={{ presentation: 'modal' }}
-                        />
+                        /> */}
             </Stack.Navigator>
             <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
         </NavigationContainer>

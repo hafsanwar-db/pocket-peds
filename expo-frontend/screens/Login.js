@@ -160,10 +160,6 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                                 setReminderInterval={setReminderInterval}
                                 onPress={handleLocalPushNotification}
                             /> */}
-                            <MessageBox>...</MessageBox>
-                            <StyledButton onPress={handleSubmit} >
-                                <ButtonText>Login</ButtonText>
-                            </StyledButton>
 
                             <MessageBox type={messageType}>{message}</MessageBox>
                             { !isSubmitting && 
