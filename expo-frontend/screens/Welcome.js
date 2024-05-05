@@ -54,8 +54,6 @@ const Welcome = ({navigation}) => {
         <>
             <StatusBar style="light" />
             <InnerContainer>
-                <WelcomeImage resizeMode="cover" source={require('../assets/img/peds-logo.png')} />
-
                 <WelcomeContainer>
                     <PageTitle welcome={true}>Welcome {username}!</PageTitle>
                     <SubTitle welcome={true}>{email}</SubTitle>

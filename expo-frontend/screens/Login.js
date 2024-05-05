@@ -73,8 +73,8 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                 else {
                     persistLogin(...data[0], message, status);
                 }
-
                 setSubmitting(false);
+                navigation.navigate('Welcome');
             })
             .catch((error) => {
                 console.log(error)
@@ -123,6 +123,7 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                         }
                         else {
                             handleLogin(values, setSubmitting);
+                            
                         }
                     }}
                 >
