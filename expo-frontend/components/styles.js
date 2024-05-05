@@ -12,10 +12,45 @@ export const Colors = {
     darkLight: "#9CA3AF",
     brand: "#0070CA",
     green: "#10B981",
-    red: "#EF4444"
+    red: "#EF4444",
+    grey: "#9F9F9F",
+    yellow: "#FDB623"
 };
 
-const { primary, secondary, tertiary, darkLight, brand, green, red } = Colors;
+const { primary, secondary, tertiary, darkLight, brand, green, red,grey,yellow } = Colors;
+
+export const ConfirmationContainer = styled.View`
+  width: 100%;
+  height: 45%;
+  top: 55%;
+  padding: 22px;
+  margin: 0 auto;
+  border-radius: 40px 40px 40px 40px;
+  background-color: #FFF2CC;
+  
+`;
+
+export const TextContainer = styled.View`
+  margin-bottom: 16px;
+`;
+
+export const ConfirmationTitle = styled.Text`
+  color: #0E0E0E;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 32px;
+  text-align: center;
+`;
+
+export const ConfirmationText = styled.Text`
+  color: #0E0E0E;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: left;
+  margin-top: 15px;
+`;
+
 
 export const StyledContainer = styled.View`
     flex: 1;
@@ -127,6 +162,39 @@ export const StyledButton = styled.TouchableOpacity`
     margin-vertical: 5px;
     height: 60px;
     align-items: center;
+
+    ${(props) => props.google == true && `
+        background-color: ${green};
+        flex-direction: row;
+        justify-content: center;
+    `}
+`;
+
+export const StyledButtonConfirmation1 = styled.TouchableOpacity`
+    padding: 15px;
+    background-color: ${grey};
+    justify-content: center;
+    border-radius: 5px;
+    margin-vertical: 5px;
+    height: 60px;
+    align-items: center;
+    margin-top: 35px;
+
+    ${(props) => props.google == true && `
+        background-color: ${green};
+        flex-direction: row;
+        justify-content: center;
+    `}
+`;
+export const StyledButtonConfirmation2 = styled.TouchableOpacity`
+    padding: 15px;
+    background-color: ${yellow};
+    justify-content: center;
+    border-radius: 5px;
+    margin-vertical: 5px;
+    height: 60px;
+    align-items: center;
+    margin-top: 35px;
 
     ${(props) => props.google == true && `
         background-color: ${green};

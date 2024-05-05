@@ -1,13 +1,16 @@
 #fastAPI and MongoDB dependencies
 from fastapi import FastAPI, HTTPException, Depends, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.responses import JSONResponse
 from pymongo.mongo_client import MongoClient
 from pydantic import BaseModel
 from typing import Annotated
 from jose import JWTError, jwt
 from passlib.hash import bcrypt
 from bson import ObjectId
+import psycopg2
+from psycopg2 import sql
+import uvicorn
 
 #miscellaneous dependencies
 from datetime import datetime, timedelta, timezone
@@ -30,6 +33,15 @@ client = MongoClient(connection_string)
 db = client['PocketPeds']
 child_profiles = db['child_profiles']
 user_profiles = db['user_profiles']
+
+#loading the SQL database
+engine = psycopg2.connect(
+        database="postgres",
+        user="mcersi",
+        password="pocketpeds123",
+        host="pocket-peds.c10qkoguai68.us-east-2.rds.amazonaws.com",
+        port='5432'
+    )
 
 class User(BaseModel):
     username: str
@@ -62,6 +74,10 @@ def get_userID(token: str) -> ObjectId:
     except JWTError:
         raise credentials_exception
     return ObjectId(user_id)
+
+@app.get('/')
+def hello():
+    return 'Hello, server is running!'
 
 # API endpoint for creating a new user profile
 @app.post('/register')
@@ -216,6 +232,12 @@ async def delete_child_profile(child_name: str, token: Annotated[str, Depends(oa
 
     return {'message': 'Child profile deleted successfully'}
 
+@app.get('/dummy-data')
+async def dummy_data():
+    return {
+        'dosage': 'dosage will go here'
+    }
+
 @app.get('/process-upc')
 async def process_upc(upc: str):
     # Make a GET request to the given endpoint
@@ -223,15 +245,73 @@ async def process_upc(upc: str):
     upc_json = upc_response.json()
 
     ndc = upc_json['results'][0]['product_ndc']
-    setId = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?ndc={}".format(ndc)).json()['data'][0]['setid']
+    setIdJson = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?ndc={}".format(ndc)).json()
+    setId = setIdJson['data'][0]['setid']
+    name = setIdJson['data'][0]['title']
 
     spl = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/{}.xml".format(setId))
     spl_xml = spl.text
+    media_details = requests.get("https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/{}/media.json".format(setId))
+    media_details = media_details.json()
+    if not media_details["data"]["media"]:
+        raise HTTPException(status_code=404, detail='Media details not found')
+    media_url = media_details["data"]["media"][0]["url"]
     # spl_dict = xmltodict.parse(spl_xml)
     # spl_json = json.dumps(spl_dict)
-    return spl_xml
+    #return spl_xml
+    media = {"media_url": media_url, "name": name}
+    return media
+
+@app.get('/medication-history-all/{childID}')
+async def process_upc(childID: str):
+    #the times come in as "January 2022", "December 2019", etc
+    try: cursor = engine.cursor()
+    except psycopg2.InterfaceError: 
+        #this is in case the connection is timed out
+        new_engine = psycopg2.connect(
+        database="postgres",
+        user="mcersi",
+        password="pocketpeds123",
+        host="pocket-peds.c10qkoguai68.us-east-2.rds.amazonaws.com",
+        port='5432')
+        cursor = new_engine.cursor()
+    cursor.execute("SELECT dosage, upc, time, name FROM history WHERE childid = %s", (childID,))
+    rows = cursor.fetchall()
+    data = {}
+    for row in rows:
+        formattedDate = row[2].strftime("%Y-%m-%d")
+        formattedTime = row[2].strftime("%H:%M")
+        if data.get(formattedDate):
+            data[formattedDate].append({'startingDay':True, 'endingDay': True, 'color': '#FDB623', 'dosage': row[0], 'upc': row[1], 'name': row[3], "time": formattedTime})
+        else: data[formattedDate] = [{'startingDay':True, 'endingDay': True, 'color': '#FDB623', 'dosage': row[0], 'upc': row[1], 'name': row[3], "time": formattedTime}]
+    print(data['2024-05-16'])
+    return data
+
+#for specfic time period, not currently being used anywhere
+@app.get('/medication-history/{childID}')
+async def process_upc(childID: str, data: dict):
+    #the times come in as "January 2022", "December 2019", etc
+    start_time= format_date(data.get('start_time'))
+    end_time= format_date(data.get('end_time'))
+    cursor = engine.cursor()
+    cursor.execute("select * from history where childid = %s and time between %s and %s", (childID, start_time, end_time))
+    rows = cursor.fetchall()
+    print(len(rows))
+    return {'message': 'Got the data successfully'}
+
+#helper method for specific time period fetching, again not being used anywhere
+def format_date(string_date) -> datetime:
+    month_name, year_str = string_date.split(" ")
+    month = datetime.strptime(month_name, "%B").month
+    print(month, type(month))
+    year = int(year_str)
+    date = datetime(year, month, 1, 0, 1)
+    return date
+
 
 def try_ping():
     print(user_profiles.find_one({'username': 'example_user'}))
     print("Pinged your deployment. You successfully connected to MongoDB!")
 
+# if __name__ == '__main__':
+#     uvicorn.run(app, host='0.0.0.0', port=8000)

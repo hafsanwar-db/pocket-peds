@@ -36,17 +36,9 @@ import { View, ActivityIndicator } from 'react-native'
 
 // Keyboard Avoiding View
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
+import ReminderPickerButton from '../notifications/ReminderPickerButton';
 
-// Axios
-import axios from 'axios';
-
-// Async storage
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Credentials context
-import { CredentialsContext } from '../components/CredentialsContext';
-
-const Login = ({navigation}) => {
+const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPushNotification }) => {
     const [hidePassword, setHidePassword] = useState(true);
     const [message, setMessage] = useState();
     const [messageType, setMessageType] = useState();
@@ -150,32 +142,38 @@ const Login = ({navigation}) => {
                                 hidePassword={hidePassword}
                                 setHidePassword={setHidePassword}
                             />
-
-                            <MessageBox type={messageType}>{message}</MessageBox>
-                            { !isSubmitting && 
-                                <StyledButton onPress={handleSubmit} >
-                                    <ButtonText>Login</ButtonText>
-                                </StyledButton> 
-                            }
-
-                            { isSubmitting && 
-                                <StyledButton disabled={true}>
-                                    <ActivityIndicator size="large" color={primary}></ActivityIndicator>
-                                </StyledButton> 
-                            }
+                            {/* <ReminderPickerButton
+                                reminderInterval={reminderInterval}
+                                setReminderInterval={setReminderInterval}
+                                onPress={handleLocalPushNotification}
+                            /> */}
+                            <MessageBox>...</MessageBox>
+                            <StyledButton onPress={handleSubmit} >
+                                <ButtonText>Login</ButtonText>
+                            </StyledButton>
 
                             <Line />
+                            
                             <StyledButton google={true} onPress={handleSubmit} >
                                 <Fontisto name="google" size={24} color={primary} />
                                 <ButtonText google={true}>Sign in with Google</ButtonText>
                             </StyledButton>
-
+                            
                             <ExtraView>
                                 <ExtraText>Don't have an account already? </ExtraText>
                                 <TextLink onPress={() => navigation.navigate('Signup')}>
                                     <TextLinkContent>Sign up!</TextLinkContent>
                                 </TextLink>
                             </ExtraView>
+                            
+
+                            <ExtraView>
+                                <ExtraText>Calendar </ExtraText>
+                                <TextLink onPress={() => navigation.navigate('MyCalendar')}>
+                                    <TextLinkContent>Click Here!</TextLinkContent>
+                                </TextLink>
+                            </ExtraView>
+
 
                         </StyledFormArea>
                     }
@@ -183,6 +181,7 @@ const Login = ({navigation}) => {
 
             </InnerContainer>
         </StyledContainer>
+        
         </KeyboardAvoidingWrapper>
     );
 };

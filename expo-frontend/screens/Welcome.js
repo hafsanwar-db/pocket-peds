@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 
 // Import icons
@@ -32,25 +32,7 @@ import {
 // Colors
 const { primary, secondary, tertiary, darkLight, brand, green, red } = Colors;
 
-// Async storage
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Credentials context
-import { CredentialsContext } from '../components/CredentialsContext';
-
-const Welcome = () => {
-    const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
-    const {username, email} = storedCredentials;
-
-    const ClearLogin = () => {
-        AsyncStorage
-            .removeItem('userCredentials')
-            .then(() => {
-                setStoredCredentials("");
-            })
-            .catch((error) => console.log(error)); 
-    }
- 
+const Welcome = ({ navigation }) => {
     return (
         <>
             <StatusBar style="light" />
@@ -64,11 +46,15 @@ const Welcome = () => {
                     <StyledFormArea>
                         <Avatar resizeMode="cover" source={require('../assets/img/peds-logo.png')} />
 
+
+                        <StyledButton onPress={() => navigation.navigate('ScanBarcode')}>
+                            <ButtonText>Scan Barcode</ButtonText>
+                        </StyledButton>
+
                         <Line />
                         <StyledButton onPress={ClearLogin}>
                             <ButtonText>Logout</ButtonText>
                         </StyledButton>
-
                     </StyledFormArea>
                 </WelcomeContainer>
             </InnerContainer>
