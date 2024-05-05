@@ -181,12 +181,12 @@ const Login = ({navigation}) => {
                                 </TextLink>
                             </ExtraView>
 
-                            <ExtraView>
+                            {/* <ExtraView>
                                 <ExtraText>Update Profile </ExtraText>
                                 <TextLink onPress={() => navigation.navigate('UpdateProfile',{childName: 'Lucy'})}>
                                     <TextLinkContent>Click Here!</TextLinkContent>
                                 </TextLink>
-                            </ExtraView>
+                            </ExtraView> */}
 
                         </StyledFormArea>
                     }
