@@ -30,6 +30,7 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false
   })
 });
+
 export default function App() {
   const [appReady, setAppReady] = useState(false);
   const [storedCredentials, setStoredCredentials] = useState("");
