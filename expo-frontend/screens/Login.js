@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { StatusBar } from 'expo-status-bar';
 
 // Import formik
@@ -32,43 +32,113 @@ import {
 // Colors
 const { primary, secondary, tertiary, darkLight, brand, green, red } = Colors;
 
-import { View } from 'react-native'
+import { View, ActivityIndicator } from 'react-native'
 
 // Keyboard Avoiding View
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 import ReminderPickerButton from '../notifications/ReminderPickerButton';
 
+// Axios
+import axios from 'axios';
+
+// Async storage
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Credentials context
+import { CredentialsContext } from '../components/CredentialsContext';
+
+import ip from './ip.js';
+
 const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPushNotification }) => {
     const [hidePassword, setHidePassword] = useState(true);
+    const [message, setMessage] = useState();
+    const [messageType, setMessageType] = useState();
+
+    // Credentials context
+    const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
+
+    const handleLogin = (credentials, setSubmitting) => {
+        handleMessage(null);
+        const url = `http://${ip}:8000/login`;
+
+        axios
+            .post(url, credentials)
+            .then((response) => {
+                const result = response.data;
+                const {message, status, data} = result;
+
+                if (status !== 'SUCCESS') {
+                    handleMessage(message, status);
+                }
+                else {
+                    persistLogin(...data[0], message, status);
+                }
+
+                setSubmitting(false);
+            })
+            .catch((error) => {
+                console.log(error)
+                setSubmitting(false);
+                handleMessage("An error occurred. Please try again.");
+            });
+    }
+
+    const handleMessage = (message, type = 'FAILED') => {
+        setMessage(message);
+        setMessageType(type);
+    }
+
+    const handleGoogleSignIn = () => {
+        handleMessage("Google sign in is in progress.", "SUCCESS");
+    }
+
+    const persistLogin = (credentials, message, status) => {
+        AsyncStorage
+            .setItem('userCredentials', JSON.stringify(credentials))
+            .then(() => {
+                handleMessage(message, status);
+                setStoredCredentials(credentials);
+            })
+            .catch((error) => {
+                console.log(error);
+                handleMessage("Persisting login failed.");
+            });
+    }
 
     return (
         <KeyboardAvoidingWrapper>
         <StyledContainer>
-            <StatusBar style="dark" />
+            <StatusBar style="dark" />  
             <InnerContainer>
                 <PageLogo resizeMode="cover" source={require('../assets/img/peds-logo.png')} />
                 <PageTitle>Pocket Peds</PageTitle>
                 <SubTitle>Login</SubTitle>
                 
                 <Formik
-                    initialValues={{ email: '', password: '' }}
-                    onSubmit={(values) => {
-                        console.log(values);
-                        navigation.navigate('Welcome');
+                    initialValues={{ username: '', password: '' }}
+                    onSubmit={(values, {setSubmitting}) => {
+                        if (values.username == '' || values.password == '') {
+                            handleMessage("Please fill in all fields.");
+                            setSubmitting(false);
+                        }
+                        else {
+                            handleLogin(values, setSubmitting);
+                        }
                     }}
                 >
-                    {({handleChange, handleBlur, handleSubmit, values}) => 
+                    {({handleChange, handleBlur, handleSubmit, values, isSubmitting}) => 
                         <StyledFormArea>
 
                             <MyTextInput
-                                label="Email Address"
-                                icon="mail"
-                                placeholder="example@gmail.com"
+                                label="Username"
+                                icon={"person"}
+                                placeholder="pocket123"
                                 placeholderTextColor={darkLight}
-                                onChangeText={handleChange('email')}
-                                onBlur={handleBlur('email')}
-                                values={values.email}
+                                onChangeText={handleChange('username')}
+                                onBlur={handleBlur('username')}
+                                values={values.username}
                                 keyboardType="email-address"
+                                autoCapitalize="none" 
                             />
 
                             <MyTextInput
@@ -83,6 +153,7 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                                 isPassword={true}
                                 hidePassword={hidePassword}
                                 setHidePassword={setHidePassword}
+                                autoCapitalize="none" 
                             />
                             {/* <ReminderPickerButton
                                 reminderInterval={reminderInterval}
@@ -93,6 +164,19 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                             <StyledButton onPress={handleSubmit} >
                                 <ButtonText>Login</ButtonText>
                             </StyledButton>
+
+                            <MessageBox type={messageType}>{message}</MessageBox>
+                            { !isSubmitting && 
+                                <StyledButton onPress={handleSubmit} >
+                                    <ButtonText>Login</ButtonText>
+                                </StyledButton> 
+                            }
+
+                            { isSubmitting && 
+                                <StyledButton disabled={true}>
+                                    <ActivityIndicator size="large" color={primary}></ActivityIndicator>
+                                </StyledButton> 
+                            }
 
                             <Line />
                             
@@ -116,6 +200,13 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                                 </TextLink>
                             </ExtraView>
 
+
+                            {/* <ExtraView>
+                                <ExtraText>Update Profile </ExtraText>
+                                <TextLink onPress={() => navigation.navigate('UpdateProfile',{childName: 'Lucy'})}>
+                                    <TextLinkContent>Click Here!</TextLinkContent>
+                                </TextLink>
+                            </ExtraView> */}
 
                         </StyledFormArea>
                     }

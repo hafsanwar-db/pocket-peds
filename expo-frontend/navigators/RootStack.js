@@ -71,8 +71,13 @@ const RootStack = ({ reminderInterval, setReminderInterval, handleLocalPushNotif
                 <Stack.Screen name="ConfirmationScreen"> 
                     {props => <ConfirmationScreen {...props} />}
                 </Stack.Screen>
-        
+                <Stack.Screen
+                            name="WeightWarning"
+                            component={WeightWarning}
+                            options={{ presentation: 'modal' }}
+                        />
             </Stack.Navigator>
+            <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
         </NavigationContainer>
     );
 }

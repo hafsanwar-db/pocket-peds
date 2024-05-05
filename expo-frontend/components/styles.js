@@ -215,6 +215,7 @@ export const ButtonText = styled.Text`
 export const MessageBox = styled.Text`
     text-align: center;
     font-size: 13px;
+    color: ${props => props.type == 'SUCCESS' ? green : red};
 `;
 
 export const Line = styled.View`
@@ -246,4 +247,14 @@ export const TextLink = styled.TouchableOpacity`
 export const TextLinkContent = styled.Text`
     color: ${brand};
     font-size: 15px;
+`;
+
+export const ModalContent = styled.View`
+    height: 25%;
+    width: 100%;
+    background-color: #25292e;
+    border-top-right-radius: 18px;
+    border-top-left-radius: 18px;
+    position: absolute;
+    bottom: 0;
 `;

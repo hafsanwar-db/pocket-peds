@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import { StatusBar } from 'expo-status-bar';
 
 // Import icons
@@ -31,8 +31,25 @@ import {
 
 // Colors
 const { primary, secondary, tertiary, darkLight, brand, green, red } = Colors;
+// Async storage
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Welcome = ({ navigation }) => {
+// Credentials context
+import { CredentialsContext } from '../components/CredentialsContext';
+
+const Welcome = ({navigation}) => {
+    const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
+    const {username, email} = storedCredentials;
+
+    const ClearLogin = () => {
+        AsyncStorage
+            .removeItem('userCredentials')
+            .then(() => {
+                setStoredCredentials("");
+            })
+            .catch((error) => console.log(error));
+    }
+
     return (
         <>
             <StatusBar style="light" />
@@ -40,9 +57,8 @@ const Welcome = ({ navigation }) => {
                 <WelcomeImage resizeMode="cover" source={require('../assets/img/peds-logo.png')} />
 
                 <WelcomeContainer>
-                    <PageTitle welcome={true}>Welcome!</PageTitle>
-                    <SubTitle welcome={true}>First Name</SubTitle>
-                    <SubTitle welcome={true}>Email</SubTitle>
+                    <PageTitle welcome={true}>Welcome {username}!</PageTitle>
+                    <SubTitle welcome={true}>{email}</SubTitle>
 
                     <StyledFormArea>
                         <Avatar resizeMode="cover" source={require('../assets/img/peds-logo.png')} />
@@ -53,7 +69,7 @@ const Welcome = ({ navigation }) => {
                         </StyledButton>
 
                         <Line />
-                        <StyledButton onPress={() => navigation.navigate('Login')}>
+                        <StyledButton onPress={ClearLogin}>
                             <ButtonText>Logout</ButtonText>
                         </StyledButton>
                     </StyledFormArea>
