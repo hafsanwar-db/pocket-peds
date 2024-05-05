@@ -4,7 +4,7 @@ import { Camera } from 'expo-camera';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
 import { StyledContainer, InnerContainer, PageLogo, PageTitle, SubTitle, StyledButton, ButtonText, Colors, ExtraText, ExtraView, TextLink, TextLinkContent } from '../components/styles';
-
+import ip from './ip.js';
 const { primary, secondary, tertiary, darkLight, brand, green, red } = Colors;
 
 const ScanBarcode = () => {
@@ -48,7 +48,7 @@ const ScanBarcode = () => {
     try {
       // Make API call to process scanned data
       console.log('Making API call for barcode:', data); // Add this line to check if the function is triggered
-      const url = `http://10.105.12.9:8000/process-upc?upc=${encodeURIComponent(data)}`;
+      const url = `http://${ip}:8000/process-upc?upc=${encodeURIComponent(data)}`;
       const response = await fetch(url, {
         method: 'GET',
         headers: {
