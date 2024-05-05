@@ -114,9 +114,9 @@ const Login = ({navigation}) => {
                 <SubTitle>Login</SubTitle>
                 
                 <Formik
-                    initialValues={{ email: '', password: '' }}
+                    initialValues={{ username: '', password: '' }}
                     onSubmit={(values, {setSubmitting}) => {
-                        if (values.email == '' || values.password == '') {
+                        if (values.username == '' || values.password == '') {
                             handleMessage("Please fill in all fields.");
                             setSubmitting(false);
                         }
@@ -129,14 +129,15 @@ const Login = ({navigation}) => {
                         <StyledFormArea>
 
                             <MyTextInput
-                                label="Email Address"
-                                icon="mail"
-                                placeholder="example@gmail.com"
+                                label="Username"
+                                icon={"person"}
+                                placeholder="pocket123"
                                 placeholderTextColor={darkLight}
-                                onChangeText={handleChange('email')}
-                                onBlur={handleBlur('email')}
-                                values={values.email}
+                                onChangeText={handleChange('username')}
+                                onBlur={handleBlur('username')}
+                                values={values.username}
                                 keyboardType="email-address"
+                                autoCapitalize="none" 
                             />
 
                             <MyTextInput
@@ -151,6 +152,7 @@ const Login = ({navigation}) => {
                                 isPassword={true}
                                 hidePassword={hidePassword}
                                 setHidePassword={setHidePassword}
+                                autoCapitalize="none" 
                             />
 
                             <MessageBox type={messageType}>{message}</MessageBox>
@@ -176,6 +178,13 @@ const Login = ({navigation}) => {
                                 <ExtraText>Don't have an account already? </ExtraText>
                                 <TextLink onPress={() => navigation.navigate('Signup')}>
                                     <TextLinkContent>Sign up!</TextLinkContent>
+                                </TextLink>
+                            </ExtraView>
+
+                            <ExtraView>
+                                <ExtraText>Update Profile </ExtraText>
+                                <TextLink onPress={() => navigation.navigate('UpdateProfile',{childName: 'Lucy'})}>
+                                    <TextLinkContent>Click Here!</TextLinkContent>
                                 </TextLink>
                             </ExtraView>
 
