@@ -46,6 +46,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Credentials context
 import { CredentialsContext } from '../components/CredentialsContext';
 
+import ip from './ip.js';
+
 const Login = ({navigation}) => {
     const [hidePassword, setHidePassword] = useState(true);
     const [message, setMessage] = useState();
@@ -56,7 +58,7 @@ const Login = ({navigation}) => {
 
     const handleLogin = (credentials, setSubmitting) => {
         handleMessage(null);
-        const url = "http://10.105.226.56:8000/login";
+        const url = `http://${ip}:8000/login`;
 
         axios
             .post(url, credentials)
