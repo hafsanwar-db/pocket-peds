@@ -5,7 +5,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-
+import ip from './ip.js'
 import { Agenda } from "react-native-calendars";
 
 const MyCalendar = ({ navigation }) => {
@@ -20,8 +20,9 @@ const MyCalendar = ({ navigation }) => {
   };
   const fetchData = async () => {
     try {
+      console.log(ip)
       const response = await fetch(
-        `http://10.105.12.9:8000/medication-history-all/60c7c2879e2f610c989e4a81`
+        `http://${ip}:8000/medication-history-all/60c7c2879e2f610c989e4a81`
       ); // hard coded with a childId atm
       const data = await response.json();
       setMarkedDates(data);
@@ -74,7 +75,7 @@ const MyCalendar = ({ navigation }) => {
       <SafeAreaView className="flex-1 bg-transparent">
         <Agenda
           items={markedDates}
-          scrollEnabled={false}
+          scrollEnabled={true}
           //to keep the view proper I need to render an extra month for some reason
           futureScrollRange={1}
           //maxDate={getCurrentDate()}

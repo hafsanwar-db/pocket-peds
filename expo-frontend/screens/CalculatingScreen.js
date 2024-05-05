@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import ip from './ip.js';
 const CalculatingScreen = ({ route }) => {
   const { scannedData } = route.params;
   const navigation = useNavigation();
@@ -10,7 +10,8 @@ const CalculatingScreen = ({ route }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://10.105.12.9:8000/dummy-data');
+        console.log(`http://${ip}:8000/dummy-data`)
+        const response = await fetch(`http://${ip}:8000/dummy-data`);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
