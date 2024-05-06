@@ -48,15 +48,17 @@ export const useLocalNotification = () => {
 };
 
 export const handleNotificationResponse = async (response) => {
-  
+  const medicineName = response.notification.request.content.data.medicineName;
+  const dateofNotification = response.notification.request.content.data.date;
   Notifications.getNotificationCategoriesAsync().then((categories) => {
     //console.log("categories", categories);
+    
     if (response.actionIdentifier === 'DOSE_GIVEN') {
       Notifications.dismissNotificationAsync(response.actionIdentifier);
 //dismissAllNotificationAsync clears notification as soon user clicks on notification in phone
     } else if (response.actionIdentifier === 'NO_LONGER_GIVING') {
         
-        navigation.navigate(('ConfirmationScreen'));
+        navigation.navigate('ConfirmationScreen',{medicineName: medicineName});
         
       } 
   });

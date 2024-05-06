@@ -10,7 +10,7 @@ const CalculatingScreen = ({ route }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://10.105.12.9:8000/dummy-data');
+        const response = await fetch('http://10.104.41.45:8000/dummy-data');
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }

@@ -4,19 +4,18 @@ import { Platform } from "react-native";
 
 //use these functions to get user permissions and trigger the notification process.
 
-export const schedulePushNotification = async (intervalInSeconds) => {
+export const schedulePushNotification = async (date,medicineName,dosage) => {
   await Notifications.scheduleNotificationAsync({
     //identifier: "PocketPeds",
     content: {
       title: "PocketPeds",
       
-      body: "Time for Lily's next dose!\nGive 5.75mL of Children's Motrin",
-      categoryIdentifier: "reminder"
+      body: `Time for Lily's next dose!\nGive ${dosage} of ${medicineName} to Lily.`,
+      categoryIdentifier: "reminder",
+      data: { medicineName: medicineName,date:date }
     },
-    trigger: {
-      seconds: intervalInSeconds,
-      //repeats: true,
-    }
+    //trigger: { date: date},
+    trigger: { seconds: 4 },
   });
 };
 

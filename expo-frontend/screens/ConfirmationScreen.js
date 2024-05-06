@@ -11,7 +11,8 @@ import {
   StyledButtonConfirmation2
 } from '../components/styles';
 
-const ConfirmationScreen = ({ navigation }) => {
+const ConfirmationScreen = ({ route }) => {
+  const medicineName = route.params.medicineName;
   const [isConfirmationVisible, setConfirmationVisible] = useState(true); // Set confirmation modal to be initially visible
   const handleConfirm = (confirmed) => {
     if (confirmed) {
@@ -39,7 +40,7 @@ const ConfirmationScreen = ({ navigation }) => {
         </ConfirmationTitle>
 
         <ConfirmationText>
-          Are you sure you want to stop giving [Medication Name] to [Child's Name]?
+          Are you sure you want to stop giving {medicineName} to [Child's Name]?
         </ConfirmationText>
 
         <StyledButtonConfirmation1  onPress={() => handleConfirm(true)}>
