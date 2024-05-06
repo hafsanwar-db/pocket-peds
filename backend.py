@@ -100,7 +100,7 @@ def register(data: dict):
     user = {'_id': ObjectId(),'username': username, 'hashed_password': hashed_password, 'email': email, 'children': []}
     user_profiles.insert_one(user)
 
-    return {'message': 'User registered successfully'}
+    return {'message': 'User registered successfully! Please log in to continue.'}
 
 # API endpoint for logging in a new user profile.
 @app.post('/login')
@@ -210,9 +210,9 @@ async def update_child_profile(child_name: str, data: dict, token: Annotated[str
     result = child_profiles.update_one({'_id': child_profile['_id']}, {'$set': data})
 
     if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail='Child profile not found')
+        raise HTTPException(status_code=404, detail='Child profile not found.')
 
-    return {'message': 'Child profile updated successfully'}
+    return {'message': 'Child profile updated successfully!'}
 
 @app.delete('/child-profiles/{child_name}')
 async def delete_child_profile(child_name: str, token: Annotated[str, Depends(oauth2_scheme)]):
