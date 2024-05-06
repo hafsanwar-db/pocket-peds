@@ -58,9 +58,9 @@ const ScanBarcode = () => {
 
       if (response.ok) {
         const responseData = await response.json();
-        const { image, name } = responseData;
-        setScannedData({ image: image, name: name });
-        navigation.navigate('ShowUPC', { scannedData: { image: image, name: name } });
+        const { upc, image, name, dosage } = responseData;
+        setScannedData({ upc: upc, image: image, name: namme, dosage: dosage });
+        navigation.navigate('ShowUPC', { scannedData: { upc: upc, image: image, name: name, dosage: dosage } });
       } else {
         console.error(`API call failed for barcode: 0${data}`);
       }
