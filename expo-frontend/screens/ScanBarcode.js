@@ -86,7 +86,7 @@ const ScanBarcode = () => {
   };
 
   return (
-    <StyledContainer>
+    <StyledContainer style={{ marginBottom: 70}}>
       {hasPermission === null ? (
         <Text>Requesting for camera permission</Text>
       ) : hasPermission === false ? (
@@ -114,7 +114,7 @@ const ScanBarcode = () => {
           <TextLinkContent>Go back to Login</TextLinkContent>
         </TextLink>
       </ExtraView>
-      <View style={{ marginTop: 20, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ marginTop: 20, marginBottom: 20, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
         <TextInput
           style={{ height: 40, width: 30, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5 }}
           onChangeText={text => setBarcodeSegment1(text)}

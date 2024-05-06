@@ -1,15 +1,32 @@
-// ChildProfileScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import axios from 'axios';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { StyledFormArea } from '../components/styles';
 import ip from './ip.js';
-const UpdateProfile = ({ route }) => {
-  const { childName } = route.params; // Get child name from navigation params
+
+import Iconicons from 'react-native-vector-icons/Ionicons';
+
+// Keyboard Avoiding View
+import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
+
+import {
+  StyledContainer, InnerContainer, PageLogo, PageTitle, SubTitle, StyledFormArea, LeftIcon, StyledInputLabel, StyledTextInput,
+  RightIcon, StyledButton, ButtonText, Colors, MessageBox, Line, ExtraText, ExtraView, TextLink, TextLinkContent
+} from '../components/styles';
+import { StatusBar } from 'expo-status-bar';
+const { brand, darkLight, primary } = Colors;
+
+// Formik
+import { Formik } from 'formik';
+
+import ChangeWeightModal from '../components/modal/WeightWarning.js';
+
+
+const UpdateProfile = ({ navigation, route }) => {
+  const { childName } = route.params || {}; // Get child name from navigation params
 
   const [childInfo, setChildInfo] = useState({ name: '', weight: '' });
+  const [message, setMessage] = useState();
+  const [messageType, setMessageType] = useState();
 
   useEffect(() => {
     // Fetch child info using Axios
@@ -22,44 +39,107 @@ const UpdateProfile = ({ route }) => {
       });
   }, [childName]);
 
-  const formik = useFormik({
-    initialValues: {
-      weight: childInfo.weight || '',
-    },
-    validationSchema: Yup.object().shape({
-      weight: Yup.number().required('Weight is required'),
-    }),
-    onSubmit: async (values) => {
-      try {
-        // Submit form data to the same endpoint
-        
-        await axios.post(`http://${ip}:8000/child-profiles/${childName}`, { weight: values.weight });
-        console.log('Form submitted successfully!');
-      } catch (error) {
-        console.error('Error submitting form:', error);
-      }
-    },
-  });
+  const handleUpdate = (credentials, setSubmitting) => {
+    handleMessage(null);
+    const url = `http://${ip}:8000/child-profiles/${childName}`;
+
+    axios
+        .post(url, credentials)
+        .then((response) => {
+            const result = response.data;
+            const {message} = result;
+
+            handleMessage(message, "SUCCESS");
+            setSubmitting(false);
+        })
+        .catch((error) => {
+            console.log(error)
+            setSubmitting(false);
+            handleMessage("An error occurred. Please try again.");
+        });
+  };
+
+  const handleMessage = (message, type = 'FAILED') => {
+    setMessage(message);
+    setMessageType(type);
+  };
 
   return (
-    <StyledFormArea>
-        <Text>Child Name: {childInfo.name}</Text>
 
-        <Text>Child Weight:</Text>
-        <TextInput
-            onChangeText={formik.handleChange('weight')}
-            onBlur={formik.handleBlur('weight')}
-            value={formik.values.weight}
-            keyboardType="numeric"
-        />
+<>
+<ChangeWeightModal />
+<KeyboardAvoidingWrapper>
+<StyledContainer>
+    <StatusBar style="dark" />  
+    <InnerContainer>
+        <SubTitle>{childInfo.name}'s Profile</SubTitle>
+        
+        <Formik
+            initialValues={{ weight: childInfo.weight || '' }}
+            onSubmit={(values, {setSubmitting}) => {
+                if (values.weight == '') {
+                    handleMessage("Please fill in all fields.");
+                    setSubmitting(false);
+                }
+                else {
+                    handleUpdate(values, setSubmitting);
+                    
+                }
+            }}
+        >
+            {({handleChange, handleBlur, handleSubmit, values, isSubmitting}) => 
+                <StyledFormArea>
 
-        {formik.touched.weight && formik.errors.weight ? (
-            <ExtraText>{formik.errors.weight}</ExtraText>
-        ) : null}
+                    <MyTextInput
+                        label="Weight (lbs)"
+                        icon={"scale-outline"}
+                        placeholder="0"
+                        placeholderTextColor={darkLight}
+                        onChangeText={handleChange('weight')}
+                        onBlur={handleBlur('weight')}
+                        values={values.weight}
+                        keyboardType="numeric"
+                    />
 
-        <Button title="Submit" onPress={formik.handleSubmit} />
-    </StyledFormArea>
+                    <MessageBox type={messageType}>{message}</MessageBox>
+                    { !isSubmitting && 
+                        <StyledButton onPress={handleSubmit} >
+                            <ButtonText>Update Weight</ButtonText>
+                        </StyledButton> 
+                    }
+
+                    { isSubmitting && 
+                        <StyledButton disabled={true}>
+                            <ActivityIndicator size="large" color={primary}></ActivityIndicator>
+                        </StyledButton> 
+                    }
+
+                </StyledFormArea>
+            }
+        </Formik>
+
+    </InnerContainer>
+
+</StyledContainer>
+</KeyboardAvoidingWrapper>
+
+</>
   );
 };
+
+const MyTextInput = ({label, icon, isPassword, ...props}) => {
+  return (
+      <View>
+          <LeftIcon>
+              <Iconicons name={icon} size={30} color={brand} />
+          </LeftIcon>
+
+          <StyledInputLabel>{label}</StyledInputLabel>
+
+          <StyledTextInput {...props} />
+      </View>
+  );
+}
+
 
 export default UpdateProfile;

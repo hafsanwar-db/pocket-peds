@@ -8,25 +8,8 @@ import { Formik } from 'formik';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons'; 
 
 import {
-    StyledContainer,
-    InnerContainer,
-    PageLogo,
-    PageTitle,
-    SubTitle,
-    StyledFormArea,
-    LeftIcon,
-    StyledInputLabel,
-    StyledTextInput,
-    RightIcon,
-    StyledButton,
-    ButtonText,
-    Colors,
-    MessageBox,
-    Line,
-    ExtraText,
-    ExtraView,
-    TextLink,
-    TextLinkContent
+    StyledContainer, InnerContainer, PageLogo, PageTitle, SubTitle, StyledFormArea, LeftIcon, StyledInputLabel, StyledTextInput,
+    RightIcon, StyledButton, ButtonText, Colors, MessageBox, Line, ExtraText, ExtraView, TextLink, TextLinkContent
 } from '../components/styles';
 
 // Colors
@@ -41,11 +24,8 @@ import ReminderPickerButton from '../notifications/ReminderPickerButton';
 // Axios
 import axios from 'axios';
 
-// Async storage
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 // Credentials context
-import { CredentialsContext } from '../components/CredentialsContext';
+//import { CredentialsContext } from '../components/CredentialsContext';
 
 import ip from './ip.js';
 
@@ -55,7 +35,7 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
     const [messageType, setMessageType] = useState();
 
     // Credentials context
-    const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
+    //const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
 
     const handleLogin = (credentials, setSubmitting) => {
         handleMessage(null);
@@ -65,16 +45,15 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
             .post(url, credentials)
             .then((response) => {
                 const result = response.data;
-                const {message, status, data} = result;
+                const {access_token, token_type} = result;
 
-                if (status !== 'SUCCESS') {
-                    handleMessage(message, status);
+                if (access_token !== undefined) {
+                    navigation.navigate('Welcome', { ...result });
                 }
                 else {
-                    persistLogin(...data[0], message, status);
+                    handleMessage("Login failed. Please try again later.");
                 }
                 setSubmitting(false);
-                navigation.navigate('Welcome');
             })
             .catch((error) => {
                 console.log(error)
@@ -87,7 +66,7 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
         setMessage(message);
         setMessageType(type);
     }
-
+    /* 
     const handleGoogleSignIn = () => {
         handleMessage("Google sign in is in progress.", "SUCCESS");
     }
@@ -104,6 +83,7 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                 handleMessage("Persisting login failed.");
             });
     }
+    */
 
     return (
         <KeyboardAvoidingWrapper>
@@ -177,10 +157,10 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
 
                             <Line />
                             
-                            <StyledButton google={true} onPress={handleSubmit} >
+                            {/* <StyledButton google={true} onPress={handleSubmit} >
                                 <Fontisto name="google" size={24} color={primary} />
                                 <ButtonText google={true}>Sign in with Google</ButtonText>
-                            </StyledButton>
+                                </StyledButton> */}
                             
                             <ExtraView>
                                 <ExtraText>Don't have an account already? </ExtraText>

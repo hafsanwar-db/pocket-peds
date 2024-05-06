@@ -19,6 +19,7 @@ import MyCalendar from '../screens/Calendar';
 import ConfirmationScreen from '../screens/ConfirmationScreen';
 import { navigationRef } from '../NavigationService';
 import UpdateProfile from '../screens/UpdateProfile';
+import BottomNavigation from './BottomNavigation';
 
 const Stack = createStackNavigator();
 const RootStack = ({ reminderInterval, setReminderInterval, handleLocalPushNotification }) => {
@@ -35,49 +36,25 @@ const RootStack = ({ reminderInterval, setReminderInterval, handleLocalPushNotif
                     headerTitle: '', 
                     headerLeftContainerStyle: {
                         paddingLeft: 20
-                    }
+                    },
+                    headerLeft: null
                 }}
-                initialRouteName='Login'
+                initialRouteName='BottomNavigation'
             >
+                <Stack.Screen name="BottomNavigation" component={BottomNavigation} />
                 <Stack.Screen name="Login">
                     {props => <Login reminderInterval={reminderInterval}
                     setReminderInterval={setReminderInterval}
                     handleLocalPushNotification={handleLocalPushNotification} {...props}/>}
                 </Stack.Screen>
-                <Stack.Screen name="Signup">
-                    {props => <Signup {...props} />}
-                </Stack.Screen>
-                <Stack.Screen name="Welcome">
-                    {props => <Welcome {...props} />}
-                </Stack.Screen>
-                <Stack.Screen name="ScanBarcode">
-                    {props => <ScanBarcode {...props} />}
-                </Stack.Screen>
-                <Stack.Screen name="ShowUPC">
-                    {props => <ShowUPC {...props} />}
-                </Stack.Screen>
-                <Stack.Screen name="CalculatingScreen">
-                    {props => <CalculatingScreen {...props} />}
-                </Stack.Screen>
-                <Stack.Screen name="ShowData">
-                    {props => <ShowData {...props} />}
-                </Stack.Screen>
-                <Stack.Screen name="DoseSettings">
-                    {props => <DoseSettings {...props} />}
-                </Stack.Screen>
-                <Stack.Screen name="MyCalendar" options={{ headerShown: false }}>
-                    {props => <MyCalendar navigation = {props.navigation} {...props} />}
-                </Stack.Screen>
-                <Stack.Screen name="ConfirmationScreen"> 
-                    {props => <ConfirmationScreen {...props} />}
-                </Stack.Screen>
-                {/* <Stack.Screen
-                            name="WeightWarning"
-                            component={WeightWarning}
-                            options={{ presentation: 'modal' }}
-                        /> */}
+                <Stack.Screen name="Signup" component={Signup}/>
+
+                <Stack.Screen
+                    name="WeightWarning"
+                    component={WeightWarning}
+                    options={{ presentation: 'modal' }}
+                />
             </Stack.Navigator>
-            <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
         </NavigationContainer>
     );
 }

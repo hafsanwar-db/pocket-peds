@@ -5,14 +5,13 @@ import Signup from './screens/Signup';
 import Welcome from './screens/Welcome';
 import React, { useState, useEffect, useCallback } from 'react';
 import { View } from 'react-native';
+
 // Async storage
-import AsyncStorage from '@react-native-async-storage/async-storage';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Credentials context
-import { CredentialsContext } from './components/CredentialsContext';
+// import { CredentialsContext } from './components/CredentialsContext';
 
-// Splash Screen
-import * as SplashScreen from 'expo-splash-screen';
 // Import RootStack
 import RootStack from './navigators/RootStack';
 import { useLocalNotification } from './notifications/useLocalNotification';
@@ -20,8 +19,6 @@ import * as Notifications from "expo-notifications";
 import { schedulePushNotification } from "./notifications/handleNotifications";
 import { Button } from "react-native";
 import ReminderPickerButton from "./notifications/ReminderPickerButton";
-
-//SplashScreen.preventAutoHideAsync();
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -32,10 +29,12 @@ Notifications.setNotificationHandler({
 });
 
 export default function App() {
+
+  // WE ARE USING TOKENS INSTEAD OF ASYNC STORAGE
+  /* 
   const [appReady, setAppReady] = useState(false);
   const [storedCredentials, setStoredCredentials] = useState("");
 
-  // Load login info, hide splash screen when done
   useEffect(() => {
     const checkLoginCredentials = async () => {
       try {
@@ -53,7 +52,7 @@ export default function App() {
     };
 
     checkLoginCredentials();
-  }, []);
+  }, []); */
 
   useLocalNotification();
   const [reminderInterval, setReminderInterval] = useState(8);
@@ -65,13 +64,10 @@ export default function App() {
     await schedulePushNotification(intervalInSeconds);
   };
   return (
-    <CredentialsContext.Provider value={{storedCredentials, setStoredCredentials}}>
-
-      <RootStack
+    <RootStack
         reminderInterval={reminderInterval}
         setReminderInterval={setReminderInterval}
         handleLocalPushNotification={handleLocalPushNotification}
       />
-     </CredentialsContext.Provider>
   );
 } 
