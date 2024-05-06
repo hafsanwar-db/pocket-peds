@@ -15,7 +15,7 @@ export const Colors = {
     green: "#10B981",
     red: "#EF4444",
     grey: "#9F9F9F",
-    yellow: "#FDB623"
+    yellow: "#FDB623",
 };
 
 const { primary, secondary, tertiary, darkLight, brand, green, red,grey,yellow } = Colors;
@@ -164,7 +164,7 @@ export const RightIcon = styled.TouchableOpacity`
 
 export const StyledButton = styled.TouchableOpacity`
     padding: 15px;
-    background-color: ${brand};
+    background-color: ${yellow};
     justify-content: center;
     border-radius: 5px;
     margin-vertical: 5px;
