@@ -60,12 +60,11 @@ const RootStack = ({
   useEffect(() => {
     // Set up app state listener
     //shouldRefresh is true only after the user has logged in
-    if (shouldRefresh) {
-      const subscription = AppState.addEventListener(
+    const subscription = AppState.addEventListener(
         "change",
         handleAppStateChange
       );
-
+    if (shouldRefresh) {
       //only for when the app is put on the background, only at that instant
       //this means the user has 15 minutes before they are logged out
       if (appState !== "active") {
@@ -76,17 +75,16 @@ const RootStack = ({
       const intervalId = setInterval(() => {
         const currentTime = new Date().getTime();
         const timeSinceLastRefresh = currentTime - (lastRefreshTime || 0);
-        console.log(appState)
         if (appState === "active") { 
             // Check if 15 minutes have elapsed since the last refresh
           refreshToken();
         } else {
             //if time elapsed in background is greater than 15 minutes, go back to the login screen
-          if (timeSinceLastRefresh >= 15 * 60 * 1000) {
+          if (timeSinceLastRefresh >= 6 * 1000) {
             navigateToLoginPage();
           }
         }
-      }, 15 * 60 * 1000);
+      }, 5 * 1000);
 
       return () => {
         //unmounting the setInterval hooks and the listeners
