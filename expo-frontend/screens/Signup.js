@@ -6,7 +6,7 @@ import { Formik } from 'formik';
 
 // Import icons
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons'; 
-
+import ip from './ip.js';
 // Axios
 import axios from 'axios';
 
@@ -57,7 +57,7 @@ const Signup = ({navigation}) => {
 
     const handleSignup = (credentials, setSubmitting) => {
         handleMessage(null);
-        const url = "http://10.105.226.56:8000/register";
+        const url = `http://${ip}:8000/register`;
 
         axios
             .post(url, credentials)
@@ -129,11 +129,12 @@ const Signup = ({navigation}) => {
                             <MyTextInput
                                 label="Username"
                                 icon="person"
-                                placeholder="Rick117"
+                                placeholder="rick117"
                                 placeholderTextColor={darkLight}
                                 onChangeText={handleChange('username')}
                                 onBlur={handleBlur('email')}
                                 values={values.name}
+                                autoCapitalize="none" 
                             />
 
                             <MyTextInput
@@ -145,6 +146,7 @@ const Signup = ({navigation}) => {
                                 onBlur={handleBlur('email')}
                                 values={values.email}
                                 keyboardType="email-address"
+                                autoCapitalize="none" 
                             />
 
                             <MyTextInput
@@ -159,6 +161,7 @@ const Signup = ({navigation}) => {
                                 isPassword={true}
                                 hidePassword={hidePassword}
                                 setHidePassword={setHidePassword}
+                                autoCapitalize="none" 
                             />
 
                             <MyTextInput
@@ -173,6 +176,7 @@ const Signup = ({navigation}) => {
                                 isPassword={true}
                                 hidePassword={hidePassword}
                                 setHidePassword={setHidePassword}
+                                autoCapitalize="none" 
                             />
 
                             <MessageBox type={messageType}>{message}</MessageBox>

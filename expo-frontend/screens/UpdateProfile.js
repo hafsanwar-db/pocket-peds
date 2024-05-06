@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { StyledFormArea } from '../components/styles';
-
+import ip from './ip.js';
 const UpdateProfile = ({ route }) => {
   const { childName } = route.params; // Get child name from navigation params
 
@@ -13,7 +13,7 @@ const UpdateProfile = ({ route }) => {
 
   useEffect(() => {
     // Fetch child info using Axios
-    axios.get(`/child-profiles/${childName}`)
+    axios.get(`http://${ip}:8000/child-profiles/${childName}`)
       .then((response) => {
         setChildInfo(response.data);
       })
@@ -32,7 +32,8 @@ const UpdateProfile = ({ route }) => {
     onSubmit: async (values) => {
       try {
         // Submit form data to the same endpoint
-        await axios.post(`/child-profiles/${childName}`, { weight: values.weight });
+        
+        await axios.post(`http://${ip}:8000/child-profiles/${childName}`, { weight: values.weight });
         console.log('Form submitted successfully!');
       } catch (error) {
         console.error('Error submitting form:', error);

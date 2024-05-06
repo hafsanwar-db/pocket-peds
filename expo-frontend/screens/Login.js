@@ -38,6 +38,17 @@ import { View, ActivityIndicator } from 'react-native'
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 import ReminderPickerButton from '../notifications/ReminderPickerButton';
 
+// Axios
+import axios from 'axios';
+
+// Async storage
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Credentials context
+import { CredentialsContext } from '../components/CredentialsContext';
+
+import ip from './ip.js';
+
 const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPushNotification }) => {
     const [hidePassword, setHidePassword] = useState(true);
     const [message, setMessage] = useState();
@@ -48,7 +59,7 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
 
     const handleLogin = (credentials, setSubmitting) => {
         handleMessage(null);
-        const url = "http://10.105.226.56:8000/login";
+        const url = `http://${ip}:8000/login`;
 
         axios
             .post(url, credentials)
@@ -62,8 +73,8 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                 else {
                     persistLogin(...data[0], message, status);
                 }
-
                 setSubmitting(false);
+                navigation.navigate('Welcome');
             })
             .catch((error) => {
                 console.log(error)
@@ -104,14 +115,15 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                 <SubTitle>Login</SubTitle>
                 
                 <Formik
-                    initialValues={{ email: '', password: '' }}
+                    initialValues={{ username: '', password: '' }}
                     onSubmit={(values, {setSubmitting}) => {
-                        if (values.email == '' || values.password == '') {
+                        if (values.username == '' || values.password == '') {
                             handleMessage("Please fill in all fields.");
                             setSubmitting(false);
                         }
                         else {
                             handleLogin(values, setSubmitting);
+                            
                         }
                     }}
                 >
@@ -119,14 +131,15 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                         <StyledFormArea>
 
                             <MyTextInput
-                                label="Email Address"
-                                icon="mail"
-                                placeholder="example@gmail.com"
+                                label="Username"
+                                icon={"person"}
+                                placeholder="pocket123"
                                 placeholderTextColor={darkLight}
-                                onChangeText={handleChange('email')}
-                                onBlur={handleBlur('email')}
-                                values={values.email}
+                                onChangeText={handleChange('username')}
+                                onBlur={handleBlur('username')}
+                                values={values.username}
                                 keyboardType="email-address"
+                                autoCapitalize="none" 
                             />
 
                             <MyTextInput
@@ -141,16 +154,26 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                                 isPassword={true}
                                 hidePassword={hidePassword}
                                 setHidePassword={setHidePassword}
+                                autoCapitalize="none" 
                             />
                             {/* <ReminderPickerButton
                                 reminderInterval={reminderInterval}
                                 setReminderInterval={setReminderInterval}
                                 onPress={handleLocalPushNotification}
                             /> */}
-                            <MessageBox>...</MessageBox>
-                            <StyledButton onPress={handleSubmit} >
-                                <ButtonText>Login</ButtonText>
-                            </StyledButton>
+
+                            <MessageBox type={messageType}>{message}</MessageBox>
+                            { !isSubmitting && 
+                                <StyledButton onPress={handleSubmit} >
+                                    <ButtonText>Login</ButtonText>
+                                </StyledButton> 
+                            }
+
+                            { isSubmitting && 
+                                <StyledButton disabled={true}>
+                                    <ActivityIndicator size="large" color={primary}></ActivityIndicator>
+                                </StyledButton> 
+                            }
 
                             <Line />
                             
@@ -174,6 +197,13 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                                 </TextLink>
                             </ExtraView>
 
+
+                            {/* <ExtraView>
+                                <ExtraText>Update Profile </ExtraText>
+                                <TextLink onPress={() => navigation.navigate('UpdateProfile',{childName: 'Lucy'})}>
+                                    <TextLinkContent>Click Here!</TextLinkContent>
+                                </TextLink>
+                            </ExtraView> */}
 
                         </StyledFormArea>
                     }
