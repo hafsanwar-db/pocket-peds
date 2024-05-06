@@ -48,7 +48,7 @@ const ScanBarcode = () => {
     try {
       // Make API call to process scanned data
       console.log('Making API call for barcode:', data); // Add this line to check if the function is triggered
-      const url = `http://${ip}:8000/process-upc?upc=${encodeURIComponent(data)}`;
+      const url = `http://${ip}:8000/get_medicine?upc=${encodeURIComponent(data)}`;
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -58,9 +58,9 @@ const ScanBarcode = () => {
 
       if (response.ok) {
         const responseData = await response.json();
-        const { media_url, name } = responseData;
-        setScannedData({ mediaUrl: media_url, name: name });
-        navigation.navigate('ShowUPC', { scannedData: { mediaUrl: media_url, name: name } });
+        const { image, name } = responseData;
+        setScannedData({ image: image, name: name });
+        navigation.navigate('ShowUPC', { scannedData: { image: image, name: name } });
       } else {
         console.error(`API call failed for barcode: 0${data}`);
       }

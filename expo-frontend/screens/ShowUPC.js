@@ -22,7 +22,7 @@ const ShowUPC = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.upc}>{scannedData.upc}</Text>
-      <Image source={{ uri: scannedData.mediaUrl }} style={styles.image} />
+      <Image source={{ uri: scannedData.image }} style={styles.image} />
       <Text style={styles.name}>{scannedData.name}</Text>
       <Text style={styles.description}>
         For ages 2 to 11 years old{'\n'}
