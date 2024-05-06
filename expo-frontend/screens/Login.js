@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 
 // Import formik
@@ -46,17 +46,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Credentials context
 import { CredentialsContext } from '../components/CredentialsContext';
-
+import {Token} from '../components/Token';
 import ip from './ip.js';
 
-const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPushNotification }) => {
+const Login = ({setLastRefreshTime, setShouldRefresh, navigation,reminderInterval, setReminderInterval, handleLocalPushNotification }) => {
     const [hidePassword, setHidePassword] = useState(true);
     const [message, setMessage] = useState();
     const [messageType, setMessageType] = useState();
-
+    //for JWT tokens, updates whenever the user logs in
+    const {updateToken} = useContext(Token);
     // Credentials context
     const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
-
+    useEffect(() => {
+        console.log("does this run");
+        setShouldRefresh(false);
+    }, []);
     const handleLogin = (credentials, setSubmitting) => {
         handleMessage(null);
         const url = `http://${ip}:8000/login`;
@@ -73,7 +77,12 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                 else {
                     persistLogin(...data[0], message, status);
                 }
+                console.log(result);
+                //updateing the JWT token when the user successfully logs in
+                updateToken(result["access_token"]);
                 setSubmitting(false);
+                setLastRefreshTime(new Date().getTime());
+                setShouldRefresh(true);
                 navigation.navigate('Welcome');
             })
             .catch((error) => {
@@ -112,7 +121,6 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
             <InnerContainer>
                 <PageLogo resizeMode="cover" source={require('../assets/img/peds-logo.png')} />
                 <PageTitle>Pocket Peds</PageTitle>
-                <SubTitle>Login</SubTitle>
                 
                 <Formik
                     initialValues={{ username: '', password: '' }}
@@ -177,10 +185,10 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
 
                             <Line />
                             
-                            <StyledButton google={true} onPress={handleSubmit} >
+                            {/* <StyledButton google={true} onPress={handleSubmit} >
                                 <Fontisto name="google" size={24} color={primary} />
                                 <ButtonText google={true}>Sign in with Google</ButtonText>
-                            </StyledButton>
+                            </StyledButton> */}
                             
                             <ExtraView>
                                 <ExtraText>Don't have an account already? </ExtraText>
@@ -188,16 +196,6 @@ const Login = ({navigation,reminderInterval, setReminderInterval, handleLocalPus
                                     <TextLinkContent>Sign up!</TextLinkContent>
                                 </TextLink>
                             </ExtraView>
-                            
-
-                            <ExtraView>
-                                <ExtraText>Calendar </ExtraText>
-                                <TextLink onPress={() => navigation.navigate('MyCalendar')}>
-                                    <TextLinkContent>Click Here!</TextLinkContent>
-                                </TextLink>
-                            </ExtraView>
-
-
                             {/* <ExtraView>
                                 <ExtraText>Update Profile </ExtraText>
                                 <TextLink onPress={() => navigation.navigate('UpdateProfile',{childName: 'Lucy'})}>

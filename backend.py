@@ -23,7 +23,7 @@ import os
 app = FastAPI()
 SECRET_KEY = "70b15e4e47fcc13b26223aa4e0091688d652564cc3ea5afa0653427cce3a7139"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 16
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")#change tokenUrl later
 
 # Connect to MongoDB Atlas
@@ -117,6 +117,15 @@ def login(data: dict) -> dict :
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={ "sub": str(user['_id'])}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post('/refresh-token')
+async def refresh(token: Annotated[str, Depends(oauth2_scheme)]):
+    user_id = get_userID(token)
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={ "sub": str(user_id)}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 

@@ -1,8 +1,9 @@
 import styled from 'styled-components'
-import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, Dimensions } from 'react-native';
 import Constants from 'expo-constants';
 
 const StatusBarHeight = Constants.statusBarHeight;
+const { height, width } = Dimensions.get('window');
 
 // Colors
 export const Colors = {
@@ -55,14 +56,21 @@ export const ConfirmationText = styled.Text`
 export const StyledContainer = styled.View`
     flex: 1;
     padding: 25px;
+    justify-content: center;
+    align-items: center;
     padding-top: ${StatusBarHeight + 30}px;
     background-color: ${primary};
+    height: ${height}px;
+    overflow: visible;
 `;
 
 export const InnerContainer = styled.View`
     flex: 1;
     width: 100%;
+    justify-content: center;
     align-items: center;
+    height: ${height}px;
+    padding-bottom: 10px;
 `;
 
 export const WelcomeContainer = styled(InnerContainer)`
@@ -88,8 +96,8 @@ export const WelcomeImage = styled.Image`
 `;
 
 export const PageLogo = styled.Image`
-    width: 250px;
-    height: 200px;
+    width: ${width*0.5}px;
+    height: ${height*0.25}px;
 `;
 
 export const PageTitle = styled.Text`

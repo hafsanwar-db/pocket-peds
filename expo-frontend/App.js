@@ -1,9 +1,6 @@
 
 // Import Screens
-import Login from './screens/Login';
-import Signup from './screens/Signup';
-import Welcome from './screens/Welcome';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 // Async storage
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,7 +17,7 @@ import * as Notifications from "expo-notifications";
 import { schedulePushNotification } from "./notifications/handleNotifications";
 import { Button } from "react-native";
 import ReminderPickerButton from "./notifications/ReminderPickerButton";
-
+import {TokenProvider} from './components/Token';
 //SplashScreen.preventAutoHideAsync();
 
 Notifications.setNotificationHandler({
@@ -34,7 +31,6 @@ Notifications.setNotificationHandler({
 export default function App() {
   const [appReady, setAppReady] = useState(false);
   const [storedCredentials, setStoredCredentials] = useState("");
-
   // Load login info, hide splash screen when done
   useEffect(() => {
     const checkLoginCredentials = async () => {
@@ -51,7 +47,6 @@ export default function App() {
         }
       }
     };
-
     checkLoginCredentials();
   }, []);
 
@@ -66,12 +61,13 @@ export default function App() {
   };
   return (
     <CredentialsContext.Provider value={{storedCredentials, setStoredCredentials}}>
-
+      <TokenProvider>
       <RootStack
         reminderInterval={reminderInterval}
         setReminderInterval={setReminderInterval}
         handleLocalPushNotification={handleLocalPushNotification}
       />
+      </TokenProvider>
      </CredentialsContext.Provider>
   );
 } 

@@ -105,7 +105,6 @@ const Signup = ({navigation}) => {
             <StatusBar style="dark" />
             <InnerContainer>
                 <PageTitle>Pocket Peds</PageTitle>
-                <SubTitle>Register today!</SubTitle>
                 
                 <Formik
                     initialValues={{ username: '', email: '', password: '', confirmPassword: '' }}
@@ -193,10 +192,10 @@ const Signup = ({navigation}) => {
                             }
 
                             <Line />
-                            <StyledButton google={true} onPress={handleSubmit} >
+                            {/* <StyledButton google={true} onPress={handleSubmit} >
                                 <Fontisto name="google" size={24} color={primary} />
                                 <ButtonText google={true}>Sign in with Google</ButtonText>
-                            </StyledButton>
+                            </StyledButton> */}
 
                             <ExtraView>
                                 <ExtraText>Already have an account? </ExtraText>

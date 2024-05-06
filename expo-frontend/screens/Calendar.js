@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo, useMemo, useCallback } from "react";
+import React, { useState, useEffect, memo, useContext, useCallback } from "react";
 import {
   SafeAreaView,
   View,
@@ -9,7 +9,6 @@ import ip from './ip.js'
 import { Agenda } from "react-native-calendars";
 
 const MyCalendar = ({ navigation }) => {
-
   const [markedDates, setMarkedDates] = useState({});
   //api call to the endpoint
   const getCurrentDate = () => {
