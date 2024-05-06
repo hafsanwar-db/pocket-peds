@@ -80,11 +80,11 @@ const RootStack = ({
           refreshToken();
         } else {
             //if time elapsed in background is greater than 15 minutes, go back to the login screen
-          if (timeSinceLastRefresh >= 6 * 1000) {
+          if (timeSinceLastRefresh >= 16 * 60* 1000) {
             navigateToLoginPage();
           }
         }
-      }, 5 * 1000);
+      }, 15 * 60* 1000);
 
       return () => {
         //unmounting the setInterval hooks and the listeners
