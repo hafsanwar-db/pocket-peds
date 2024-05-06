@@ -14,7 +14,7 @@ const ShowData = ({ route, navigation }) => {
       <Text style={styles.upc}>{scannedData.upc}</Text>
       <Image source={{ uri: scannedData.image }} style={styles.image} />
       <Text style={styles.name}>{scannedData.name}</Text>
-      <Text style={styles.dosage}>{apiData.dose}</Text>
+      <Text style={styles.dosage}>For children weight {apiData.weight} and age {apiData.age}, the dose is {apiData.dose}</Text>
       <TouchableOpacity
         style={styles.startDoseButton}
         onPress={handleStartDosePress}

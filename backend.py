@@ -352,22 +352,27 @@ async def get_medicine_dosage(data:dict):
     dosage = medicine['dosage']
     weight = data['weight']
     age = data['age']
+    dose = {}
     for key in dosage.keys():
         if key is not None:
             if "under" in key:
                 if weight < float(key.split(" ")[1]):
-                    return dosage[key]
+                    dose = dosage[key]
+                    dose["weight"] = key
                 
             elif "-" in key:
                 weight_range = key.split("-")
                 if weight >= float(weight_range[0]) and weight <= float(weight_range[1].split()[0]):
-                    return dosage[key]  
+                    dose =  dosage[key]  
+                    dose["weight"] = key
                   
             elif "over" in key:
                 if weight > float(key.split(" ")[1]):
-                    return dosage[key]
+                    dose = dosage[key]
+                    dose["weight"] = key
             else:
                 return None
+    return dose
 
 #helper method for specific time period fetching, again not being used anywhere
 def format_date(string_date) -> datetime:
