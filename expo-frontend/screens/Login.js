@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-
 // Import formik
 import { Formik } from 'formik';
 
@@ -206,8 +205,9 @@ const Login = ({setLastRefreshTime, setShouldRefresh, navigation,reminderInterva
                         </StyledFormArea>
                     }
                 </Formik>
-
             </InnerContainer>
+            
+
         </StyledContainer>
         
         </KeyboardAvoidingWrapper>

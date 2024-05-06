@@ -41,7 +41,6 @@ import {Token} from '../components/Token';
 const Welcome = ({navigation}) => {
     const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
     const {username, email} = storedCredentials;
-    console.log("testing", useContext(Token))
     const ClearLogin = () => {
         AsyncStorage
             .removeItem('userCredentials')
