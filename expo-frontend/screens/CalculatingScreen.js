@@ -11,7 +11,18 @@ const CalculatingScreen = ({ route }) => {
     const fetchData = async () => {
       try {
         console.log(`http://${ip}:8000/dummy-data`)
-        const response = await fetch(`http://${ip}:8000/dummy-data`);
+      const url = `http://${ip}:8000/get_medicine_dosage`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          upc: encodeURIComponent(scannedData.upc),
+          weight: 35, // replace with the actual weight value
+          age: 2, // replace with the actual age value
+        }),
+      });
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }

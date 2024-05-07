@@ -1,8 +1,9 @@
 import styled from 'styled-components'
-import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, Dimensions } from 'react-native';
 import Constants from 'expo-constants';
 
 const StatusBarHeight = Constants.statusBarHeight;
+const { height, width } = Dimensions.get('window');
 
 // Colors
 export const Colors = {
@@ -14,7 +15,7 @@ export const Colors = {
     green: "#10B981",
     red: "#EF4444",
     grey: "#9F9F9F",
-    yellow: "#FDB623"
+    yellow: "#FDB623",
 };
 
 const { primary, secondary, tertiary, darkLight, brand, green, red,grey,yellow } = Colors;
@@ -55,14 +56,21 @@ export const ConfirmationText = styled.Text`
 export const StyledContainer = styled.View`
     flex: 1;
     padding: 25px;
+    justify-content: center;
+    align-items: center;
     padding-top: ${StatusBarHeight + 30}px;
     background-color: ${primary};
+    height: ${height}px;
+    overflow: visible;
 `;
 
 export const InnerContainer = styled.View`
     flex: 1;
     width: 100%;
+    justify-content: center;
     align-items: center;
+    height: ${height}px;
+    padding-bottom: 10px;
 `;
 
 export const WelcomeContainer = styled(InnerContainer)`
@@ -88,8 +96,8 @@ export const WelcomeImage = styled.Image`
 `;
 
 export const PageLogo = styled.Image`
-    width: 250px;
-    height: 200px;
+    width: ${width*0.5}px;
+    height: ${height*0.25}px;
 `;
 
 export const PageTitle = styled.Text`
@@ -156,7 +164,7 @@ export const RightIcon = styled.TouchableOpacity`
 
 export const StyledButton = styled.TouchableOpacity`
     padding: 15px;
-    background-color: ${brand};
+    background-color: ${yellow};
     justify-content: center;
     border-radius: 5px;
     margin-vertical: 5px;
@@ -249,7 +257,7 @@ export const TextLinkContent = styled.Text`
     font-size: 15px;
 `;
 
-export const ModalContent = styled.View`
+export const ModalContent = styled.Modal`
     height: 25%;
     width: 100%;
     background-color: #25292e;
@@ -257,4 +265,23 @@ export const ModalContent = styled.View`
     border-top-left-radius: 18px;
     position: absolute;
     bottom: 0;
+`;
+
+export const WeightModal = styled.View`
+    padding: 20px;
+    height: 50%;
+    width: 100%;
+    background-color: #FFF3CC;
+    border-top-right-radius: 18px;
+    border-top-left-radius: 18px;
+    position: absolute;
+    bottom: 0;
+`;
+
+export const WeightModalButton = styled.TouchableOpacity`
+    justify-content: center;
+    border-radius: 5px;
+    height: 60px;
+    align-items: center;
+    margin-vertical: 5px;
 `;

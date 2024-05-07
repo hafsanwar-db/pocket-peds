@@ -26,9 +26,10 @@ import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 
 // Async storage
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ChangeWeightModal from '../components/modal/ChangeWeightModal.js';
 
 // Credentials context
-import { CredentialsContext } from '../components/CredentialsContext';
+//import { CredentialsContext } from '../components/CredentialsContext';
 
 
 const Signup = ({navigation}) => {
@@ -79,12 +80,13 @@ const Signup = ({navigation}) => {
     } */
 
     return (
+        <>
+        <ChangeWeightModal navigation={navigation}/>
         <KeyboardAvoidingWrapper>
         <StyledContainer>
             <StatusBar style="dark" />
             <InnerContainer>
                 <PageTitle>Pocket Peds</PageTitle>
-                <SubTitle>Register today!</SubTitle>
                 
                 <Formik
                     initialValues={{ username: '', email: '', password: '', confirmPassword: '' }}
@@ -171,14 +173,11 @@ const Signup = ({navigation}) => {
                                 </StyledButton> 
                             }
 
-
-                            {
-                                /* <Line />
-                            <StyledButton google={true} onPress={handleSubmit} >
+                            <Line />
+                            {/* <StyledButton google={true} onPress={handleSubmit} >
                                 <Fontisto name="google" size={24} color={primary} />
                                 <ButtonText google={true}>Sign in with Google</ButtonText>
-                            </StyledButton> */
-                            }
+                            </StyledButton> */}
 
                             <ExtraView>
                                 <ExtraText>Already have an account? </ExtraText>
@@ -194,6 +193,7 @@ const Signup = ({navigation}) => {
             </InnerContainer>
         </StyledContainer>
         </KeyboardAvoidingWrapper>
+        </>
     );
 };
 

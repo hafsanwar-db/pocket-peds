@@ -21,7 +21,7 @@ import { navigationRef, isReadyRef } from "../NavigationService";
 import UpdateProfile from "../screens/UpdateProfile";
 import { AppState } from "react-native";
 import { refresh } from "@react-native-community/netinfo";
-import ChangeWeightModal from "../components/modal/WeightWarning.js";
+import ChangeWeightModal from "../components/modal/ChangeWeightModal.js";
 
 const Stack = createStackNavigator();
 const RootStack = ({
@@ -124,6 +124,7 @@ const RootStack = ({
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         screenOptions={{
+          headerBackTitleVisible: false,
           headerStyle: {
             backgroundColor: "transparent",
           },
@@ -132,7 +133,7 @@ const RootStack = ({
           headerTitle: "",
           headerLeftContainerStyle: {
             paddingLeft: 10,
-          },
+          }
         }}
         initialRouteName="Login"
       >
@@ -178,14 +179,18 @@ const RootStack = ({
         <Stack.Screen name="ConfirmationScreen">
           {(props) => <ConfirmationScreen {...props} />}
         </Stack.Screen>
+        
         <Stack.Screen
             name="ChangeWeightModal"
             options={{ presentation: 'modal' }}
-          >
+        > 
           {(props) => <ChangeWeightModal {...props} />}
         </Stack.Screen>
+
+        
+        <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
+
       </Stack.Navigator>
-      <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
     </NavigationContainer>
   );
 };

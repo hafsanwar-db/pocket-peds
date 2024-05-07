@@ -23,7 +23,7 @@ import os
 app = FastAPI()
 SECRET_KEY = "70b15e4e47fcc13b26223aa4e0091688d652564cc3ea5afa0653427cce3a7139"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 16
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")#change tokenUrl later
 
 # Connect to MongoDB Atlas
@@ -33,6 +33,7 @@ client = MongoClient(connection_string)
 db = client['PocketPeds']
 child_profiles = db['child_profiles']
 user_profiles = db['user_profiles']
+medicines = db['medicines']
 
 #loading the SQL database
 engine = psycopg2.connect(
@@ -117,6 +118,15 @@ def login(data: dict) -> dict :
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={ "sub": str(user['_id'])}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post('/refresh-token')
+async def refresh(token: Annotated[str, Depends(oauth2_scheme)]):
+    user_id = get_userID(token)
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={ "sub": str(user_id)}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -256,11 +266,24 @@ async def process_upc(upc: str):
     if not media_details["data"]["media"]:
         raise HTTPException(status_code=404, detail='Media details not found')
     media_url = media_details["data"]["media"][0]["url"]
-    # spl_dict = xmltodict.parse(spl_xml)
-    # spl_json = json.dumps(spl_dict)
-    #return spl_xml
-    media = {"media_url": media_url, "name": name}
+
+    media = {"media_url": media_url, "name": name, "upc": upc}
     return media
+
+@app.get('/get_medicine/')
+async def get_medicine(upc: str):
+    # Retrieve the medicine from the database
+    medicine = medicines.find_one({'upc': upc})
+    if not medicine:
+        raise HTTPException(status_code=404, detail='Medicine not found')
+    print(medicine)
+    medicine = {
+        'upc': medicine['upc'],
+        'image': medicine['image'],
+        'name': medicine['name'],
+        'dosage': medicine['dosage']
+    }
+    return medicine
 
 @app.get('/medication-history-all/{childID}')
 async def process_upc(childID: str):
@@ -298,6 +321,58 @@ async def process_upc(childID: str, data: dict):
     rows = cursor.fetchall()
     print(len(rows))
     return {'message': 'Got the data successfully'}
+
+@app.post('/add_medicines/')
+async def add_medicine(data: dict):
+    # Check if the medicine already exists in the database
+    existing_medicine = medicines.find_one({'upc': data['upc']})
+    if existing_medicine:
+        return {'message': 'Medicine already exists'}
+
+    # Create a new medicine document
+    medicine = {
+        'upc': data['upc'],
+        'image': data['image'],
+        'name': data['name'],
+        'dosage': data['dosage']
+    }
+
+    # Add the medicine to the medicines collection
+    medicines.insert_one(medicine)
+    return {'message': 'Medicine added successfully'}
+
+@app.post('/get_medicine_dosage/')
+async def get_medicine_dosage(data:dict):
+    # Retrieve the medicine from the database
+    upc = data['upc']
+    medicine = medicines.find_one({'upc': upc})
+    if not medicine:
+        raise HTTPException(status_code=404, detail='Medicine not found')
+    
+    dosage = medicine['dosage']
+    weight = data['weight']
+    age = data['age']
+    dose = {}
+    for key in dosage.keys():
+        if key is not None:
+            if "under" in key:
+                if weight < float(key.split(" ")[1]):
+                    dose = dosage[key]
+                    dose["weight"] = key
+                
+            elif "-" in key:
+                weight_range = key.split("-")
+                if weight >= float(weight_range[0]) and weight <= float(weight_range[1].split()[0]):
+                    dose =  dosage[key]  
+                    dose["weight"] = key
+                  
+            elif "over" in key:
+                if weight > float(key.split(" ")[1]):
+                    dose = dosage[key]
+                    dose["weight"] = key
+            else:
+                return None
+    return dose
 
 #helper method for specific time period fetching, again not being used anywhere
 def format_date(string_date) -> datetime:

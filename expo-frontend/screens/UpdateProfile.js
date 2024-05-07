@@ -18,7 +18,7 @@ const { brand, darkLight, primary } = Colors;
 // Formik
 import { Formik } from 'formik';
 
-import ChangeWeightModal from '../components/modal/WeightWarning.js';
+import ChangeWeightModal from '../components/modal/ChangeWeightModal.js';
 
 
 const UpdateProfile = ({ navigation, route }) => {
@@ -67,7 +67,6 @@ const UpdateProfile = ({ navigation, route }) => {
   return (
 
 <>
-<ChangeWeightModal />
 <KeyboardAvoidingWrapper>
 <StyledContainer>
     <StatusBar style="dark" />  

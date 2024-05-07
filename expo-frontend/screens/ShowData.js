@@ -12,9 +12,9 @@ const ShowData = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.upc}>{scannedData.upc}</Text>
-      <Image source={{ uri: scannedData.mediaUrl }} style={styles.image} />
+      <Image source={{ uri: scannedData.image }} style={styles.image} />
       <Text style={styles.name}>{scannedData.name}</Text>
-      <Text style={styles.dosage}>{apiData.dosage}</Text>
+      <Text style={styles.dosage}>For children weight {apiData.weight} and age {apiData.age}, the dose is {apiData.dose}</Text>
       <TouchableOpacity
         style={styles.startDoseButton}
         onPress={handleStartDosePress}

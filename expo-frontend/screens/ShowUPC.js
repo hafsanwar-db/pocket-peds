@@ -22,12 +22,8 @@ const ShowUPC = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.upc}>{scannedData.upc}</Text>
-      <Image source={{ uri: scannedData.mediaUrl }} style={styles.image} />
+      <Image source={{ uri: scannedData.image }} style={styles.image} />
       <Text style={styles.name}>{scannedData.name}</Text>
-      <Text style={styles.description}>
-        For ages 2 to 11 years old{'\n'}
-        For weights 24 to 95 lbs (10.8 to 43.1 kg)
-      </Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.buttonView, rescanPressed && styles.buttonPressed]}

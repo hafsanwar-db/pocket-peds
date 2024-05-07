@@ -15,6 +15,9 @@ const { primary, secondary, tertiary, darkLight, brand, green, red } = Colors;
 // Async storage
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Credentials and Token context
+//import { CredentialsContext } from '../components/CredentialsContext';
+import {Token} from '../components/Token';
 // Credentials context
 // import { CredentialsContext } from '../components/CredentialsContext';
 
@@ -23,7 +26,6 @@ const Welcome = ({navigation, route}) => {
 
     /* const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
     const {username, email} = storedCredentials;
-
     const ClearLogin = () => {
         AsyncStorage
             .removeItem('userCredentials')
@@ -60,6 +62,12 @@ const Welcome = ({navigation, route}) => {
                             <ButtonText>Logout</ButtonText>
     </StyledButton> */}
                     </StyledFormArea>
+                    <ExtraView>
+                                <ExtraText>Calendar </ExtraText>
+                                <TextLink onPress={() => navigation.navigate('MyCalendar')}>
+                                    <TextLinkContent>Click Here!</TextLinkContent>
+                                </TextLink>
+                    </ExtraView>
                 </WelcomeContainer>
             </InnerContainer>
         </>
