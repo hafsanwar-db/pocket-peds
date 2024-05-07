@@ -342,7 +342,7 @@ async def add_medicine(data: dict):
     medicines.insert_one(medicine)
     return {'message': 'Medicine added successfully'}
 
-@app.post('/get_medicine_dosage/')
+@app.post('/get_medicine_dosage')
 async def get_medicine_dosage(data:dict):
     # Retrieve the medicine from the database
     upc = data['upc']
