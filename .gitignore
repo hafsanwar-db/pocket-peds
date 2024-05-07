@@ -4,3 +4,5 @@ venv/
 .env
 test.rest
 __pycache__/
+
+expo-frontend/screens/ip.js
