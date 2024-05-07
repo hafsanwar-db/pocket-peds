@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StatusBar, Text, View, Button, TextInput } from 'react-native';
+import { StatusBar, Text, View, Button, TextInput, KeyboardAvoidingView, Platform } from 'react-native'; // Import KeyboardAvoidingView and Platform
 import { Camera } from 'expo-camera';
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
@@ -86,81 +86,83 @@ const ScanBarcode = () => {
   };
 
   return (
-    <StyledContainer>
-      {hasPermission === null ? (
-        <Text>Requesting for camera permission</Text>
-      ) : hasPermission === false ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Text>No access to camera</Text>
-          <Button title="Request Camera Access" onPress={handleRequestCameraPermission} />
-        </View>
-      ) : (
-        <View style={{ flex: 1, width: '100%' }}>
-          <Camera
-            style={{ flex: 1 }}
-            type={Camera.Constants.Type.back}
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-            ref={ref => setCameraRef(ref)}
-            onError={error => console.error(error)}
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} style={{ flex: 1 }}>
+      <StyledContainer>
+        {hasPermission === null ? (
+          <Text>Requesting for camera permission</Text>
+        ) : hasPermission === false ? (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <Text>No access to camera</Text>
+            <Button title="Request Camera Access" onPress={handleRequestCameraPermission} />
+          </View>
+        ) : (
+          <View style={{ flex: 1, width: '100%' }}>
+            <Camera
+              style={{ flex: 1 }}
+              type={Camera.Constants.Type.back}
+              onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+              ref={ref => setCameraRef(ref)}
+              onError={error => console.error(error)}
+            />
+            {scanned && (
+              <Button title="Scan Again" onPress={() => setScanned(false)} />
+            )}
+          </View>
+        )}
+        <ExtraView>
+          <ExtraText>Don't want to scan? </ExtraText>
+          <TextLink onPress={() => navigation.navigate('Login')}>
+            <TextLinkContent>Go back to Login</TextLinkContent>
+          </TextLink>
+        </ExtraView>
+        <View style={{ marginTop: 20, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+          <TextInput
+            style={{ height: 40, width: 30, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5 }}
+            onChangeText={text => setBarcodeSegment1(text)}
+            value={barcodeSegment1}
+            keyboardType="numeric"
+            maxLength={1}
+            placeholder="3"
           />
-          {scanned && (
-            <Button title="Scan Again" onPress={() => setScanned(false)} />
-          )}
+          <TextInput
+            style={{ height: 40, width: 60, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5, textAlign: 'center' }}
+            onChangeText={text => setBarcodeSegment2(text)}
+            value={barcodeSegment2}
+            keyboardType="numeric"
+            maxLength={4}
+            placeholder="XXXX"
+          />
+          <Text>-</Text>
+          <TextInput
+            style={{ height: 40, width: 60, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5, textAlign: 'center' }}
+            onChangeText={text => setBarcodeSegment3(text)}
+            value={barcodeSegment3}
+            keyboardType="numeric"
+            maxLength={4}
+            placeholder="XXXX"
+          />
+          <Text>-</Text>
+          <TextInput
+            style={{ height: 40, width: 50, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5, textAlign: 'center' }}
+            onChangeText={text => setBarcodeSegment4(text)}
+            value={barcodeSegment4}
+            keyboardType="numeric"
+            maxLength={2}
+            placeholder="XX"
+          />
+          <Text>-</Text>
+          <TextInput
+            style={{ height: 40, width: 30, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 5, textAlign: 'center' }}
+            onChangeText={text => setBarcodeSegment5(text)}
+            value={barcodeSegment5}
+            keyboardType="numeric"
+            maxLength={1}
+            placeholder='X'
+          />
         </View>
-      )}
-      <ExtraView>
-        <ExtraText>Don't want to scan? </ExtraText>
-        <TextLink onPress={() => navigation.navigate('Login')}>
-          <TextLinkContent>Go back to Login</TextLinkContent>
-        </TextLink>
-      </ExtraView>
-      <View style={{ marginTop: 20, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-        <TextInput
-          style={{ height: 40, width: 30, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5 }}
-          onChangeText={text => setBarcodeSegment1(text)}
-          value={barcodeSegment1}
-          keyboardType="numeric"
-          maxLength={1}
-          placeholder="3"
-        />
-        <TextInput
-          style={{ height: 40, width: 60, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5, textAlign: 'center' }}
-          onChangeText={text => setBarcodeSegment2(text)}
-          value={barcodeSegment2}
-          keyboardType="numeric"
-          maxLength={4}
-          placeholder="XXXX"
-        />
-        <Text>-</Text>
-        <TextInput
-          style={{ height: 40, width: 60, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5, textAlign: 'center' }}
-          onChangeText={text => setBarcodeSegment3(text)}
-          value={barcodeSegment3}
-          keyboardType="numeric"
-          maxLength={4}
-          placeholder="XXXX"
-        />
-        <Text>-</Text>
-        <TextInput
-          style={{ height: 40, width: 50, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5, textAlign: 'center' }}
-          onChangeText={text => setBarcodeSegment4(text)}
-          value={barcodeSegment4}
-          keyboardType="numeric"
-          maxLength={2}
-          placeholder="XX"
-        />
-        <Text>-</Text>
-        <TextInput
-          style={{ height: 40, width: 30, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 5, textAlign: 'center' }}
-          onChangeText={text => setBarcodeSegment5(text)}
-          value={barcodeSegment5}
-          keyboardType="numeric"
-          maxLength={1}
-          placeholder='X'
-        />
-      </View>
-      <Button title="Submit" onPress={handleManualInputSubmit} />
-    </StyledContainer>
+        <Button title="Submit" onPress={handleManualInputSubmit} />
+      </StyledContainer>
+    </KeyboardAvoidingView>
   );
 };
 
