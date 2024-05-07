@@ -1,11 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 // Import formik
+import {TouchableOpacity} from 'react-native';
 import { Formik } from 'formik';
-
+import Footer from '../components/Footer';
 // Import icons
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons'; 
-
+import { footerContainer } from '../components/styles';
 import {
     StyledContainer,
     InnerContainer,
@@ -206,8 +207,7 @@ const Login = ({setLastRefreshTime, setShouldRefresh, navigation,reminderInterva
                     }
                 </Formik>
             </InnerContainer>
-            
-
+           
         </StyledContainer>
         
         </KeyboardAvoidingWrapper>

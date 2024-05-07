@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { StatusBar } from 'expo-status-bar';
-
+import Footer from '../components/Footer';
 // Import icons
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons'; 
 
@@ -79,6 +79,7 @@ const Welcome = ({navigation}) => {
                     </ExtraView>
                 </WelcomeContainer>
             </InnerContainer>
+
         </>
     );
 };

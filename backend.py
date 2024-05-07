@@ -9,7 +9,7 @@ from jose import JWTError, jwt
 from passlib.hash import bcrypt
 from bson import ObjectId
 import psycopg2
-from psycopg2 import sql
+from psycopg2 import sql, pool
 import uvicorn
 
 #miscellaneous dependencies
@@ -36,12 +36,14 @@ user_profiles = db['user_profiles']
 medicines = db['medicines']
 
 #loading the SQL database
-engine = psycopg2.connect(
+engine = pool.SimpleConnectionPool(
+    5,
+        10,
         database="postgres",
         user="mcersi",
         password="pocketpeds123",
         host="pocket-peds.c10qkoguai68.us-east-2.rds.amazonaws.com",
-        port='5432'
+        port='5432',
     )
 
 class User(BaseModel):
@@ -288,27 +290,26 @@ async def get_medicine(upc: str):
 @app.get('/medication-history-all/{childID}')
 async def process_upc(childID: str):
     #the times come in as "January 2022", "December 2019", etc
-    try: cursor = engine.cursor()
-    except psycopg2.InterfaceError: 
-        #this is in case the connection is timed out
-        new_engine = psycopg2.connect(
-        database="postgres",
-        user="mcersi",
-        password="pocketpeds123",
-        host="pocket-peds.c10qkoguai68.us-east-2.rds.amazonaws.com",
-        port='5432')
-        cursor = new_engine.cursor()
-    cursor.execute("SELECT dosage, upc, time, name FROM history WHERE childid = %s", (childID,))
-    rows = cursor.fetchall()
-    data = {}
-    for row in rows:
-        formattedDate = row[2].strftime("%Y-%m-%d")
-        formattedTime = row[2].strftime("%H:%M")
-        if data.get(formattedDate):
-            data[formattedDate].append({'startingDay':True, 'endingDay': True, 'color': '#FDB623', 'dosage': row[0], 'upc': row[1], 'name': row[3], "time": formattedTime})
-        else: data[formattedDate] = [{'startingDay':True, 'endingDay': True, 'color': '#FDB623', 'dosage': row[0], 'upc': row[1], 'name': row[3], "time": formattedTime}]
-    print(data['2024-05-16'])
-    return data
+    try: 
+        connection = engine.getconn()
+        cursor = connection.cursor()
+        cursor.execute("SELECT dosage, upc, time, name FROM history WHERE childid = %s", (childID,))
+        rows = cursor.fetchall()
+        engine.putconn(connection)
+        
+        data = {}
+        for row in rows:
+            formattedDate = row[2].strftime("%Y-%m-%d")
+            formattedTime = row[2].strftime("%H:%M")
+            if data.get(formattedDate):
+                data[formattedDate].append({'startingDay':True, 'endingDay': True, 'color': '#FDB623', 'dosage': row[0], 'upc': row[1], 'name': row[3], "time": formattedTime})
+            else: data[formattedDate] = [{'startingDay':True, 'endingDay': True, 'color': '#FDB623', 'dosage': row[0], 'upc': row[1], 'name': row[3], "time": formattedTime}]
+        print(data['2024-05-16'])
+        
+        return data
+    except (Exception, psycopg2.Error) as error:
+        print("Error executing SQL:", error)
+        return {'message': 'Error executing SQL'}
 
 #for specfic time period, not currently being used anywhere
 @app.get('/medication-history/{childID}')

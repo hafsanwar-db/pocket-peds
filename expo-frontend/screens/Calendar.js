@@ -77,7 +77,8 @@ const MyCalendar = ({ navigation }) => {
           scrollEnabled={true}
           //to keep the view proper I need to render an extra month for some reason
           futureScrollRange={1}
-          //maxDate={getCurrentDate()}
+          maxDate={getCurrentDate()}
+          showsVerticalScrollIndicator = {true}
           // Specify how each item should be rendered in agenda
           renderItem={(item, firstItem) => {
             return <MemoizedItem item={item} firstItem={firstItem} />
@@ -86,10 +87,6 @@ const MyCalendar = ({ navigation }) => {
           hideKnob={false}
           showClosingKnob={true}
           scrollEventThrottle={16}
-          renderEmptyDate={() => {
-            console.log("empty date");
-            return <View />;
-          }}
           theme={{
             selectedDayBackgroundColor: "#FDB623",
             agendaDayTextColor: "black",
@@ -103,7 +100,7 @@ const MyCalendar = ({ navigation }) => {
           renderEmptyData={()=>{return <EmptyDate/>}}
         />
       </SafeAreaView>
-      <CustomBackButton navigation={navigation} />
+      {/* <CustomBackButton navigation={navigation} /> */}
     </View>
   );
 };

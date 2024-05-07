@@ -1,5 +1,5 @@
-import { React, useState, useEffect, useContext, useNavigation } from "react";
-
+import { React, useState, useEffect, useContext } from "react";
+import Footer from "../components/Footer.js";
 import { Colors } from "../components/styles";
 const tertiary = Colors.tertiary; // Import the missing tertiary variable
 import ip from "../screens/ip.js"; // Import the missing ip variable
@@ -19,17 +19,17 @@ import MyCalendar from "../screens/Calendar";
 import ConfirmationScreen from "../screens/ConfirmationScreen";
 import { navigationRef, isReadyRef } from "../NavigationService";
 import UpdateProfile from "../screens/UpdateProfile";
-import { AppState } from "react-native";
-import { refresh } from "@react-native-community/netinfo";
+import { AppState, View, Dimensions } from "react-native";
 
+height = Dimensions.get("window").height;
+width = Dimensions.get("window").width;
 const Stack = createStackNavigator();
 const RootStack = ({
   reminderInterval,
   setReminderInterval,
   handleLocalPushNotification,
 }) => {
-
-    // all these states and contexts are for JWT tokens
+  // all these states and contexts are for JWT tokens
   const [appState, setAppState] = useState(AppState.currentState);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const { tokenValue } = useContext(Token);
@@ -61,9 +61,9 @@ const RootStack = ({
     // Set up app state listener
     //shouldRefresh is true only after the user has logged in
     const subscription = AppState.addEventListener(
-        "change",
-        handleAppStateChange
-      );
+      "change",
+      handleAppStateChange
+    );
     if (shouldRefresh) {
       //only for when the app is put on the background, only at that instant
       //this means the user has 15 minutes before they are logged out
@@ -75,16 +75,16 @@ const RootStack = ({
       const intervalId = setInterval(() => {
         const currentTime = new Date().getTime();
         const timeSinceLastRefresh = currentTime - (lastRefreshTime || 0);
-        if (appState === "active") { 
-            // Check if 15 minutes have elapsed since the last refresh
+        if (appState === "active") {
+          // Check if 15 minutes have elapsed since the last refresh
           refreshToken();
         } else {
-            //if time elapsed in background is greater than 15 minutes, go back to the login screen
-          if (timeSinceLastRefresh >= 16 * 60* 1000) {
+          //if time elapsed in background is greater than 15 minutes, go back to the login screen
+          if (timeSinceLastRefresh >= 16 * 60 * 1000) {
             navigateToLoginPage();
           }
         }
-      }, 15 * 60* 1000);
+      }, 15 * 60 * 1000);
 
       return () => {
         //unmounting the setInterval hooks and the listeners
@@ -132,6 +132,7 @@ const RootStack = ({
           headerLeftContainerStyle: {
             paddingLeft: 10,
           },
+          backgroundColor: "white",
         }}
         initialRouteName="Login"
       >
@@ -154,28 +155,76 @@ const RootStack = ({
         {/* this welcome screen is shown after login, its'a a 
                 placeholder for profile sections*/}
         <Stack.Screen name="Welcome">
-          {(props) => <Welcome {...props} />}
+          {(props) => (
+            <>
+            <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+              <Welcome {...props} />
+            </View>
+            <Footer navigation={props.navigation} />
+          </>
+          )}
         </Stack.Screen>
         <Stack.Screen name="ScanBarcode">
-          {(props) => <ScanBarcode {...props} />}
+          {(props) => (
+            <>
+              <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+                <ScanBarcode {...props} />
+              </View>
+              <Footer navigation={props.navigation} />
+            </>
+          )}
         </Stack.Screen>
         <Stack.Screen name="ShowUPC">
-          {(props) => <ShowUPC {...props} />}
+          {(props) => 
+           <>
+           <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+           <ShowUPC {...props} />
+           </View>
+           <Footer navigation={props.navigation} />
+         </>}
         </Stack.Screen>
         <Stack.Screen name="CalculatingScreen">
-          {(props) => <CalculatingScreen {...props} />}
+          {(props) => 
+          <>
+           <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+           <CalculatingScreen {...props} />
+           </View>
+           <Footer navigation={props.navigation} />
+         </>}
         </Stack.Screen>
         <Stack.Screen name="ShowData">
-          {(props) => <ShowData {...props} />}
+          {(props) => 
+          <>
+          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <ShowData {...props} />
+          </View>
+          <Footer navigation={props.navigation} />
+        </>}
         </Stack.Screen>
         <Stack.Screen name="DoseSettings">
-          {(props) => <DoseSettings {...props} />}
+          {(props) => <>
+          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <DoseSettings {...props} />
+          </View>
+          <Footer navigation={props.navigation} />
+        </>}
         </Stack.Screen>
         <Stack.Screen name="MyCalendar" options={{ headerShown: false }}>
-          {(props) => <MyCalendar navigation={props.navigation} {...props} />}
+          {(props) => <>
+          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <MyCalendar navigation={props.navigation} {...props} />
+          </View>
+          <Footer navigation={props.navigation} />
+        </>}
         </Stack.Screen>
         <Stack.Screen name="ConfirmationScreen">
-          {(props) => <ConfirmationScreen {...props} />}
+          {(props) =>
+          (props) => <>
+          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <ConfirmationScreen {...props} />
+          </View>
+          <Footer navigation={props.navigation} />
+        </> }
         </Stack.Screen>
         {/* <Stack.Screen
                             name="WeightWarning"
@@ -183,6 +232,7 @@ const RootStack = ({
                             options={{ presentation: 'modal' }}
                         /> */}
       </Stack.Navigator>
+      {/*include the component as done in the screens above*/}
       <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
     </NavigationContainer>
   );
