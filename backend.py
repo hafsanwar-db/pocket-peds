@@ -355,6 +355,24 @@ async def get_medicine_dosage(data:dict):
     dose = {}
     for key in dosage.keys():
         if key is not None:
+            if "mos" in key or "years" in key or "yrs" in key:
+                if "under" in key:
+                    if age < float(key.split(" ")[1]):
+                        dose = dosage[key]
+                        dose["age"] = key
+
+                elif "-" in key:
+                    age_range = key.split("-")
+                    if age >= float(age_range[0]) and age <= float(age_range[1].split()[0]):
+                        dose =  dosage[key]  
+                        dose["age"] = key
+
+                elif "over" in key:
+                    if age > float(key.split(" ")[1]):
+                        dose = dosage[key]
+                        dose["age"] = key
+                continue
+
             if "under" in key:
                 if weight < float(key.split(" ")[1]):
                     dose = dosage[key]
