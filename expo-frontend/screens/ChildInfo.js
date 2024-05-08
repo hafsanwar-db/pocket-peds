@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Dimensions, Text, Image, TouchableOpacity, TextInput, StyleSheet, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { StyledContainer, InnerContainer, Colors } from '../components/styles';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import ip from './ip.js';
+import {Token} from '../components/Token';
 import axios from 'axios';
 
 const { darkLight, primary, grey } = Colors;
@@ -14,24 +15,35 @@ const ChildInfo = ({ route, navigation }) => {
   const [childInfo, setChildInfo] = useState(null);
   const [medications, setMedications] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
+  const {tokenValue} = useContext(Token);
+
+  const imagePaths = {
+    avatar1: require('../assets/img/avatar1.png'),
+    avatar2: require('../assets/img/avatar2.png'),
+    avatar3: require('../assets/img/avatar3.png'),
+    avatar4: require('../assets/img/avatar4.png'),
+    avatar5: require('../assets/img/avatar5.png'),
+    avatar6: require('../assets/img/avatar6.png'),
+    // Add more images as needed
+  };
 
   // Fetch child info and medications on component mount
   useEffect(() => {
     fetchChildInfo();
-    fetchMedications();
   }, []);
 
   // Fetch child info from the API
   const fetchChildInfo = async () => {
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjM5NDA4ZTliMWUwOWUzZWM4YmE3NTEifQ.EDAgPMUlM7ia2WygFK_DLpNz3IvN_T_HbF6ItOeXjQA" //await getAccessToken(); // Implement the logic to get the access token
-      const response = await axios.get(`http://127.0.0.1:8000/child-profiles/${name}`, {
+      const token = tokenValue //await getAccessToken(); // Implement the logic to get the access token
+      const response = await axios.get(`http://${ip}:8000/child-profiles/${name.toLowerCase()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       console.log("RESPONSE CHILD: ", response.data);
       setChildInfo(response.data);
+      setMedications(response.data.medications); // Set medications from child info
     } catch (error) {
       console.error('Error fetching child info:', error);
     }
@@ -40,32 +52,32 @@ const ChildInfo = ({ route, navigation }) => {
   // Fetch medications from the API
   const fetchMedications = async () => {
     try {
-      //const response = await axios.get(`http://127.0.0.1:8000/medication-history-all/${childInfo._id}`);
-      response = {
-        data: {
-          "child_id": {
-            "$oid": "60a1234567890abcdef12345"
-          },
-          "medications": [
-            {
-              "name": "Acetaminophen",
-              "time": {
-                "$date": "2023-05-08T10:30:00Z"
-              },
-              "dose": 5.5,
-              "upc": 123456789012
-            },
-            {
-              "name": "Ibuprofen",
-              "time": {
-                "$date": "2023-05-08T14:45:00Z"
-              },
-              "dose": 7.5,
-              "upc": 987654321098
-            }
-          ]
-        }
-      };
+      const response = await axios.get(`http://${ip}:8000/get_medicine?upc=${childInfo.upc}`);
+      // response = {
+      //   data: {
+      //     "child_id": {
+      //       "$oid": "60a1234567890abcdef12345"
+      //     },
+      //     "medications": [
+      //       {
+      //         "name": "Acetaminophen",
+      //         "time": {
+      //           "$date": "2023-05-08T10:30:00Z"
+      //         },
+      //         "dose": 5.5,
+      //         "upc": 123456789012
+      //       },
+      //       {
+      //         "name": "Ibuprofen",
+      //         "time": {
+      //           "$date": "2023-05-08T14:45:00Z"
+      //         },
+      //         "dose": 7.5,
+      //         "upc": 987654321098
+      //       }
+      //     ]
+      //   }
+      // };
       setMedications(response.data.medications);
     } catch (error) {
       console.error('Error fetching medications:', error);
@@ -101,11 +113,9 @@ const ChildInfo = ({ route, navigation }) => {
 
     return (
       <View style={styles.childInfoContainer}>
-        <View style={styles.profileImageContainer}>
-          <Text style={styles.profileInitials}>{name.slice(0, 1)}</Text>
-        </View>
+        <Image source={imagePaths[childInfo.image]} style={styles.profileImage} />
         <View style={styles.childInfoTextContainer}>
-          <Text style={styles.childName}>{name}</Text>
+          <Text style={styles.childName}>{name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
           <Text style={styles.childAge}>{years} years {months} {months>1 ? 'months' : 'month'}</Text>
           <Text style={styles.childWeight}>{weight} lbs ({weightInKg} kg)</Text>
           <Text style={styles.lastUpdated}>Last Updated: {last_updated_date}</Text>
@@ -116,41 +126,39 @@ const ChildInfo = ({ route, navigation }) => {
 
 // Render the medication list
 const renderMedications = () => {
-
   return (
     <ScrollView>
-    <SwipeListView
-      data={medications}
-      keyExtractor={(item, index) => index.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.medicationItemContainer}>
-          <View style={styles.medicationImage} />
-          <View style={styles.medicationTextContainer}>
-            <Text style={styles.medicationName}>{item.name}</Text>
-            <Text style={styles.medicationUPC}>{item.upc}</Text>
-            <Text style={styles.medicationDosage}>{item.dose}</Text>
+      <SwipeListView
+        data={medications}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.medicationItemContainer}>
+            <Image source={{ uri: item.image }} style={styles.medicationImage} />
+            <View style={styles.medicationTextContainer}>
+              <Text style={styles.medicationName}>{item.name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
+              <Text style={styles.medicationUPC}>UPC: {item.upc}</Text>
+              <Text style={styles.medicationDosage}>Dose: {item.dosage}</Text>
+            </View>
           </View>
-        </View>
-      )}
-      renderHiddenItem={({ item, index }) => (
-        <View style={styles.hiddenItemContainer}>
-          <TouchableOpacity
-            style={[styles.hiddenItemButton, styles.editButton]}
-            onPress={() => handleEditMedication(item, index)}
-          >
-            <Icon name="clock-o" size={20} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.hiddenItemButton, styles.deleteButton]}
-            onPress={() => handleDeleteMedication(index)}
-          >
-            <Icon name="trash" size={20} color="white" />
-          </TouchableOpacity>
-        </View>
-      )}
-      rightOpenValue={-75}
-    />
-
+        )}
+        renderHiddenItem={({ item, index }) => (
+          <View style={styles.hiddenItemContainer}>
+            <TouchableOpacity
+              style={[styles.hiddenItemButton, styles.editButton]}
+              onPress={() => handleEditMedication(item, index)}
+            >
+              <Icon name="clock-o" size={20} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.hiddenItemButton, styles.deleteButton]}
+              onPress={() => handleDeleteMedication(index)}
+            >
+              <Icon name="trash" size={20} color="white" />
+            </TouchableOpacity>
+          </View>
+        )}
+        rightOpenValue={-75}
+      />
     </ScrollView>
   );
 };
@@ -256,7 +264,7 @@ const styles = StyleSheet.create({
   },
   medicationImage: {
     width: 50,
-    height: 50,
+    height: 75,
     backgroundColor: 'lightgrey',
     marginRight: 25,
   },
