@@ -183,6 +183,21 @@ async def create_child_profile(data: dict, token: Annotated[str, Depends(oauth2_
     child_profiles.insert_one(child_profile)
     return {'message': 'Child profile created successfully'}
 
+@app.get('/all-child-profiles/')
+async def get_all_child_profile(token: Annotated[str, Depends(oauth2_scheme)]):
+    # Retrieve the child profile from the database
+    user_id = get_userID(token)
+    children = child_profiles.find({'parent_id': user_id})
+    if not child_profiles:
+        raise HTTPException(status_code=404, detail='Child profile not found')
+
+    all_child_profiles= []
+    for child_profile in children:    
+        child_profile['_id'] = str(child_profile['_id'])
+        child_profile['parent_id'] = str(child_profile['parent_id'])
+        all_child_profiles.append(child_profile)
+    return all_child_profiles
+
 @app.get('/child-profiles/{child_name}')
 async def get_child_profile(child_name: str, token: Annotated[str, Depends(oauth2_scheme)]):
     # Retrieve the child profile from the database

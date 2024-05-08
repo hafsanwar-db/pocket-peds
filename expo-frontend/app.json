@@ -1,6 +1,5 @@
 {
   "expo": {
-    
     "name": "expo-frontend",
     "slug": "expo-frontend",
     "version": "1.0.0",
@@ -8,16 +7,18 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "plugins": [
-        [
-          "expo-notifications",
-          {
-            "icon": "./src/assets/notification-icon.png",
-            "color": "#082849",
-            "sounds": [
-              "./local/assets/notification-sound.wav"
-            ]
-          }
-        ]],
+      [
+        "expo-notifications",
+        {
+          "icon": "./src/assets/notification-icon.png",
+          "color": "#082849",
+          "sounds": [
+            "./local/assets/notification-sound.wav"
+          ]
+        }
+      ],
+      "expo-font"
+    ],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",

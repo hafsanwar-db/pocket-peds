@@ -83,7 +83,7 @@ const Login = ({setLastRefreshTime, setShouldRefresh, navigation,reminderInterva
                 setSubmitting(false);
                 setLastRefreshTime(new Date().getTime());
                 setShouldRefresh(true);
-                navigation.navigate('Welcome');
+                navigation.navigate('Child');
             })
             .catch((error) => {
                 console.log(error)

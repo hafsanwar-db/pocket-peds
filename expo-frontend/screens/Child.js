@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, ScrollView, TouchableOpacity, Text, Image } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text, Image, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import {Token} from '../components/Token';
+import { useIsFocused } from '@react-navigation/native'
 import {
   StyledContainer,
   InnerContainer,
@@ -10,36 +11,56 @@ import {
   SubTitle,
   Colors,
 } from '../components/styles';
+import {
+  useFonts,
+  Jost_400Regular,
+} from '@expo-google-fonts/jost';
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 import axios from 'axios';
-
-
+import ip from './ip.js';
+import slides from './slides.js';
 const { primary, darkLight } = Colors;
+const {height, width} = Dimensions.get('window');
+
+const imageList = [
+  require('../assets/img/avatar1.png'),
+  require('../assets/img/avatar2.png'),
+  require('../assets/img/avatar3.png'),
+  require('../assets/img/avatar4.png'),
+  require('../assets/img/avatar5.png'),
+  require('../assets/img/avatar6.png')
+];
+const imageMap = {'avatar1': imageList[0], 'avatar2': imageList[1], 'avatar3': imageList[2], 'avatar4': imageList[3], 'avatar5': imageList[4], 'avatar6': imageList[5]};
+
 
 const Child = ({ navigation }) => {
   const [profiles, setProfiles] = useState([]);
   const {tokenValue} = useContext(Token);
+  const isFocused = useIsFocused();
+  const [fonts] = useFonts({
+    Jost_400Regular
+  })
   useEffect(() => {
     fetchProfiles();
-  }, []); // Empty dependency array ensures the effect runs only once
+  }, [isFocused]); // Empty dependency array ensures the effect runs only once
   
   // Fetch and format the data
   const fetchProfiles = async () => {
     try {
       const token = tokenValue;
-      const response = await axios.get('http://127.0.0.1:8000/child-profiles/', {
+      const response = await axios.get(`http://${ip}:8000/all-child-profiles/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("DATA: ", response);
+      console.log("DATA: ", response.data);
   
       //PRObably don't need to end all the data?
       const formattedData = response.data.map(item => {
         return {
-          id: item?._id,
-          name: item?.name,
-          image: item?.image // Add the image field if available in the data
+          id: item._id,
+          name: item.name.charAt(0).toUpperCase() + item.name.slice(1), // Capitalize the first letter of the name
+          image: imageMap[item.image] // Add the image field if available in the data
         };
       });
   
@@ -50,7 +71,9 @@ const Child = ({ navigation }) => {
     }
   };
 
-  const renderProfileItem = (item) => (
+  const renderProfileItem = (item) => {
+    console.log(item.image)
+    return (
     <TouchableOpacity
       key={item.id}
       style={{ alignItems: 'center', marginBottom: 20 }}
@@ -69,19 +92,20 @@ const Child = ({ navigation }) => {
         
       }}>
         <Image
-          source={item.image ? { uri: item.image } : null} // Show image if available
+          source={item.image} // Show image if available
           style={{ width: '100%', height: '100%' }}
           resizeMode="cover"
         />
       </View>
       <Text style={{ fontSize: 16 }}>{item.name}</Text>
     </TouchableOpacity>
-  );
+  )
+};
 
   const renderAddProfileButton = () => (
     <TouchableOpacity
       style={{ alignItems: 'center', marginBottom: 20 }}
-      onPress={() => navigation.navigate('AddChild', { addProfile })}
+      onPress={() => navigation.navigate('AddChild')}
     >
       <View
         style={{
@@ -111,9 +135,14 @@ const Child = ({ navigation }) => {
         <StatusBar style="dark" />
         <InnerContainer>
           <PageTitle>Child Screen</PageTitle>
-          <SubTitle>Children</SubTitle>
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+          <Text style={{
+            textAlign:'left',
+            fontSize:26,
+            fontFamily: 'Jost_400Regular',
+            marginBottom:0.05*height,
+          }}>Who are you dosing for?</Text>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 , width: 0.65*width}}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', columnGap: 0.2*width}}>
               {profiles.map((item) => renderProfileItem(item))}
               {renderAddProfileButton()}
             </View>

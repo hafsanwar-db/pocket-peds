@@ -79,9 +79,9 @@ const AddChild = ({ navigation }) => {
         weight: newWeight.trim(),
         sex: sex.toLowerCase(), // Add the appropriate sex value
         allergies: newAllergies
-          .trim()
+          ?.trim()
           .split(",")
-          .map((allergy) => allergy.trim()),
+          .map((allergy) => allergy?.trim()),
         medications: newMedications
           .trim()
           .split(",")

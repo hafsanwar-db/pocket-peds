@@ -239,10 +239,9 @@ const RootStack = ({
         </Stack.Screen>
         <Stack.Screen name="Child">
           {(props) => <>
-          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <View style={{ height: height, backgroundColor: "white" }}>
           <Child {...props} />
           </View>
-          <Footer navigation={props.navigation} />
         </> }
         </Stack.Screen>
         <Stack.Screen name="ChildInfo">

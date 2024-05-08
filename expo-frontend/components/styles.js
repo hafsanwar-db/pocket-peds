@@ -237,8 +237,8 @@ export const StyledButtonConfirmation2 = styled.TouchableOpacity`
 `;
 
 export const ButtonText = styled.Text`
-  color: ${primary};
-  font-size: 16px;
+  color: black;
+  font-size: 20px;
 
   ${(props) =>
     props.google == true &&
