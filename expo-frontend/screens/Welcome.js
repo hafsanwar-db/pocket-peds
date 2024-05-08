@@ -76,6 +76,10 @@ const Welcome = ({navigation}) => {
                                 <TextLink onPress={() => navigation.navigate('MyCalendar')}>
                                     <TextLinkContent>Click Here!</TextLinkContent>
                                 </TextLink>
+                                <ExtraText>Carousel </ExtraText>
+                                <TextLink onPress={() => navigation.navigate('Carousel')}>
+                                    <TextLinkContent>Click Here!</TextLinkContent>
+                                </TextLink>
                     </ExtraView>
                 </WelcomeContainer>
             </InnerContainer>

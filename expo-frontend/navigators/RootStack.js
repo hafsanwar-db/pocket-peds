@@ -4,6 +4,7 @@ import { Colors } from "../components/styles";
 const tertiary = Colors.tertiary; // Import the missing tertiary variable
 import ip from "../screens/ip.js"; // Import the missing ip variable
 // React navigation
+import Carousel from "../screens/Carousel";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Token } from "../components/Token";
@@ -218,14 +219,21 @@ const RootStack = ({
         </>}
         </Stack.Screen>
         <Stack.Screen name="ConfirmationScreen">
-          {(props) =>
-          (props) => <>
+          {(props) => <>
           <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
           <ConfirmationScreen {...props} />
           </View>
           <Footer navigation={props.navigation} />
         </> }
         </Stack.Screen>
+        {/* <Stack.Screen name="Carousel">
+          {(props) => <>
+          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <Carousel {...props} />
+          </View>
+          <Footer navigation={props.navigation} />
+        </> }
+        </Stack.Screen> */}
         {/* <Stack.Screen
                             name="WeightWarning"
                             component={WeightWarning}
