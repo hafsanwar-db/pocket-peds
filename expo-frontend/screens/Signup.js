@@ -7,29 +7,13 @@ import { Formik } from 'formik';
 // Import icons
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons'; 
 import ip from './ip.js';
+
 // Axios
 import axios from 'axios';
 
 import {
-    StyledContainer,
-    InnerContainer,
-    PageLogo,
-    PageTitle,
-    SubTitle,
-    StyledFormArea,
-    LeftIcon,
-    StyledInputLabel,
-    StyledTextInput,
-    RightIcon,
-    StyledButton,
-    ButtonText,
-    Colors,
-    MessageBox,
-    Line,
-    ExtraText,
-    ExtraView,
-    TextLink,
-    TextLinkContent
+    StyledContainer, InnerContainer, PageLogo, PageTitle, SubTitle, StyledFormArea, LeftIcon, StyledInputLabel, StyledTextInput,
+    RightIcon, StyledButton, ButtonText, Colors, MessageBox, Line, ExtraText, ExtraView, TextLink, TextLinkContent
 } from '../components/styles';
 
 // Colors
@@ -42,9 +26,10 @@ import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 
 // Async storage
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ChangeWeightModal from '../components/modal/ChangeWeightModal.js';
 
 // Credentials context
-import { CredentialsContext } from '../components/CredentialsContext';
+//import { CredentialsContext } from '../components/CredentialsContext';
 
 
 const Signup = ({navigation}) => {
@@ -53,7 +38,7 @@ const Signup = ({navigation}) => {
     const [messageType, setMessageType] = useState();
 
     // Credentials context
-    const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
+    //const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
 
     const handleSignup = (credentials, setSubmitting) => {
         handleMessage(null);
@@ -63,15 +48,9 @@ const Signup = ({navigation}) => {
             .post(url, credentials)
             .then((response) => {
                 const result = response.data;
-                const {message, status, data} = result;
+                const {message} = result;
 
-                if (status !== 'SUCCESS') {
-                    handleMessage(message, status);
-                }
-                else {
-                    persistLogin(...data[0], message, status);
-                }
-
+                handleMessage(message, "SUCCESS");
                 setSubmitting(false);
             })
             .catch((error) => {
@@ -86,6 +65,7 @@ const Signup = ({navigation}) => {
         setMessageType(type);
     }
 
+    /* 
     const persistLogin = (credentials, message, status) => {
         AsyncStorage
             .setItem('userCredentials', JSON.stringify(credentials))
@@ -97,9 +77,11 @@ const Signup = ({navigation}) => {
                 console.log(error);
                 handleMessage("Persisting login failed.");
             });
-    }
+    } */
 
     return (
+        <>
+        <ChangeWeightModal navigation={navigation}/>
         <KeyboardAvoidingWrapper>
         <StyledContainer>
             <StatusBar style="dark" />
@@ -211,6 +193,7 @@ const Signup = ({navigation}) => {
             </InnerContainer>
         </StyledContainer>
         </KeyboardAvoidingWrapper>
+        </>
     );
 };
 
