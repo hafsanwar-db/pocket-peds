@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Text } from 'react-native';
 import axios from 'axios';
 import ip from './ip.js';
 
@@ -10,7 +10,7 @@ import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 
 import {
   StyledContainer, InnerContainer, PageLogo, PageTitle, SubTitle, StyledFormArea, LeftIcon, StyledInputLabel, StyledTextInput,
-  RightIcon, StyledButton, ButtonText, Colors, MessageBox, Line, ExtraText, ExtraView, TextLink, TextLinkContent
+  RightIcon, StyledButton, ButtonText, Colors, MessageBox, Line, ExtraText, ExtraView, TextLink, TextLinkContent, WeightModalButton
 } from '../components/styles';
 import { StatusBar } from 'expo-status-bar';
 const { brand, darkLight, primary } = Colors;
@@ -18,13 +18,13 @@ const { brand, darkLight, primary } = Colors;
 // Formik
 import { Formik } from 'formik';
 
-import ChangeWeightModal from '../components/modal/ChangeWeightModal.js';
 
+import Internet from "../components/modal/Internet";
 
 const UpdateProfile = ({ navigation, route }) => {
   const { childName } = route.params || {}; // Get child name from navigation params
 
-  const [childInfo, setChildInfo] = useState({ name: '', weight: '' });
+  const [childInfo, setChildInfo] = useState({ name: '', weight: '', age: ''});
   const [message, setMessage] = useState();
   const [messageType, setMessageType] = useState();
 
@@ -67,22 +67,31 @@ const UpdateProfile = ({ navigation, route }) => {
   return (
 
 <>
+<Internet>/</Internet>
 <KeyboardAvoidingWrapper>
 <StyledContainer>
     <StatusBar style="dark" />  
     <InnerContainer>
-        <SubTitle>{childInfo.name}'s Profile</SubTitle>
+        <PageTitle style={{ color: "black", marginBottom: 10 }}>Updating Profile</PageTitle>
+        <PageLogo resizeMode="cover" source={require('../assets/img/peds-logo.png')} />
         
         <Formik
-            initialValues={{ weight: childInfo.weight || '' }}
+            initialValues={{ weight: childInfo.weight || '', name: childInfo.name || '', age: childInfo.age || ''}}
             onSubmit={(values, {setSubmitting}) => {
-                if (values.weight == '') {
+                if (values.weight == '' || values.name == '' || values.age == '') {
                     handleMessage("Please fill in all fields.");
+                    setSubmitting(false);
+                }
+                else if (isNaN(values.weight) || isNaN(values.age)) {
+                    handleMessage("Please enter a valid weight and age.");
+                    setSubmitting(false);
+                }
+                else if (values.weight < 0 || values.age < 0) {
+                    handleMessage("Please enter a valid weight and age.");
                     setSubmitting(false);
                 }
                 else {
                     handleUpdate(values, setSubmitting);
-                    
                 }
             }}
         >
@@ -90,9 +99,30 @@ const UpdateProfile = ({ navigation, route }) => {
                 <StyledFormArea>
 
                     <MyTextInput
+                        label="Name"
+                        icon={"person-circle-outline"}
+                        placeholder="Jane"
+                        placeholderTextColor={darkLight}
+                        onChangeText={handleChange('name')}
+                        onBlur={handleBlur('name')}
+                        values={values.weight}
+                    />
+
+                    <MyTextInput
+                        label="Age (years)"
+                        icon={"balloon-outline"}
+                        placeholder="6"
+                        placeholderTextColor={darkLight}
+                        onChangeText={handleChange('age')}
+                        onBlur={handleBlur('age')}
+                        values={values.weight}
+                        keyboardType="numeric"
+                    />
+                    
+                    <MyTextInput
                         label="Weight (lbs)"
                         icon={"scale-outline"}
-                        placeholder="0"
+                        placeholder="45"
                         placeholderTextColor={darkLight}
                         onChangeText={handleChange('weight')}
                         onBlur={handleBlur('weight')}
@@ -102,9 +132,9 @@ const UpdateProfile = ({ navigation, route }) => {
 
                     <MessageBox type={messageType}>{message}</MessageBox>
                     { !isSubmitting && 
-                        <StyledButton onPress={handleSubmit} >
-                            <ButtonText>Update Weight</ButtonText>
-                        </StyledButton> 
+                        <WeightModalButton onPress={handleSubmit} title="Save Profile" style={{ backgroundColor: '#FEB624' }} >
+                            <Text style={{ fontSize: 20, color: "black" }}>Save Profile</Text>
+                        </WeightModalButton>
                     }
 
                     { isSubmitting && 
@@ -128,7 +158,7 @@ const UpdateProfile = ({ navigation, route }) => {
 
 const MyTextInput = ({label, icon, isPassword, ...props}) => {
   return (
-      <View>
+      <View style={{ margin: 5 }}>
           <LeftIcon>
               <Iconicons name={icon} size={30} color={brand} />
           </LeftIcon>

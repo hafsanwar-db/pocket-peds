@@ -134,7 +134,7 @@ export const StyledTextInput = styled.TextInput`
     padding: 15px;
     padding-left: 55px;
     padding-right: 55px;
-    border-radius: 5px;
+    border-radius: 20px;
     font-size: 16px;
     height: 60px;
     margin-vertical: 3px;
@@ -166,7 +166,7 @@ export const StyledButton = styled.TouchableOpacity`
     padding: 15px;
     background-color: ${yellow};
     justify-content: center;
-    border-radius: 5px;
+    border-radius: 20px;
     margin-vertical: 5px;
     height: 60px;
     align-items: center;
@@ -280,7 +280,7 @@ export const WeightModal = styled.View`
 
 export const WeightModalButton = styled.TouchableOpacity`
     justify-content: center;
-    border-radius: 5px;
+    border-radius: 20px;
     height: 60px;
     align-items: center;
     margin-vertical: 5px;

@@ -19,7 +19,7 @@ const ChangeWeightModal = ({navigation}) => {
                     <WeightModalButton onPress={() => setVisible(false)} title="Continue" style={{ backgroundColor: '#9F9F9F' }} >
                         <Text style={{ fontSize: 20, color: "white" }}>Continue</Text>
                     </WeightModalButton>
-                    <WeightModalButton onPress={() => {navigation.navigate("UpdateProfile"); setVisible(false);}} title="Update Weight" style={{ backgroundColor: '#FEB624' }} >
+                    <WeightModalButton onPress={() => {navigation.navigate("UpdateProfile")}} title="Update Weight" style={{ backgroundColor: '#FEB624' }} >
                         <Text style={{ fontSize: 20, color: "black" }}>Update Profile</Text>
                     </WeightModalButton>
                 </View>

@@ -133,9 +133,10 @@ const RootStack = ({
           headerTitle: "",
           headerLeftContainerStyle: {
             paddingLeft: 10,
-          }
+          },
+          headerLeft: null
         }}
-        initialRouteName="Login"
+        initialRouteName="UpdateProfile"
       >
         <Stack.Screen name="Login">
           {(props) => (
