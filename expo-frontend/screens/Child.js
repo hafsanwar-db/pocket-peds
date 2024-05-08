@@ -10,6 +10,8 @@ import {
   Colors,
 } from '../components/styles';
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
+import axios from 'axios';
+
 
 const { primary, darkLight } = Colors;
 
@@ -17,43 +19,41 @@ const Child = ({ navigation }) => {
   const [profiles, setProfiles] = useState([]);
 
   useEffect(() => {
-    // Get the authentication token from storage or state
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjM4OTMzMDU0NmE0MDJmNWRmNWMyODIifQ.hTvOG8NbX3IkjF7bTlnJbO1ux_QoYmoIqhju8pA7mEg";
-  
-    // Fetch and format the data when the component mounts
-    fetch('http://127.0.0.1:8000/child-profiles/', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        // Process the retrieved data
-        const formattedData = data.map(item => {
-          return {
-            id: item._id,
-            name: item.name,
-            dateOfBirth: new Date(item.date_of_birth).toISOString().split('T')[0],
-            weight: `${item.weight} lbs`,
-            allergies: item.allergies,
-            // medications: item.medications, // Add the medications field if available in the data
-            // image: item.image // Add the image field if available in the data
-          };
-        });
-        console.log(formattedData);
-        // Update the profiles state with the formatted data
-        setProfiles(formattedData);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+    fetchProfiles();
   }, []); // Empty dependency array ensures the effect runs only once
+  
+  // Fetch and format the data
+  const fetchProfiles = async () => {
+    try {
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjM5NDA4ZTliMWUwOWUzZWM4YmE3NTEifQ.EDAgPMUlM7ia2WygFK_DLpNz3IvN_T_HbF6ItOeXjQA";
+      const response = await axios.get('http://127.0.0.1:8000/child-profiles/', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("DATA: ", response);
+  
+      //PRObably don't need to end all the data?
+      const formattedData = response.data.map(item => {
+        return {
+          id: item._id,
+          name: item.name,
+          // image: item.image // Add the image field if available in the data
+        };
+      });
+  
+      console.log("PROFILE: ", formattedData);
+      setProfiles(formattedData);
+    } catch (error) {
+      console.error('Error fetching profiles:', error);
+    }
+  };
 
   const renderProfileItem = (item) => (
     <TouchableOpacity
       key={item.id}
       style={{ alignItems: 'center', marginBottom: 20 }}
-      onPress={() => navigation.navigate('ChildInfo', { baby: item })}
+      onPress={() => navigation.navigate('ChildInfo', { name: item.name })}
     >
       <View style={{
         width: 80,

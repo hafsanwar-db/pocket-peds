@@ -1,133 +1,348 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet, ScrollView, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Dimensions, Text, Image, TouchableOpacity, TextInput, StyleSheet, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { StyledContainer, InnerContainer, Colors } from '../components/styles';
+import { SwipeListView } from 'react-native-swipe-list-view';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 import axios from 'axios';
 
 const { darkLight, primary, grey } = Colors;
 
 const ChildInfo = ({ route, navigation }) => {
-  const { baby } = route.params;
-  const [name, setName] = useState(baby.name);
-  const [dateOfBirth, setDateOfBirth] = useState(baby.dateOfBirth);
-  const [weight, setWeight] = useState(baby.weight);
-  const [allergies, setAllergies] = useState(baby.allergies || '');
-  const [medications, setMedications] = useState(baby.medications || []);
-  const [medicationName, setMedicationName] = useState('');
-  const [dosage, setDosage] = useState('');
+  const { name } = route.params;
+  const [childInfo, setChildInfo] = useState(null);
+  const [medications, setMedications] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
+  // Fetch child info and medications on component mount
+  useEffect(() => {
+    fetchChildInfo();
+    fetchMedications();
+  }, []);
 
-  const handleAddMedication = () => {
-    const newMedication = { name: medicationName, dosage };
-    setMedications([...medications, newMedication]);
-    setMedicationName('');
-    setDosage('');
-  };
-
-  const handleUpdate = async () => {
-    const updatedProfile = {
-      name,
-      dob: dateOfBirth,
-      weight,
-      allergies,
-      medications,
-    };
-
+  // Fetch child info from the API
+  const fetchChildInfo = async () => {
     try {
-      const response = await axios.put(`http://127.0.0.1:8000/child-profiles/${baby.id}`, updatedProfile);
-      console.log(response.data.message);
-      setIsEditing(false);
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjM5NDA4ZTliMWUwOWUzZWM4YmE3NTEifQ.EDAgPMUlM7ia2WygFK_DLpNz3IvN_T_HbF6ItOeXjQA" //await getAccessToken(); // Implement the logic to get the access token
+      const response = await axios.get(`http://127.0.0.1:8000/child-profiles/${name}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("RESPONSE CHILD: ", response.data);
+      setChildInfo(response.data);
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('Error fetching child info:', error);
     }
   };
 
-  
+  // Fetch medications from the API
+  const fetchMedications = async () => {
+    try {
+      //const response = await axios.get(`http://127.0.0.1:8000/medication-history-all/${childInfo._id}`);
+      response = {
+        data: {
+          "child_id": {
+            "$oid": "60a1234567890abcdef12345"
+          },
+          "medications": [
+            {
+              "name": "Acetaminophen",
+              "time": {
+                "$date": "2023-05-08T10:30:00Z"
+              },
+              "dose": 5.5,
+              "upc": 123456789012
+            },
+            {
+              "name": "Ibuprofen",
+              "time": {
+                "$date": "2023-05-08T14:45:00Z"
+              },
+              "dose": 7.5,
+              "upc": 987654321098
+            }
+          ]
+        }
+      };
+      setMedications(response.data.medications);
+    } catch (error) {
+      console.error('Error fetching medications:', error);
+    }
+  };
+
+  // Calculate child's age in years and months
+  const calculateAge = (dateOfBirth) => {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    const months = (today.getMonth() - birthDate.getMonth() + 12) % 12;
+    return { years: age, months };
+  };
+
+  // Handle edit profile button press
+  const handleEditProfile = () => {
+    setIsEditing(true);
+  };
+
+  // Render the child info section
+  const renderChildInfo = () => {
+    if (!childInfo) return null;
+
+    const { name, date_of_birth, weight, last_updated } = childInfo;
+    const { years, months } = calculateAge(date_of_birth);
+    const weightInKg = (weight * 0.45359237).toFixed(1);
+    const last_updated_date = new Date(last_updated).toLocaleDateString();
+
+    return (
+      <View style={styles.childInfoContainer}>
+        <View style={styles.profileImageContainer}>
+          <Text style={styles.profileInitials}>{name.slice(0, 1)}</Text>
+        </View>
+        <View style={styles.childInfoTextContainer}>
+          <Text style={styles.childName}>{name}</Text>
+          <Text style={styles.childAge}>{years} years {months} {months>1 ? 'months' : 'month'}</Text>
+          <Text style={styles.childWeight}>{weight} lbs ({weightInKg} kg)</Text>
+          <Text style={styles.lastUpdated}>Last Updated: {last_updated_date}</Text>
+        </View>
+      </View>
+    );
+  };
+
+// Render the medication list
+const renderMedications = () => {
+
+  return (
+    <ScrollView>
+    <SwipeListView
+      data={medications}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item }) => (
+        <View style={styles.medicationItemContainer}>
+          <View style={styles.medicationImage} />
+          <View style={styles.medicationTextContainer}>
+            <Text style={styles.medicationName}>{item.name}</Text>
+            <Text style={styles.medicationUPC}>{item.upc}</Text>
+            <Text style={styles.medicationDosage}>{item.dose}</Text>
+          </View>
+        </View>
+      )}
+      renderHiddenItem={({ item, index }) => (
+        <View style={styles.hiddenItemContainer}>
+          <TouchableOpacity
+            style={[styles.hiddenItemButton, styles.editButton]}
+            onPress={() => handleEditMedication(item, index)}
+          >
+            <Icon name="clock-o" size={20} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.hiddenItemButton, styles.deleteButton]}
+            onPress={() => handleDeleteMedication(index)}
+          >
+            <Icon name="trash" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
+      )}
+      rightOpenValue={-75}
+    />
+
+    </ScrollView>
+  );
+};
+
+// Helper function to format the date
+const formatDate = (dateString) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+  return new Date(dateString).toLocaleDateString(undefined, options);
+};
+
+  return (
+    <StyledContainer>
+      <StatusBar style="dark" />
+      <InnerContainer>
+        {renderChildInfo()}
+        {renderMedications()}
+        {!isEditing && (
+          <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfile}>
+            <Text style={styles.editProfileButtonText}>Edit Profile</Text>
+          </TouchableOpacity>
+        )}
+      </InnerContainer>
+    </StyledContainer>
+  );
+};
+
+const getRandomColor = () => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
+const screenWidth = Dimensions.get('window').width;
+
 const styles = StyleSheet.create({
-  scrollView: {
-    flexGrow: 1,
-    justifyContent: 'space-between'
-  },
-  profileContainer: {
+  // ...
+  childInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
     marginBottom: 20,
+    marginTop: 25,
+    marginLeft: 10,
   },
-  profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginRight: 20,
-  },
-  defaultImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#D3D3D3',
+  profileImageContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'lightpink', //REMOVE. PULL FROM DB
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 20,
   },
-  initials: {
-    color: 'black',
+  profileInitials: {
     fontSize: 24,
+    fontWeight: 'bold',
   },
-  infoBox: {
-    backgroundColor: darkLight,
+  childInfoTextContainer: {
+    flex: 1,
+    backgroundColor: '#f0f0f0',
     borderRadius: 10,
     padding: 10,
   },
-  nameText: {
+  childName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  childAge: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  childWeight: {
+    fontSize: 16,
+  },
+  lastUpdated: {
+    fontSize: 14,
+    color: 'gray',
+  },
+  medicationListContainer: {
+    width: '100%',
+    color: 'black',
+  },
+  medicationDateContainer: {
+    marginBottom: 10,
+  },
+  medicationDate: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
   },
-  detailText: {
-    fontSize: 16,
-  },
-  editButtonBottom: {
-    backgroundColor: grey,
+  medicationItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderRadius: 5,
+    marginBottom: 5,
+    paddingVertical: 10,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 20,
+    width: screenWidth * 0.86,
   },
-  editButtonText: {
-    color: 'black',
-    fontSize: 16,
+  medicationImage: {
+    width: 50,
+    height: 50,
+    backgroundColor: 'lightgrey',
+    marginRight: 25,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginVertical: 5,
-  },
-  addButton: {
-    backgroundColor: primary,
-    padding: 10,
-    alignItems: 'center',
+  medicationTextContainer: {
+    backgroundColor: '#e0f2ff',
     borderRadius: 5,
+    padding: 10,
+    width: '80%',
   },
-  addButtonText: {
+  medicationName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  medicationDosage: {
+    fontSize: 14,
+    color: 'black',
+  },
+  medicationUPC: {
+    fontSize: 14,
+    color: 'black',
+  },
+  medicationTime: {
+    fontSize: 14,
+    color: 'gray',
+  },
+  editProfileButton: {
+    backgroundColor: grey,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignSelf: 'center',
+    marginTop: 20,
+  },
+  editProfileButtonText: {
     color: 'white',
     fontSize: 16,
+    fontWeight: 'bold',
   },
-  medicationItem: {
-    padding: 10,
-    marginVertical: 5,
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginRight: 20,
+  },
+  defaultImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: getRandomColor(),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 20,
+  },
+  infoBox: {
     backgroundColor: '#f0f0f0',
-    borderRadius: 5,
+    borderRadius: 10,
+    padding: 10,
   },
-  medicationText: {
-    fontSize: 16,
+  hiddenItemContainer: {
+    alignItems: 'flex-end',
+    borderRadius: 5,
+    width: screenWidth * 0.85,
+    padding: 10,
+  },
+  hiddenItemButton: {
+    padding: 5,
+    borderRadius: 5,
+    width: screenWidth * 0.15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editButton: {
+    marginBottom: 8,
+    backgroundColor: '#ffb200',
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+  },
+  hiddenItemButtonText: {
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 12,
+    paddingVertical: 4
   },
 });
-}
+
+
+
 export default ChildInfo;
