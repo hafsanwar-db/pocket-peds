@@ -23,18 +23,18 @@ import {
   
     return (
       <View style={styles.container}>
-        <Animated.Image
+        <Image
           source={item.img}
           resizeMode='contain'
           style={[
             styles.image,
-            {
-              transform: [
-                {
-                  translateY: translateYImage,
-                },
-              ],
-            },
+            // {
+            //   transform: [
+            //     {
+            //       translateY: translateYImage,
+            //     },
+            //   ],
+            // },
           ]}
         />
       </View>
@@ -46,8 +46,7 @@ import {
   const styles = StyleSheet.create({
     container: {
       width : width,
-      height: 0.25*height,
-      alignItems: 'center'
+      alignItems: 'center',
     },
     image: {
       flex: 1,

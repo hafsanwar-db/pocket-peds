@@ -5,6 +5,9 @@ const tertiary = Colors.tertiary; // Import the missing tertiary variable
 import ip from "../screens/ip.js"; // Import the missing ip variable
 // React navigation
 import Carousel from "../screens/Carousel";
+import AddChild from "../screens/AddChild";
+import Child from "../screens/Child";
+import ChildInfo from "../screens/ChildInfo";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Token } from "../components/Token";
@@ -226,14 +229,38 @@ const RootStack = ({
           <Footer navigation={props.navigation} />
         </> }
         </Stack.Screen>
-        {/* <Stack.Screen name="Carousel">
+        <Stack.Screen name="AddChild">
+          {(props) => <>
+          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <AddChild {...props} />
+          </View>
+          <Footer navigation={props.navigation} />
+        </> }
+        </Stack.Screen>
+        <Stack.Screen name="Child">
+          {(props) => <>
+          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <Child {...props} />
+          </View>
+          <Footer navigation={props.navigation} />
+        </> }
+        </Stack.Screen>
+        <Stack.Screen name="ChildInfo">
+          {(props) => <>
+          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <ChildInfo {...props} />
+          </View>
+          <Footer navigation={props.navigation} />
+        </> }
+        </Stack.Screen>
+        <Stack.Screen name="Carousel">
           {(props) => <>
           <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
           <Carousel {...props} />
           </View>
           <Footer navigation={props.navigation} />
         </> }
-        </Stack.Screen> */}
+        </Stack.Screen>
         {/* <Stack.Screen
                             name="WeightWarning"
                             component={WeightWarning}

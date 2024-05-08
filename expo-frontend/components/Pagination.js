@@ -6,6 +6,7 @@ const {width} = Dimensions.get('screen');
 const Pagination = ({data, scrollX, index}) => {
 
   return (
+    <View>
     <View style={styles.container}>
       {data.map((_, idx) => {
         const inputRange = [(idx - 1) * width, idx * width, (idx + 1) * width];
@@ -40,6 +41,7 @@ const Pagination = ({data, scrollX, index}) => {
           />
         );
       })}
+    </View>
     </View>
   );
 };

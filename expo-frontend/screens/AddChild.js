@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Image } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Animated } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
-
-
+import Carousel from './Carousel';
+import { Token } from '../components/Token';
 import {
   StyledContainer,
   InnerContainer,
   PageTitle,
   Colors,
 } from '../components/styles';
+import Constants from "expo-constants";
 
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 
 const { primary, darkLight } = Colors;
+const StatusBarHeight = Constants.statusBarHeight;
 
 const AddChild = ({ navigation, route }) => {
   const [newProfileName, setNewProfileName] = useState('');
@@ -23,7 +25,11 @@ const AddChild = ({ navigation, route }) => {
   const [newAllergies, setNewAllergies] = useState('');
   const [newMedications, setNewMedications] = useState('');
   const [profileImage, setProfileImage] = useState(null);
+  const {tokenValue} = useContext(Token);
 
+
+  
+  
    const handleImagePicker = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -56,13 +62,13 @@ const AddChild = ({ navigation, route }) => {
       };
   
       try {
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjM4OTMzMDU0NmE0MDJmNWRmNWMyODIifQ.hTvOG8NbX3IkjF7bTlnJbO1ux_QoYmoIqhju8pA7mEg" //await getAccessToken(); // Implement the logic to get the access token
+        const token = tokenValue //await getAccessToken(); // Implement the logic to get the access token
         const response = await axios.post('http://127.0.0.1:8000/child-profiles/', newProfile, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response.data.message);
+        console.log(response);
         route.params.addProfile(newProfile);
         navigation.goBack();
       } catch (error) {
@@ -74,40 +80,39 @@ const AddChild = ({ navigation, route }) => {
 
   
   return (
-    <KeyboardAvoidingWrapper>
-      <StyledContainer>
+      <View style= {styles.container}>
         <StatusBar style="dark" />
-        <InnerContainer>
-          <PageTitle>Add </PageTitle>
-
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               alignSelf: 'center',
               marginBottom: 20,
+              borderWidth: 1,
+              borderColor: 'red',
             }}
-            onPress={handleImagePicker}
-          >
-            {profileImage ? (
-              <Image
-                source={{ uri: profileImage }}
-                style={{ width: 100, height: 100, borderRadius: 50 }}
-              />
-            ) : (
-              <View
-                style={{
-                  width: 100,
-                  height: 100,
-                  borderRadius: 50,
-                  backgroundColor: darkLight,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Text style={{ color: 'white', fontSize: 16 }}>Upload Image</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-
+            // onPress={handleImagePicker}
+          > */}
+            {/* {profileImage ? (
+            //   <Image
+            //     source={{ uri: profileImage }}
+            //     style={{ width: 100, height: 100, borderRadius: 50 }}
+            //   />
+            // ) : (
+            //   <View
+            //     style={{
+            //       width: 100,
+            //       height: 100,
+            //       borderRadius: 50,
+            //       backgroundColor: darkLight,
+            //       alignItems: 'center',
+            //       justifyContent: 'center',
+            //     }}
+            //   >
+            //     <Text style={{ color: 'white', fontSize: 16 }}>Upload Image</Text>
+            //   </View>
+            )} */}
+            <Carousel/>
+          {/* </TouchableOpacity> */}
+            <View style= {styles.inputContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
             <Text style={{ fontSize: 16, marginRight: 10 }}>Name:</Text>
             <TextInput
@@ -153,7 +158,7 @@ const AddChild = ({ navigation, route }) => {
                 borderRadius: 5,
                 paddingHorizontal: 10,
               }}
-              placeholder="Enter weight"
+              placeholder="Enter weight (in lbs)"
               value={newWeight}
               onChangeText={setNewWeight}
             />
@@ -170,7 +175,7 @@ const AddChild = ({ navigation, route }) => {
                 borderRadius: 5,
                 paddingHorizontal: 10,
               }}
-              placeholder="Enter allergies"
+              placeholder="allergies (separated by a comma)"
               value={newAllergies}
               onChangeText={setNewAllergies}
             />
@@ -187,12 +192,12 @@ const AddChild = ({ navigation, route }) => {
                 borderRadius: 5,
                 paddingHorizontal: 10,
               }}
-              placeholder="Enter medications"
+              placeholder="medications (separated by a comma)"
               value={newMedications}
               onChangeText={setNewMedications}
             />
           </View>
-
+          </View>
           <TouchableOpacity
             style={{
               backgroundColor: primary,
@@ -206,9 +211,8 @@ const AddChild = ({ navigation, route }) => {
           >
             <Text style={{ color: 'black', fontSize: 16 }}>Save Profile</Text>
           </TouchableOpacity>
-        </InnerContainer>
-      </StyledContainer>
-    </KeyboardAvoidingWrapper>
+      </View>
+
   );
 };
 const handleSubmit = async () => {
@@ -233,5 +237,22 @@ const handleSubmit = async () => {
     // }
   }
 };
+
+const styles = StyleSheet.create({
+  container:{
+    flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  paddingTop: StatusBarHeight,
+  backgroundColor: "white",
+  height: height,
+  overflow: "visible",
+  },
+  inputContainer:{
+    width:width,
+    paddingLeft:20,
+    paddingRight:20,
+  }
+})
 
 export default AddChild;

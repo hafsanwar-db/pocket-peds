@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, ScrollView, TouchableOpacity, Text, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import {Token} from '../components/Token';
 import {
   StyledContainer,
   InnerContainer,
@@ -17,7 +18,7 @@ const { primary, darkLight } = Colors;
 
 const Child = ({ navigation }) => {
   const [profiles, setProfiles] = useState([]);
-
+  const {tokenValue} = useContext(Token);
   useEffect(() => {
     fetchProfiles();
   }, []); // Empty dependency array ensures the effect runs only once
@@ -25,7 +26,7 @@ const Child = ({ navigation }) => {
   // Fetch and format the data
   const fetchProfiles = async () => {
     try {
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjM5NDA4ZTliMWUwOWUzZWM4YmE3NTEifQ.EDAgPMUlM7ia2WygFK_DLpNz3IvN_T_HbF6ItOeXjQA";
+      const token = tokenValue;
       const response = await axios.get('http://127.0.0.1:8000/child-profiles/', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -36,9 +37,9 @@ const Child = ({ navigation }) => {
       //PRObably don't need to end all the data?
       const formattedData = response.data.map(item => {
         return {
-          id: item._id,
-          name: item.name,
-          // image: item.image // Add the image field if available in the data
+          id: item?._id,
+          name: item?.name,
+          image: item?.image // Add the image field if available in the data
         };
       });
   

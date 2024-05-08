@@ -1,16 +1,16 @@
-import {Animated, FlatList, StyleSheet, Text, View} from 'react-native';
+import {Animated, FlatList, StyleSheet, Dimensions, View} from 'react-native';
 import React, {useRef, useState} from 'react';
 import Slides from './slides';
 import SlideItem from '../components/SlideItem';
 import Pagination from '../components/Pagination';
 
-const imageList = ['avatar1', 'avatar2', 'avatar3', 'avatar4', 'avatar5', 'avatar6'];
 
 const Slider = () => {
-  
+  const imageList = ['avatar1', 'avatar2', 'avatar3', 'avatar4', 'avatar5', 'avatar6'];
+  const {height, width} = Dimensions.get('screen');
   const [index, setIndex] = useState(0);
   const [image, setImage] = useState("");
-  console.log('avatar', image);
+
   const scrollX = useRef(new Animated.Value(0)).current;
 
   const handleOnScroll = event => {
@@ -30,17 +30,20 @@ const Slider = () => {
     )(event);
   };
 
-  const handleOnViewableItemsChanged = useRef(({viewableItems}) => {
-    setImage(imageList[viewableItems[0].item.id - 1])
-    setIndex(viewableItems[0].index);
-  }).current;
+  const handleOnViewableItemsChanged = ({viewableItems}) => {
+      const listIndex = viewableItems[0];
+      console.log(listIndex)
+    // setImage(imageList[viewableItems[0].index - 1])
+    // setIndex(viewableItems[0].index);
+  };
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,
   }).current;
 
   return (
-    <View className = "mt-[5vh]">
+    <View style={{height: 0.25*height, marginBottom:20}}>
+      <View>
       <FlatList
         data={Slides}
         renderItem={({item}) => <SlideItem item={item} />}
@@ -53,6 +56,7 @@ const Slider = () => {
         viewabilityConfig={viewabilityConfig}
       />
       <Pagination data={Slides} scrollX={scrollX} index={index} />
+      </View>
     </View>
   );
 };
