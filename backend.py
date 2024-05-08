@@ -31,7 +31,7 @@ load_dotenv()
 connection_string = os.getenv('connectionString')
 client = MongoClient(connection_string)
 db = client['PocketPeds']
-child_profiles = db['child_profiles']
+child_profiles = db['child_profiles2']
 user_profiles = db['user_profiles']
 medicines = db['medicines']
 
@@ -169,6 +169,7 @@ async def create_child_profile(data: dict, token: Annotated[str, Depends(oauth2_
         'sex': data['sex'],
         'allergies': data.get('allergies', []),
         'medications': data.get('medications', []),
+        'image': data.get('image', '')
     }
     
     # Check if the child profile already exists
