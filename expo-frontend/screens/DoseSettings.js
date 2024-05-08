@@ -38,8 +38,8 @@ const DoseSettings = ({ route }) => {
         // Set default times based on interval
         if (reminderInterval === 8 * 60 * 60 * 1000) {
           // For 8-hour interval
-          reminderTimes.push({ selected: false,time: currentTime.setHours(10, 0, 0, 0), selected: false }); // 10:00 AM
-          reminderTimes.push({ selected: false,time: currentTime.setHours(18, 0, 0, 0), selected: false }); // 6:00 PM
+          reminderTimes.push({time: currentTime.setHours(10, 0, 0, 0), selected: false,doseGiven: false  }); // 10:00 AM
+          reminderTimes.push({ time: currentTime.setHours(18, 0, 0, 0), selected: false,doseGiven: false }); // 6:00 PM
           switch (index) {
             case 0:
               currentTime.setHours(10, 0, 0, 0);
@@ -50,7 +50,7 @@ const DoseSettings = ({ route }) => {
             case 2:
               currentTime.setDate(currentTime.getDate() + 1); // Next day for 2 am
               
-              reminderTimes.push({ selected: false,time:  currentTime.setHours(2, 0, 0, 0), selected: false }); // Next day 2:00 AM
+              reminderTimes.push({time:  currentTime.setHours(2, 0, 0, 0), selected: false,doseGiven: false  }); // Next day 2:00 AM
 
               break;
             default:
@@ -58,9 +58,9 @@ const DoseSettings = ({ route }) => {
           }
         } else if (reminderInterval === 6 * 60 * 60 * 1000) {
           // For 6-hour interval
-          reminderTimes.push({ selected: false,time: currentTime.setHours(9, 0, 0, 0), selected: false }); // 9:00 AM
-          reminderTimes.push({ selected: false,time: currentTime.setHours(15, 0, 0, 0), selected: false }); // 3:00 PM
-          reminderTimes.push({ selected: false,time: currentTime.setHours(21, 0, 0, 0), selected: false }); // 9:00 PM
+          reminderTimes.push({ selected: false,time: currentTime.setHours(9, 0, 0, 0), selected: false,doseGiven: false }); // 9:00 AM
+          reminderTimes.push({ selected: false,time: currentTime.setHours(15, 0, 0, 0), selected: false,doseGiven: false  }); // 3:00 PM
+          reminderTimes.push({ selected: false,time: currentTime.setHours(21, 0, 0, 0), selected: false,doseGiven: false  }); // 9:00 PM
           switch (index) {
             case 0:
               currentTime.setHours(9, 0, 0, 0);
@@ -76,7 +76,7 @@ const DoseSettings = ({ route }) => {
           }
         }
         
-        return { time: currentTime, selected: false };
+        return { time: currentTime, selected: false,doseGiven: false };
       });
       
       setReminderTimes(newReminderTimes);
@@ -85,28 +85,17 @@ const DoseSettings = ({ route }) => {
 
   const handleReminderIntervalSelect = (interval) => {
       setReminderInterval(interval);
-      /*
-      let currentTime2 = new Date();
-      let am2Time = currentTime2.setDate(currentTime2.getDate() + 1); // Next day for 2 am
-
-      if (interval === 8 * 60 * 60 * 1000) {
-      // For 8-hour interval
-        reminderTimes.push({ selected: false,time: currentTime2.setHours(10, 0, 0, 0), selected: false }); // 10:00 AM
-        reminderTimes.push({ selected: false,time: currentTime2.setHours(18, 0, 0, 0), selected: false }); // 6:00 PM
-        reminderTimes.push({ selected: false,time:  am2Time.setHours(2, 0, 0, 0), selected: false }); // Next day 2:00 AM
-      } else if (interval === 6 * 60 * 60 * 1000) {
-      // For 6-hour interval
-        reminderTimes.push({ selected: false,time: currentTime2.setHours(9, 0, 0, 0), selected: false }); // 9:00 AM
-        reminderTimes.push({ selected: false,time: currentTime2.setHours(15, 0, 0, 0), selected: false }); // 3:00 PM
-        reminderTimes.push({ selected: false,time: currentTime2.setHours(21, 0, 0, 0), selected: false }); // 9:00 PM
-      }*/
+      
    
    
  };
 
  const toggleReminderTime = (index) => {
-   setSelectedTimeIndex(index);
-   setShowTimePicker(true);
+    setSelectedTimeIndex(index);
+    setShowTimePicker(true);
+    const newReminderTimes = [...reminderTimes];
+    newReminderTimes[index].doseGiven = !newReminderTimes[index].doseGiven;
+    setReminderTimes(newReminderTimes);
  };
 
  const handleTimeChange = (event, selectedTime) => {
@@ -137,17 +126,35 @@ const DoseSettings = ({ route }) => {
     }
   };
   
-  
+  const generateUniqueReminderId = () => {
+    const baseId = 'reminder_'; // Base ID
+    const uniqueId = Date.now().toString(36); // Unique identifier (timestamp converted to base-36 string)
+    return baseId + uniqueId;
+  };
   const handleLocalPushNotification = async () => {
     const medicineName = scannedData["name"];
     const dosage = apiData["dosage"];
 
-    console.log(reminderTimes);
-    await schedulePushNotification(4,medicineName,dosage);
-    await schedulePushNotification(reminderTimes[0].time,medicineName,dosage);
-    await schedulePushNotification(reminderTimes[1].time,medicineName,dosage);
-    await schedulePushNotification(reminderTimes[2].time,medicineName,dosage);
-    
+    for (let i = 0; i < reminderTimes.length; i++) {
+      const time = reminderTimes[i].time;
+      const doseGiven = reminderTimes[i].doseGiven;
+      const reminderId = generateUniqueReminderId();
+      const scheduledNotificationId = await schedulePushNotification(time, medicineName, dosage, doseGiven,reminderId);
+      // Update the notificationIds object with the new mapping
+      setNotificationIds(prevIds => ({
+        ...prevIds,
+        [reminderId]: scheduledNotificationId
+      }));
+
+      if (doseGiven) {
+        const nextDayTime = new Date(time);
+        nextDayTime.setDate(nextDayTime.getDate() + 1);
+        const nextDayIndex = reminderTimes.findIndex((item) => item.time.getTime() === nextDayTime.getTime());
+        if (nextDayIndex !== -1) {
+          reminderTimes[nextDayIndex].doseGiven = false;
+        }
+      }
+    }
   };
   
  const toggleTimeSelection = (index) => {
@@ -155,6 +162,21 @@ const DoseSettings = ({ route }) => {
    newReminderTimes[index].selected = !newReminderTimes[index].selected;
    setReminderTimes(newReminderTimes);
  };
+ // Function to cancel a notification based on reminder ID
+  const cancelNotification = (reminderId) => {
+    const notificationId = notificationIds[reminderId];
+    if (notificationId) {
+      // Cancel the notification using its ID
+      Notifications.cancelScheduledNotificationAsync(localNotificationId)
+      
+      // Remove the mapping from notificationIds
+      setNotificationIds(prevIds => {
+        const updatedIds = { ...prevIds };
+        delete updatedIds[reminderId];
+        return updatedIds;
+      });
+    }
+  };
 
  return (
    <View style={styles.container}>
@@ -189,8 +211,9 @@ const DoseSettings = ({ route }) => {
        <View key={index} style={[styles.reminderTimeContainer]}>
          <TouchableOpacity
            style={[styles.checkbox, item.selected ? styles.checkboxSelected : styles.checkboxUnselected]}
-           //onPress={() => toggleTimeSelection(index)}
+           onPress={() => toggleTimeSelection(index)}
          >
+          <Text style={styles.checkboxText}>{item.doseGiven ? '✓' : '✕'}</Text>
          </TouchableOpacity>
          <TouchableOpacity
            style={styles.reminderTimeTextContainer}
