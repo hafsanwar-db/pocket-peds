@@ -31,6 +31,7 @@ Notifications.setNotificationHandler({
 export default function App() {
   const [appReady, setAppReady] = useState(false);
   const [storedCredentials, setStoredCredentials] = useState("");
+  
   // Load login info, hide splash screen when done
   useEffect(() => {
     const checkLoginCredentials = async () => {
@@ -51,6 +52,7 @@ export default function App() {
   }, []);
 
   useLocalNotification();
+  
   //const [reminderInterval, setReminderInterval] = useState(8);
   
   //console.log("intervalSEC BEFORE: ",reminderInterval)

@@ -1,19 +1,20 @@
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-
+const {child} = useContext(Token)
+const childName = child.name
 //use these functions to get user permissions and trigger the notification process.
 
-export const schedulePushNotification = async (date,medicineName,dosage,reminderId) => {
+export const schedulePushNotification = async (date,medicineName,dosage,medicationUpc) => {
   await Notifications.scheduleNotificationAsync({
     //identifier: "PocketPeds",
     
     content: {
       title: "PocketPeds",
       
-      body: `Time for Lily's next dose!\nGive ${dosage} of ${medicineName} to Lily.`,
+      body: `Time for ${childName} next dose!\nGive ${dosage} of ${medicineName} to ${childName}`,
       categoryIdentifier: "reminder",
-      data: { medicineName: medicineName,date:date,reminderId: reminderId }
+      data: { medicineName: medicineName,date:date,medicationUpc: medicationUpc }
     },
     trigger: { date: date},
     //trigger: { seconds: 4 },
