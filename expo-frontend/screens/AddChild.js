@@ -18,6 +18,7 @@ import {
   InnerContainer,
   PageTitle,
   Colors,
+  MessageBox,
 } from "../components/styles";
 import Constants from "expo-constants";
 
@@ -36,6 +37,16 @@ const AddChild = ({ navigation }) => {
   const [profileImage, setProfileImage] = useState("avatar1");
   const { tokenValue } = useContext(Token);
 
+  const [message, setMessage] = useState();
+  const [messageType, setMessageType] = useState();
+  
+
+  // const handleImagePicker = async () => {
+  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //   if (status !== "granted") {
+  //     alert("Sorry, we need camera roll permissions to select an image.");
+  //     return;
+  //   }
 
   const  convertDateFormat = (dateString) => {
     const [month, day, year] = dateString.split('-');
@@ -52,9 +63,47 @@ const AddChild = ({ navigation }) => {
     return diffInMonths;
   };
 
-  const handleSubmit = async () => {
+  const handleMessage = (message, type = 'FAILED') => {
+    setMessage(message);
+    setMessageType(type);
+  };
 
-    if (newProfileName.trim() !== "") {
+  const handleSubmit = async () => {
+    const isValidDate = (dateString) => {
+      const regex = /^\d{2}-\d{2}-\d{4}$/;
+      if (!regex.test(dateString)) {
+      return false;
+      }
+      const month = parseInt(dateString.substring(0, 2));
+      const day = parseInt(dateString.substring(3, 5));
+      const year = parseInt(dateString.substring(6, 10));
+      const date = new Date(year, month - 1, day);
+      return (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+      );
+    };
+
+    if (newProfileName.trim() === "" || newDateOfBirth.trim() === "" || newWeight.trim() === "" || sex.trim() === ""
+        || newAllergies.trim() === "" || newMedications.trim() === "" || profileImage.trim() === "" ) {
+      handleMessage("Please fill in all fields.");
+    }
+
+    else if (!isValidDate(newDateOfBirth.trim())) {
+      handleMessage("Date of birth is not in the correct format. Please enter a valid date of birth.");
+    }
+
+    else if (new Date(newDateOfBirth.trim()) > new Date()) {
+      handleMessage("Invalid date of birth. Please enter a valid date of birth.");
+    }
+
+    else if (isNaN(newWeight.trim()) || newWeight.trim() < 0) {
+      handleMessage("Invalid weight. Please enter a valid weight.");
+    }
+
+      
+    else{
       const newProfile = {
         name: newProfileName.trim().toLowerCase(),
         age: calculateAge(newDateOfBirth.trim()), // Add the age calculation logic
@@ -157,6 +206,9 @@ const AddChild = ({ navigation }) => {
             onChangeText={setNewAllergies}
           />
         </View>
+
+        <MessageBox type={messageType}>{message}</MessageBox>
+
         <View style={{paddingBottom: 10, flexDirection:"row", justifyContent:'center' }}>
         <TouchableOpacity
         style={{
