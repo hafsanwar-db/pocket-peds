@@ -36,7 +36,7 @@ const UpdateProfile = ({ navigation, route }) => {
   });
   const [message, setMessage] = useState();
   const [messageType, setMessageType] = useState();
-  const [profileImage, setProfileImage] = useState("");
+  const [profileImage, setProfileImage] = useState("avatar1");
   const {tokenValue} = useContext(Token);
 
   useEffect(() => {
@@ -51,7 +51,6 @@ const UpdateProfile = ({ navigation, route }) => {
     })
       .then((response) => {
         setChildInfo(response.data);
-        setProfileImage(response.data.image);
         console.log("UPDATE PROFILE: ", response.data);
       })
       .catch((error) => {
