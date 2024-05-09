@@ -262,8 +262,9 @@ async def delete_child_profile(child_name: str, token: Annotated[str, Depends(oa
 
 @app.post('/delete-child-medication')
 async def delete_child_medication(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
+    user_id = get_userID(token)
     # Retrieve the child profile from the database
-    child_profile = child_profiles.find_one({'name': data['child_name']})
+    child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': user_id})
 
     if not child_profile:
         raise HTTPException(status_code=404, detail='Child profile not found')
@@ -287,7 +288,8 @@ async def delete_child_medication(data: dict, token: Annotated[str, Depends(oaut
 @app.post('/add-child-medication')
 async def add_child_medication(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
     # Retrieve the child profile from the database
-    child_profile = child_profiles.find_one({'name': data['child_name']})
+    user_id = get_userID(token)
+    child_profile = child_profiles.find_one({'name': data['child_name'],'parent_id': user_id})
 
     if not child_profile:
         raise HTTPException(status_code=404, detail='Child profile not found')
@@ -306,7 +308,8 @@ async def add_child_medication(data: dict, token: Annotated[str, Depends(oauth2_
 @app.post('/update_notifications')
 async def update_notifications(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
     # Retrieve the child profile from the database
-    child_profile = child_profiles.find_one({'name': data['child_name']})
+    user_id = get_userID(token)
+    child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': user_id})
 
     if not child_profile:
         raise HTTPException(status_code=404, detail='Child profile not found')
