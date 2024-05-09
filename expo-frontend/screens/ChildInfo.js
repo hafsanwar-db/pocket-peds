@@ -129,6 +129,10 @@ const ChildInfo = ({ route, navigation }) => {
     );
   };
 
+  const handleEditMedication = (medicationData) => {
+    navigation.navigate('EditMedication', { medicationData });
+  };
+
 // Render the medication list
 const renderMedications = () => {
   return (
@@ -150,7 +154,7 @@ const renderMedications = () => {
           <View style={styles.hiddenItemContainer}>
             <TouchableOpacity
               style={[styles.hiddenItemButton, styles.editButton]}
-              onPress={() => handleEditMedication(item, index)}
+              onPress={() => handleEditMedication(item)}
             >
               <Icon name="clock-o" size={20} color="white" />
             </TouchableOpacity>

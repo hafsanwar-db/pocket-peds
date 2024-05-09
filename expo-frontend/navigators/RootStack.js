@@ -24,6 +24,7 @@ import ConfirmationScreen from "../screens/ConfirmationScreen";
 import { navigationRef, isReadyRef } from "../NavigationService";
 import UpdateProfile from "../screens/UpdateProfile";
 import { AppState, View, Dimensions } from "react-native";
+import EditMedication from "../screens/EditMedication.js";
 import Internet from "../components/modal/Internet.js";
 
 height = Dimensions.get("window").height;
@@ -253,6 +254,14 @@ const RootStack = ({
           {(props) => <>
           <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
           <ChildInfo {...props} />
+          </View>
+          <Footer navigation={props.navigation} />
+        </> }
+        </Stack.Screen>
+        <Stack.Screen name="EditMedication">
+          {(props) => <>
+          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <EditMedication {...props} />
           </View>
           <Footer navigation={props.navigation} />
         </> }
