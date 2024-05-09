@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Token } from "../components/Token";
+import { InnerContainer } from "../components/styles";
+import ChangeWeightModal from '../components/modal/ChangeWeightModal';
 
 const DoseSettings = ({ route }) => {
   const { scannedData, apiData } = route.params;
@@ -17,7 +19,19 @@ const DoseSettings = ({ route }) => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(null);
   const { child } = useContext(Token);
+
+  const imagePaths = {
+    avatar1: require('../assets/img/avatar1.png'),
+    avatar2: require('../assets/img/avatar2.png'),
+    avatar3: require('../assets/img/avatar3.png'),
+    avatar4: require('../assets/img/avatar4.png'),
+    avatar5: require('../assets/img/avatar5.png'),
+    avatar6: require('../assets/img/avatar6.png'),
+    // Add more images as needed
+  };
+
   console.log(apiData);
+  console.log(child);
   useEffect(() => {
     if (reminderInterval) {
       const newReminderTimes = Array.from({ length: 3 }, (_, index) => {
@@ -117,16 +131,75 @@ const DoseSettings = ({ route }) => {
     setReminderTimes(newReminderTimes);
   };
 
+  const calculateAge = (dateOfBirth) => {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    const months = (today.getMonth() - birthDate.getMonth() + 12) % 12;
+    return { years: age, months };
+  };
+
+  const renderChildInfo = () => {
+    if (!child) return null;
+  
+    const { name, date_of_birth, weight, last_updated } = child;
+    const { years, months } = calculateAge(date_of_birth);
+    const weightInKg = (weight * 0.45359237).toFixed(1);
+    const last_updated_date = new Date(last_updated).toLocaleDateString();
+  
+    return (
+      <View style={styles.childInfoContainer}>
+        <Image source={imagePaths[child.image]} style={styles.profileImage} />
+        <View style={styles.childInfoTextContainer}>
+          <Text style={styles.childName}>
+            {name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) {
+              return txt.toUpperCase();
+            })}
+          </Text>
+          <Text style={styles.childAge}>
+            {years} years {months} {months > 1 ? "months" : "month"}
+          </Text>
+          <Text style={styles.childWeight}>
+            {weight} lbs ({weightInKg} kg)
+          </Text>
+        </View>
+      </View>
+    );
+  };
+  
   return (
     <View style={styles.container}>
+      <View style={styles.upcContainer}>
       <Text style={styles.upc}>UPC: {scannedData.upc}</Text>
-      <Image source={{ uri: scannedData.image }} style={styles.image} />
-      <View style={styles.productContainer}>
-        <Text style={styles.productName}>{scannedData.name}</Text>
       </View>
-      <Text style={styles.doseText}>
-        Dose: <Text style={styles.dosageText}>{apiData.dose}</Text>{" "}
-      </Text>
+      <View style={styles.contentContainer}>
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: scannedData.image }} style={styles.image} />
+        </View>
+        <View style={styles.infoContainer}>
+          {renderChildInfo()}
+        </View>
+      </View>
+      <View style={styles.productContainer}>
+      <Text style={styles.productName}>
+          {scannedData.name
+            .toLowerCase()
+            .split(' ')
+            .slice(0, 2)
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+          }...
+        </Text>
+      </View>
+      <InnerContainer>
+        <Text style={styles.doseText}>
+          Dose: <Text style={styles.dosageText}>{apiData.dose}</Text>{" "}
+        </Text>
+      </InnerContainer>
 
       <View style={styles.reminderButtonContainer}>
         <TouchableOpacity
@@ -193,26 +266,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
     paddingHorizontal: 20,
+  },
+  contentContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  imageContainer: {
+    flex: 0.75,
+    alignItems: "center",
+  },
+  infoContainer: {
+    flex: 1,
+    marginLeft: 20,
   },
   upc: {
     fontSize: 16,
+    color: "#F5F5F5",
+    textAlign: "center", // Center the text horizontally
     marginBottom: 10,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 150,
     resizeMode: "contain",
-    marginBottom: 20,
   },
   productContainer: {
     alignItems: "center",
     marginBottom: 20,
   },
   productName: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
   },
@@ -231,18 +316,30 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    color: '#333'
+    color: "#333",
   },
   dosageText: {
     fontSize: 22,
-    marginBottom: 20,
-    color: '#FFA500'
+    color: "#FFA500",
+  },
+  upcContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    alignContent: "center",
+    marginTop: 65,
+    marginBottom: 30,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: "#C9DAF8",
+    borderRadius: 30,
   },
   reminderButtonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "80%",
     marginBottom: 20,
+    alignSelf: "center",
   },
   reminderButton: {
     backgroundColor: "#e6e6e6",
@@ -304,6 +401,41 @@ const styles = StyleSheet.create({
   },
   selectedReminderTimeContainer: {
     backgroundColor: "#FFA500",
+  },
+  childInfoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+  },
+  profileImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
+  },
+  childInfoTextContainer: {
+    flex: 1,
+  },
+  childName: {
+    fontSize: 13,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  childAge: {
+    fontSize: 10,
+    marginBottom: 5,
+  },
+  childWeight: {
+    fontSize: 10,
+    marginBottom: 5,
+  },
+  lastUpdated: {
+    fontSize: 10,
+    color: "#666",
   },
 });
 
