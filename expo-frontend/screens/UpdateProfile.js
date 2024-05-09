@@ -17,16 +17,16 @@ import { StatusBar } from 'expo-status-bar';
 const { brand, darkLight, primary } = Colors;
 
 // Formik
-import { Formik } from 'formik';
+import { Formik, Field } from 'formik';
 
 
 const UpdateProfile = ({ navigation, route }) => {
-  const { childInfo: routeChildInfo } = route.params || {}; // Get child name from navigation params
+  const { name = '' } = route.params; // Get child name from navigation params
 
   const [childInfo, setChildInfo] = useState({
-    name: routeChildInfo?.name || '',
-    weight: routeChildInfo?.weight || '',
-    age: routeChildInfo?.age || '',
+    name: name,
+    weight: '',
+    age: '',
   });
   const [message, setMessage] = useState();
   const [messageType, setMessageType] = useState();
@@ -36,26 +36,29 @@ const UpdateProfile = ({ navigation, route }) => {
   useEffect(() => {
     const token = tokenValue;
     // Fetch child info using Axios
-    axios.get(`http://${ip}:8000/child-profiles/${childName}`, {
+    console.log(name);
+
+    axios.get(`http://${ip}:8000/child-profiles/${name.toLowerCase()}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then((response) => {
         setChildInfo(response.data);
+        console.log("UPDATE PROFILE: ", response.data);
       })
       .catch((error) => {
         console.error('Error fetching child info:', error);
       });
-  }, [childName, tokenValue]);
+  }, [name, tokenValue]);
 
   const handleUpdate = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = `http://${ip}:8000/child-profiles/${childName}`;
+    const url = `http://${ip}:8000/child-profiles/${name.toLowerCase()}`;
     const token = tokenValue;
   
     axios
-      .post(url, credentials, {
+      .put(url, credentials, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -86,10 +89,13 @@ const UpdateProfile = ({ navigation, route }) => {
     <StatusBar style="dark" />  
     <InnerContainer>
         <PageTitle style={{ color: "black", marginBottom: 10 }}>Updating Profile</PageTitle>
+
+        {/* INSERT THE CAROUSEL HERE */}
         <PageLogo resizeMode="cover" source={require('../assets/img/peds-logo.png')} />
         
         <Formik
-            initialValues={{ weight: childInfo.weight || '', name: childInfo.name || '', age: childInfo.age || '' }}
+            initialValues={{ weight: childInfo?.weight || '', name: childInfo?.name || '', age: childInfo?.age || '' }}
+            enableReinitialize
             onSubmit={(values, {setSubmitting}) => {
                 if (values.weight == '' || values.name == '' || values.age == '') {
                     handleMessage("Please fill in all fields.");
@@ -104,6 +110,7 @@ const UpdateProfile = ({ navigation, route }) => {
                     setSubmitting(false);
                 }
                 else {
+                    values.name = values.name.toLowerCase();
                     handleUpdate(values, setSubmitting);
                 }
             }}
@@ -111,36 +118,36 @@ const UpdateProfile = ({ navigation, route }) => {
             {({handleChange, handleBlur, handleSubmit, values, isSubmitting}) => 
                 <StyledFormArea>
 
-                    <MyTextInput
-                        label="Name"
-                        icon={"person-circle-outline"}
-                        placeholder="Jane"
-                        placeholderTextColor={darkLight}
-                        onChangeText={handleChange('name')}
-                        onBlur={handleBlur('name')}
-                        values={values.weight}
+                    <MyFormikTextInput
+                      label="Name"
+                      icon="person-circle-outline"
+                      name="name"
+                      placeholder="Jane"
+                      isPassword={false}
+                      value={values.name} // Use values.name from Formik
+                      onChange={handleChange('name')}
+                      onBlur={handleBlur('name')}
                     />
 
-                    <MyTextInput
-                        label="Age (years)"
-                        icon={"balloon-outline"}
-                        placeholder="6"
-                        placeholderTextColor={darkLight}
-                        onChangeText={handleChange('age')}
-                        onBlur={handleBlur('age')}
-                        values={values.weight}
-                        keyboardType="numeric"
+                    <MyFormikTextInput
+                      label="Age (years)"
+                      icon="balloon-outline"
+                      name="age"
+                      placeholder="6"
+                      keyboardType="numeric"
+                      value={values.age} // Use values.name from Formik
+                      onChange={handleChange('age')}
+                      onBlur={handleBlur('age')}
                     />
-                    
-                    <MyTextInput
-                        label="Weight (lbs)"
-                        icon={"scale-outline"}
-                        placeholder="45"
-                        placeholderTextColor={darkLight}
-                        onChangeText={handleChange('weight')}
-                        onBlur={handleBlur('weight')}
-                        values={values.weight}
-                        keyboardType="numeric"
+
+                    <MyFormikTextInput
+                      label="Weight (lbs)"
+                      icon="scale-outline"
+                      name="weight"
+                      placeholder="45"
+                      keyboardType="numeric"
+                      onChange={handleChange('weight')}
+                      onBlur={handleBlur('weight')}
                     />
 
                     <MessageBox type={messageType}>{message}</MessageBox>
@@ -168,20 +175,26 @@ const UpdateProfile = ({ navigation, route }) => {
   );
 };
 
-const MyTextInput = ({label, icon, isPassword, ...props}) => {
+// MyFormikTextInput component
+const MyFormikTextInput = ({ label, icon, isPassword, value, onChange, onBlur, ...props }) => {
   return (
-      <View style={{ margin: 5 }}>
-          <LeftIcon>
-              <Iconicons name={icon} size={30} color={brand} />
-          </LeftIcon>
+    <View style={{ margin: 5 }}>
+      <LeftIcon>
+        <Iconicons name={icon} size={30} color={brand} />
+      </LeftIcon>
 
-          <StyledInputLabel>{label}</StyledInputLabel>
+      <StyledInputLabel>{label}</StyledInputLabel>
 
-          <StyledTextInput {...props} />
-      </View>
+      <StyledTextInput
+        value={value}
+        onChangeText={onChange}
+        onBlur={onBlur}
+        placeholder={props.placeholder}
+        secureTextEntry={isPassword}
+      />
+    </View>
   );
-}
-
+};
 
 export default UpdateProfile;
 
