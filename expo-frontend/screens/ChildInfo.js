@@ -132,39 +132,37 @@ const ChildInfo = ({ route, navigation }) => {
 // Render the medication list
 const renderMedications = () => {
   return (
-    <ScrollView>
-      <SwipeListView
-        data={medications}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.medicationItemContainer}>
-            <Image source={{ uri: item.image }} style={styles.medicationImage} />
-            <View style={styles.medicationTextContainer}>
-              <Text style={styles.medicationName}>{item.name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
-              <Text style={styles.medicationUPC}>UPC: {item.upc}</Text>
-              <Text style={styles.medicationDosage}>Dose: {item.dosage}</Text>
-            </View>
+    <SwipeListView
+      data={medications}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item }) => (
+        <View style={styles.medicationItemContainer}>
+          <Image source={{ uri: item.image }} style={styles.medicationImage} />
+          <View style={styles.medicationTextContainer}>
+            <Text style={styles.medicationName}>{item.name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
+            <Text style={styles.medicationUPC}>UPC: {item.upc}</Text>
+            <Text style={styles.medicationDosage}>Dose: {item.dosage}</Text>
           </View>
-        )}
-        renderHiddenItem={({ item, index }) => (
-          <View style={styles.hiddenItemContainer}>
-            <TouchableOpacity
-              style={[styles.hiddenItemButton, styles.editButton]}
-              onPress={() => handleEditMedication(item, index)}
-            >
-              <Icon name="clock-o" size={20} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.hiddenItemButton, styles.deleteButton]}
-              onPress={() => handleDeleteMedication(index)}
-            >
-              <Icon name="trash" size={20} color="white" />
-            </TouchableOpacity>
-          </View>
-        )}
-        rightOpenValue={-75}
-      />
-    </ScrollView>
+        </View>
+      )}
+      renderHiddenItem={({ item, index }) => (
+        <View style={styles.hiddenItemContainer}>
+          <TouchableOpacity
+            style={[styles.hiddenItemButton, styles.editButton]}
+            onPress={() => handleEditMedication(item, index)}
+          >
+            <Icon name="clock-o" size={20} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.hiddenItemButton, styles.deleteButton]}
+            onPress={() => handleDeleteMedication(index)}
+          >
+            <Icon name="trash" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
+      )}
+      rightOpenValue={-75}
+    />
   );
 };
 
