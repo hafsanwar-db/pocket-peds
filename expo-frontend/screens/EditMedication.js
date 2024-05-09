@@ -1,11 +1,14 @@
 import React, { useContext, useState, useEffect } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from 'axios';
 import ip from './ip.js';
 import { Token } from "../components/Token";
 import { InnerContainer } from "../components/styles";
 import { useNavigation } from '@react-navigation/native';
+import KeyboardAvoidingWrapper from "../components/KeyboardAvoidingWrapper.js";
+
+const { height, width } = Dimensions.get("window");
 
 const EditMedication = ({ route }) => {
   const { tokenValue, child,  } = useContext(Token);
@@ -278,7 +281,8 @@ const EditMedication = ({ route }) => {
           <Text style={styles.reminderButtonText}>8 Hours</Text>
         </TouchableOpacity>
       </View>
-
+<KeyboardAvoidingWrapper>
+<>
       {/* Render reminder times */}
       {reminderTimes.map((item, index) => (
         <View key={index} style={[styles.reminderTimeContainer]}>
@@ -318,7 +322,8 @@ const EditMedication = ({ route }) => {
           onChange={handleTimeChange}
         />
       )}
-
+      </>
+</KeyboardAvoidingWrapper>
       {/* Confirm button */}
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
         <Text style={styles.confirmButtonText}>Confirm</Text>
@@ -366,8 +371,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   image: {
-    width: 200,
-    height: 150,
+    width: 0.3*width,
+    height: 0.2*height,
     resizeMode: "contain",
   },
   productContainer: {
@@ -399,6 +404,7 @@ const styles = StyleSheet.create({
   dosageText: {
     fontSize: 22,
     color: "#FFA500",
+    
   },
   upcContainer: {
     justifyContent: "center",
@@ -416,7 +422,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     width: "80%",
-    marginBottom: 20,
+    marginBottom: 10,
     alignSelf: "center",
   },
   reminderButton: {

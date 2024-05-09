@@ -208,8 +208,8 @@ const Login = ({
                   </TextLink>
                 </ExtraView>
                 {/* <ExtraView>
-                                <ExtraText>Update Profile </ExtraText>
-                                <TextLink onPress={() => navigation.navigate('UpdateProfile',{childName: 'Lucy'})}>
+                                <ExtraText>Calendar</ExtraText>
+                                <TextLink onPress={() => navigation.navigate('MyCalendar')}>
                                     <TextLinkContent>Click Here!</TextLinkContent>
                                 </TextLink>
                             </ExtraView> */}
