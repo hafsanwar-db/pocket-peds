@@ -11,6 +11,7 @@ from bson import ObjectId
 import psycopg2
 from psycopg2 import sql, pool
 import uvicorn
+from fastapi.responses import RedirectResponse
 
 #miscellaneous dependencies
 from datetime import datetime, timedelta, timezone
@@ -64,6 +65,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 #to authorize the user for different endpoints
 def get_userID(token: str) -> ObjectId:
+    print(token)
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -309,13 +311,17 @@ async def add_child_medication(data: dict, token: Annotated[str, Depends(oauth2_
 async def update_notifications(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
     # Retrieve the child profile from the database
     user_id = get_userID(token)
+
+    print(data)
     child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': user_id})
 
     if not child_profile:
         raise HTTPException(status_code=404, detail='Child profile not found')
 
     # Update the notifications in the child profile
-    child_profile['medications'].find_one({'upc': data['medication_upc']})['notifications'] = data['notifications']
+    for medication in child_profile['medications']:
+        if medication['upc'] == data['medication']['upc']:
+            medication['notifications'] = data['medication']['notifications']
 
     # Update the child profile in the database
     result = child_profiles.update_one({'_id': child_profile['_id']}, {'$set': child_profile})
@@ -324,6 +330,23 @@ async def update_notifications(data: dict, token: Annotated[str, Depends(oauth2_
         raise HTTPException(status_code=404, detail='Child profile not found')
 
     return {'message': 'Notifications updated successfully'}
+
+@app.post('/get_notifications')
+async def get_notifications(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
+    # Retrieve the child profile from the database
+    print(token)
+    user_id = get_userID(token)
+    child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': user_id})
+
+    if not child_profile:
+        raise HTTPException(status_code=404, detail='Child profile not found')
+
+    # Retrieve the notifications from the child profile
+    for medication in child_profile['medications']:
+        if medication['upc'] == data['upc']:
+            notifications = medication['notifications']
+
+    return notifications
 
 @app.get('/dummy-data')
 async def dummy_data():
@@ -433,7 +456,8 @@ async def get_medicine_dosage(data:dict):
     
     dosage = medicine['dosage']
     weight = data['weight']
-    age = data['age']
+    age = float(data['age'])/12.0
+    print(age)
     dose = {}
     for key in dosage.keys():
         if key is not None:

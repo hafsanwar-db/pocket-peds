@@ -141,6 +141,10 @@ const ChildInfo = ({ route, navigation }) => {
     );
   };
 
+  const handleEditMedication = (medicationData) => {
+    navigation.navigate('EditMedication', { medicationData });
+  };
+
 // Render the medication list
 const renderMedications = () => {
   return (

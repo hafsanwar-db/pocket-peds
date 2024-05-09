@@ -1,28 +1,26 @@
 import React, { useContext, useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-} from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Token } from "../components/Token";
-import { InnerContainer } from "../components/styles";
-import ChangeWeightModal from '../components/modal/ChangeWeightModal';
 import axios from 'axios';
 import ip from './ip.js';
+import { Token } from "../components/Token";
+import { InnerContainer } from "../components/styles";
+import { useNavigation } from '@react-navigation/native';
 
-const DoseSettings = ({ route }) => {
-  const { scannedData, apiData } = route.params;
-  const [reminderInterval, setReminderInterval] = useState(null);
-  const [reminderTimes, setReminderTimes] = useState([]);
+const EditMedication = ({ route }) => {
+  const { tokenValue, child,  } = useContext(Token);
+  const { medicationData } = route.params;
+  const [notificationData, setNotificationData] = useState({});
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(null);
-  const { child } = useContext(Token);
-  const {tokenValue} = useContext(Token);
-  const [isIntervalSelected, setIsIntervalSelected] = useState(false);
+  const [reminderTimes, setReminderTimes] = useState([]);
+  const [reminderInterval, setReminderInterval] = useState(null);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    // Fetch notification data for the child
+    fetchNotificationData();
+  }, []);
 
   const imagePaths = {
     avatar1: require('../assets/img/avatar1.png'),
@@ -34,57 +32,63 @@ const DoseSettings = ({ route }) => {
     // Add more images as needed
   };
 
-  console.log(apiData);
-  console.log(child);
-  useEffect(() => {
-    if (reminderInterval) {
-      const newReminderTimes = Array.from({ length: 3 }, (_, index) => {
-        let currentTime = new Date();
+  const parseTimeString = (timeString) => {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const currentDate = new Date();
+    currentDate.setHours(hours);
+    currentDate.setMinutes(minutes);
+    currentDate.setSeconds(0);
+    return currentDate;
+  };
 
-        // Set default times based on interval
-        if (reminderInterval === 8 * 60 * 60 * 1000) {
-          // For 8-hour interval
-          switch (index) {
-            case 0:
-              currentTime.setHours(10, 0, 0, 0);
-              break;
-            case 1:
-              currentTime.setHours(18, 0, 0, 0);
-              break;
-            case 2:
-              currentTime.setDate(currentTime.getDate() + 1); // Next day for 2 am
-              currentTime.setHours(2, 0, 0, 0);
-              break;
-            default:
-              break;
-          }
-        } else if (reminderInterval === 6 * 60 * 60 * 1000) {
-          // For 6-hour interval
-          switch (index) {
-            case 0:
-              currentTime.setHours(9, 0, 0, 0);
-              break;
-            case 1:
-              currentTime.setHours(15, 0, 0, 0);
-              break;
-            case 2:
-              currentTime.setHours(21, 0, 0, 0);
-              break;
-            default:
-              break;
-          }
-        }
+  const handleConfirm = async () => {
+    try {
+      // Retrieve the access token
+      const token = tokenValue;
 
-        return { time: currentTime, selected: false };
-      });
+      // Prepare the headers
+      const headers = {
+        Authorization: `Bearer ${token}`
+      };
 
-      setReminderTimes(newReminderTimes);
+      // Prepare the payload
+      const payload = {
+        child_name: child.name,
+        medication: {
+          name: medicationData.name,
+          dosage: medicationData.dosage,
+          upc: medicationData.upc,
+          image: medicationData.image,
+          notifications: {
+            interval: reminderInterval / (60 * 60 * 1000), // Convert milliseconds to hours
+            notification1:  {
+                time: formatTime(reminderTimes[0].time),
+                given: false,
+            },
+            notification2: {
+                time: formatTime(reminderTimes[1].time),
+                given: false,
+            },
+            notification3: {
+                time: formatTime(reminderTimes[2].time),
+                given: false,
+            },
+          },
+        },
+      };
+      console.log('Update notifications payload:', payload);
+      // Make the API call using Axios with headers
+      const response = await axios.post(`http://${ip}:8000/update_notifications`, payload, { headers });
+
+      // Handle successful response
+      console.log('Update notifications response:', response.data);
+
+      navigation.navigate('ChildInfo', { name: child.name });
+      
+    } catch (error) {
+      // Handle error
+      console.error('Error updating notifications:', error);
     }
-  }, [reminderInterval]);
-
-  const handleReminderIntervalSelect = (interval) => {
-    setReminderInterval(interval);
-    setIsIntervalSelected(true);
   };
 
   const formatTime = (time) => {
@@ -93,127 +97,14 @@ const DoseSettings = ({ route }) => {
     return `${hours}:${minutes}`;
   };
 
-  const handleConfirm = async () => {
-    try {
-      // Check if the interval is selected
-      if (isIntervalSelected) {
-        // Retrieve the access token
-        const token = tokenValue;
-  
-        // Prepare the headers
-        const headers = {
-          Authorization: `Bearer ${token}`
-        };
-  
-        // Prepare the payload
-        const payload = {
-          child_name: child.name,
-          medication: {
-            name: scannedData.name,
-            dosage: apiData.dose,
-            upc: scannedData.upc,
-            image: scannedData.image,
-            notifications: {
-              interval: (reminderInterval / (60*60*1000)),
-              notification1: {
-                time: formatTime(reminderTimes[0].time),
-                given: false,
-              },
-              notification2: {
-                time: formatTime(reminderTimes[1].time),
-                given: false,
-              },
-              notification3: {
-                time: formatTime(reminderTimes[2].time),
-                given: false,
-              },
-            },
-          }
-        };
-        console.log('Update notifications payload:', payload);
-        // Make the API call using Axios with headers
-        const response = await axios.post(`http://${ip}:8000/add-child-medication`, payload, { headers });
-  
-        // Handle successful response
-        console.log('Update notifications response:', response.data);
-
-        navigation.navigate("ChildInfo", {name: child.name})
-      }
-    } catch (error) {
-      // Handle error
-      console.error('Error updating notifications:', error);
-    }
-  };
-
-  const toggleReminderTime = (index) => {
-    setSelectedTimeIndex(index);
-    setShowTimePicker(true);
-  };
-
-  const handleTimeChange = (event, selectedTime) => {
-    if (selectedTime !== undefined) {
-      const newReminderTimes = [...reminderTimes];
-      newReminderTimes[selectedTimeIndex].time = selectedTime;
-
-      // Update times in previous boxes if not the first box
-      if (selectedTimeIndex > 0) {
-        const interval =
-          reminderInterval ||
-          newReminderTimes[1].time.getTime() -
-            newReminderTimes[0].time.getTime();
-        for (let i = selectedTimeIndex - 1; i >= 0; i--) {
-          newReminderTimes[i].time = new Date(
-            newReminderTimes[i + 1].time.getTime() - interval
-          );
-        }
-      }
-
-      // Update times in following boxes if not the last box
-      if (selectedTimeIndex < newReminderTimes.length - 1) {
-        const interval =
-          reminderInterval ||
-          newReminderTimes[1].time.getTime() -
-            newReminderTimes[0].time.getTime();
-        for (let i = selectedTimeIndex + 1; i < newReminderTimes.length; i++) {
-          newReminderTimes[i].time = new Date(
-            newReminderTimes[i - 1].time.getTime() + interval
-          );
-        }
-      }
-
-      setReminderTimes(newReminderTimes);
-      setShowTimePicker(false);
-    } else {
-      setShowTimePicker(false);
-    }
-  };
-
-  const toggleTimeSelection = (index) => {
-    const newReminderTimes = [...reminderTimes];
-    newReminderTimes[index].selected = !newReminderTimes[index].selected;
-    setReminderTimes(newReminderTimes);
-  };
-
-  const calculateAge = (dateOfBirth) => {
-    const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    const months = (today.getMonth() - birthDate.getMonth() + 12) % 12;
-    return { years: age, months };
-  };
-
   const renderChildInfo = () => {
     if (!child) return null;
-  
+
     const { name, date_of_birth, weight, last_updated } = child;
     const { years, months } = calculateAge(date_of_birth);
     const weightInKg = (weight * 0.45359237).toFixed(1);
     const last_updated_date = new Date(last_updated).toLocaleDateString();
-  
+
     return (
       <View style={styles.childInfoContainer}>
         <Image source={imagePaths[child.image]} style={styles.profileImage} />
@@ -233,23 +124,125 @@ const DoseSettings = ({ route }) => {
       </View>
     );
   };
+
+  const handleTimeChange = (event, selectedTime) => {
+    if (selectedTime !== undefined) {
+      const newReminderTimes = [...reminderTimes];
+      newReminderTimes[selectedTimeIndex].time = selectedTime;
+    
+      // Calculate interval in milliseconds based on the provided hours
+      const interval = reminderInterval; // assuming it's already in milliseconds
+    
+      // Update times in previous boxes if not the first box
+      if (selectedTimeIndex > 0) {
+        for (let i = selectedTimeIndex - 1; i >= 0; i--) {
+          newReminderTimes[i].time = new Date(
+            newReminderTimes[i + 1].time.getTime() - interval
+          );
+        }
+      }
+    
+      // Update times in following boxes if not the last box
+      if (selectedTimeIndex < newReminderTimes.length - 1) {
+        for (let i = selectedTimeIndex + 1; i < newReminderTimes.length; i++) {
+          newReminderTimes[i].time = new Date(
+            newReminderTimes[i - 1].time.getTime() + interval
+          );
+        }
+      }
+    
+      setReminderTimes(newReminderTimes);
+      setShowTimePicker(false);
+    } else {
+      setShowTimePicker(false);
+    }
+  };
+
+  const calculateAge = (dateOfBirth) => {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    const months = (today.getMonth() - birthDate.getMonth() + 12) % 12;
+    return { years: age, months };
+  };
+
+  const toggleTimeSelection = (index) => {
+    setSelectedTimeIndex(index);
+    setShowTimePicker(true);
+  };
+
+  const handleReminderIntervalSelect = (interval) => {
+    setReminderInterval(interval);
   
+    // Calculate new reminder times based on the first time
+    const newReminderTimes = [...reminderTimes];
+    const firstTime = reminderTimes[0].time;
+  
+    // Update times for remaining reminders
+    for (let i = 1; i < newReminderTimes.length; i++) {
+      newReminderTimes[i].time = new Date(firstTime.getTime() + interval * i);
+    }
+  
+    // Update state with new reminder times
+    setReminderTimes(newReminderTimes);
+  };  
+
+  const fetchNotificationData = async () => {
+    try {
+      // Retrieve the access token
+      const token = tokenValue;
+
+      // Prepare the headers
+      const headers = {
+        Authorization: `Bearer ${token}`
+      };
+
+      const payload = {
+        child_name: child.name,
+        upc: medicationData.upc,
+      };
+
+      // Make the API call using Axios with headers
+      const response = await axios.post(`http://${ip}:8000/get_notifications`, payload, { headers });
+
+      // Handle successful response
+      console.log('Notification data:', response.data);
+      setNotificationData(response.data);
+
+      // Process notification times
+      const times = [
+        { time: parseTimeString(response.data.notification1.time), given: response.data.notification1.given },
+        { time: parseTimeString(response.data.notification2.time), given: response.data.notification2.given },
+        { time: parseTimeString(response.data.notification3.time), given: response.data.notification3.given }
+      ];
+      setReminderTimes(times);
+      setReminderInterval(response.data.interval * 60 * 60 * 1000); // Convert hours to milliseconds
+    } catch (error) {
+      // Handle error
+      console.error('Error fetching notification data:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.upcContainer}>
-      <Text style={styles.upc}>UPC: {scannedData.upc}</Text>
+        <Text style={styles.upc}>UPC: {medicationData.upc}</Text>
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.imageContainer}>
-          <Image source={{ uri: scannedData.image }} style={styles.image} />
+          <Image source={{ uri: medicationData.image }} style={styles.image} />
         </View>
         <View style={styles.infoContainer}>
           {renderChildInfo()}
         </View>
       </View>
       <View style={styles.productContainer}>
-      <Text style={styles.productName}>
-          {scannedData.name
+        <Text style={styles.productName}>
+          {medicationData.name
             .toLowerCase()
             .split(' ')
             .slice(0, 2)
@@ -260,16 +253,16 @@ const DoseSettings = ({ route }) => {
       </View>
       <InnerContainer>
         <Text style={styles.doseText}>
-          Dose: <Text style={styles.dosageText}>{apiData.dose}</Text>{" "}
+          Dose: <Text style={styles.dosageText}>{medicationData.dosage}</Text>{" "}
         </Text>
       </InnerContainer>
 
-      <View style={styles.reminderButtonContainer}>
+    {/* Interval selection buttons */}
+    <View style={styles.reminderButtonContainer}>
         <TouchableOpacity
           style={[
             styles.reminderButton,
-            reminderInterval === 6 * 60 * 60 * 1000 &&
-              styles.reminderButtonSelected,
+            reminderInterval === 6 * 60 * 60 * 1000 && styles.reminderButtonSelected,
           ]}
           onPress={() => handleReminderIntervalSelect(6 * 60 * 60 * 1000)}
         >
@@ -278,40 +271,44 @@ const DoseSettings = ({ route }) => {
         <TouchableOpacity
           style={[
             styles.reminderButton,
-            reminderInterval === 8 * 60 * 60 * 1000 &&
-              styles.reminderButtonSelected,
+            reminderInterval === 8 * 60 * 60 * 1000 && styles.reminderButtonSelected,
           ]}
           onPress={() => handleReminderIntervalSelect(8 * 60 * 60 * 1000)}
         >
           <Text style={styles.reminderButtonText}>8 Hours</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Render reminder times */}
       {reminderTimes.map((item, index) => (
         <View key={index} style={[styles.reminderTimeContainer]}>
-          <TouchableOpacity
+        <TouchableOpacity
             style={[
               styles.checkbox,
-              item.selected
-                ? styles.checkboxSelected
-                : styles.checkboxUnselected,
+              item.given ? styles.checkboxGiven : styles.checkboxNotGiven // Updated
             ]}
             onPress={() => toggleTimeSelection(index)}
-          ></TouchableOpacity>
-          <TouchableOpacity
+        >
+        </TouchableOpacity>
+        <TouchableOpacity
             style={styles.reminderTimeTextContainer}
-            onPress={() => toggleReminderTime(index)}
-          >
+            onPress={() => toggleTimeSelection(index)}
+        >
             <Text
-              style={[
+            style={[
                 styles.reminderTimeText,
-                !item.selected && styles.blurText,
-              ]}
+                !item.given && styles.blurText, // Updated
+            ]}
             >
-              {item.time.toLocaleTimeString()}
+            {item.time.toLocaleTimeString()}
             </Text>
-          </TouchableOpacity>
-        </View>
-      ))}
+        </TouchableOpacity>
+      </View>
+      
+        ))}
+
+
+      {/* Show time picker */}
       {showTimePicker && (
         <DateTimePicker
           value={reminderTimes[selectedTimeIndex].time}
@@ -322,11 +319,10 @@ const DoseSettings = ({ route }) => {
         />
       )}
 
-      {isIntervalSelected && (
-        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-          <Text style={styles.confirmButtonText}>Confirm</Text>
-        </TouchableOpacity>
-      )}
+      {/* Confirm button */}
+      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+        <Text style={styles.confirmButtonText}>Confirm</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -366,7 +362,7 @@ const styles = StyleSheet.create({
   upc: {
     fontSize: 16,
     color: "#F5F5F5",
-    textAlign: "center", // Center the text horizontally
+    textAlign: "center",
     marginBottom: 10,
   },
   image: {
@@ -466,6 +462,14 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderColor: "#333",
   },
+  checkboxGiven: {
+    backgroundColor: "#00FF00", // Green for given notification
+    borderColor: "#00FF00",
+  },
+  checkboxNotGiven: {
+    backgroundColor: "#FF0000", // Red for not given notification
+    borderColor: "#FF0000",
+  },
   checkboxText: {
     color: "#333",
     fontSize: 14,
@@ -479,7 +483,7 @@ const styles = StyleSheet.create({
   reminderTimeText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: "#000",
   },
   selectedReminderTimeContainer: {
     backgroundColor: "#FFA500",
@@ -521,4 +525,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DoseSettings;
+export default EditMedication;
