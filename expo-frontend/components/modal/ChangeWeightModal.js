@@ -12,7 +12,7 @@ const ChangeWeightModal = ({navigation, name}) => {
         <Modal visible={visible} animationType='slide' transparent={true}>
             <WeightModal>
                 <PageTitle style={{ color: "black" }}>Update Information</PageTitle>
-                <Octicons name="alert" size={50} color="black" style={{ alignSelf: 'center', marginVertical: 10 }} />
+                {/* <Octicons name="alert" size={50} color="black" style={{ alignSelf: 'center', marginVertical: 10 }} /> */}
                 <Text>If you do not update the weight, dosing information may not be accurate.</Text>
                 <Text>Continue without updating?</Text>
                 <View style={{ flexDirection: "column", justifyContent: "center", marginTop: 20 }}>

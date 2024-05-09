@@ -272,8 +272,15 @@ const RootStack = ({
         > 
           {(props) => <ChangeWeightModal {...props} />}
         </Stack.Screen>        
-        <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
-
+        {/* <Stack.Screen name="UpdateProfile" component={UpdateProfile} /> */}
+        <Stack.Screen name="UpdateProfile">
+          {(props) => <>
+          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <UpdateProfile navigation={props.navigation} {...props} />
+          </View>
+          <Footer navigation={props.navigation} />
+        </> }
+        </Stack.Screen>
 
       </Stack.Navigator>
       {/*include the component as done in the screens above*/}

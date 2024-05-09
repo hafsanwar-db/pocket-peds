@@ -117,7 +117,12 @@ const ChildInfo = ({ route, navigation }) => {
       <>
         <ChangeWeightModal navigation={navigation} name={name} />
         <View style={styles.childInfoContainer}>
+          <TouchableOpacity onPress = {() =>{
+            navigation.navigate('UpdateProfile', {name: name});
+          
+          }}>
           <Image source={imagePaths[childInfo.image]} style={styles.profileImage} />
+          </TouchableOpacity>
           <View style={styles.childInfoTextContainer}>
             <Text style={styles.childName}>{name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
             <Text style={styles.childAge}>{years} years {months} {months>1 ? 'months' : 'month'}</Text>
@@ -180,11 +185,11 @@ const formatDate = (dateString) => {
       <InnerContainer>
         {renderChildInfo()}
         {renderMedications()}
-        {!isEditing && (
-          <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfile}>
+        {/* {!isEditing && (
+          <TouchableOpacity style={styles.editProfileButton} onPress={(handleEditProfile)}>
             <Text style={styles.editProfileButtonText}>Edit Profile</Text>
           </TouchableOpacity>
-        )}
+        )} */}
       </InnerContainer>
     </StyledContainer>
   );

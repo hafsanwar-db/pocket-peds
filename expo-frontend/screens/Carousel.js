@@ -30,6 +30,7 @@ const Slider = ({setImage}) => {
   };
 
   const handleOnViewableItemsChanged = ({viewableItems}) => {
+    console.log(viewableItems)
     setImage(imageList[viewableItems[0].item.id - 1])
     setIndex(viewableItems[0].index);
   };
