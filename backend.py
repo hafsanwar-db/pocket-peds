@@ -221,19 +221,19 @@ async def update_child_profile(child_name: str, data: dict, token: Annotated[str
         raise HTTPException(status_code=404, detail='Child profile not found')
     
     # appending allergies and medications
-    allergies = data.get('allergies', [])
-    data['allergies'] = []
-    for i in allergies: 
-        if i not in child_profile['allergies']:
-            data['allergies'].append(i)
-    data['allergies'].extend(child_profile['allergies'])
-    medications = data.get('medications', [])
-    data['medications'] = []
-    for i in medications: 
-        if i not in child_profile['medications']:
-            data['medications'].append(i)
-    data['medications'].extend(child_profile['medications'])
-
+    # allergies = data.get('allergies', [])
+    # data['allergies'] = []
+    # for i in allergies: 
+    #     if i not in child_profile['allergies']:
+    #         data['allergies'].append(i)
+    # data['allergies'].extend(child_profile['allergies'])
+    # medications = data.get('medications', [])
+    # data['medications'] = []
+    # for i in medications: 
+    #     if i not in child_profile['medications']:
+    #         data['medications'].append(i)
+    # data['medications'].extend(child_profile['medications'])
+    print(data.get("image"))
     # Update the child profile in the database
     result = child_profiles.update_one({'_id': child_profile['_id']}, {'$set': data})
 

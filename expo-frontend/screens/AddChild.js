@@ -48,17 +48,6 @@ const AddChild = ({ navigation }) => {
   //     return;
   //   }
 
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     allowsEditing: true,
-  //     aspect: [1, 1],
-  //     quality: 1,
-  //   });
-
-  //   if (!result.cancelled) {
-  //     setProfileImage(result.uri);
-  //   }
-  // };
   const  convertDateFormat = (dateString) => {
     const [month, day, year] = dateString.split('-');
     const newDateString = `${year}-${month}-${day}`;
@@ -155,34 +144,7 @@ const AddChild = ({ navigation }) => {
     
     <View style={styles.container}>
       <StatusBar style="dark" />
-      {/* <TouchableOpacity
-            style={{
-              alignSelf: 'center',
-              marginBottom: 20,
-              borderWidth: 1,
-              borderColor: 'red',
-            }}
-            // onPress={handleImagePicker}
-          > */}
-      {/* {profileImage ? (
-            //   <Image
-            //     source={{ uri: profileImage }}
-            //     style={{ width: 100, height: 100, borderRadius: 50 }}
-            //   />
-            // ) : (
-            //   <View
-            //     style={{
-            //       width: 100,
-            //       height: 100,
-            //       borderRadius: 50,
-            //       backgroundColor: darkLight,
-            //       alignItems: 'center',
-            //       justifyContent: 'center',
-            //     }}
-            //   >
-            //     <Text style={{ color: 'white', fontSize: 16 }}>Upload Image</Text>
-            //   </View>
-            )} */}
+      
       <Carousel setImage = {setProfileImage}/>
       {/* </TouchableOpacity> */}
       <KeyboardAvoidingWrapper>
@@ -310,3 +272,50 @@ const styles = StyleSheet.create({
 });
 
 export default AddChild;
+{/* <TouchableOpacity
+            style={{
+              alignSelf: 'center',
+              marginBottom: 20,
+              borderWidth: 1,
+              borderColor: 'red',
+            }}
+            // onPress={handleImagePicker}
+          > */}
+      {/* {profileImage ? (
+            //   <Image
+            //     source={{ uri: profileImage }}
+            //     style={{ width: 100, height: 100, borderRadius: 50 }}
+            //   />
+            // ) : (
+            //   <View
+            //     style={{
+            //       width: 100,
+            //       height: 100,
+            //       borderRadius: 50,
+            //       backgroundColor: darkLight,
+            //       alignItems: 'center',
+            //       justifyContent: 'center',
+            //     }}
+            //   >
+            //     <Text style={{ color: 'white', fontSize: 16 }}>Upload Image</Text>
+            //   </View>
+            )} */}
+
+  // const handleImagePicker = async () => {
+  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //   if (status !== "granted") {
+  //     alert("Sorry, we need camera roll permissions to select an image.");
+  //     return;
+  //   }
+
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     allowsEditing: true,
+  //     aspect: [1, 1],
+  //     quality: 1,
+  //   });
+
+  //   if (!result.cancelled) {
+  //     setProfileImage(result.uri);
+  //   }
+  // };

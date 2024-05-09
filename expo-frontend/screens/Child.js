@@ -52,7 +52,7 @@ const Child = ({ navigation }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("DATA: ", response.data);
+      // console.log("DATA: ", response.data);
   
       //PRObably don't need to end all the data?
       const formattedData = response.data.map(item => {
@@ -63,7 +63,7 @@ const Child = ({ navigation }) => {
         };
       });
   
-      console.log("PROFILE: ", formattedData);
+      // console.log("PROFILE: ", formattedData);
       setProfiles(formattedData);
     } catch (error) {
       console.error('Error fetching profiles:', error);
@@ -71,7 +71,6 @@ const Child = ({ navigation }) => {
   };
 
   const renderProfileItem = (item) => {
-    console.log(item.image)
     return (
     <TouchableOpacity
       key={item.id}

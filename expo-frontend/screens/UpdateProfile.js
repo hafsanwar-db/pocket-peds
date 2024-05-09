@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, ActivityIndicator, Text } from 'react-native';
+import { View, ActivityIndicator, Text, StyleSheet, Dimensions } from 'react-native';
 import axios from 'axios';
 import ip from './ip.js';
+import Constants from "expo-constants";
 
 import Iconicons from 'react-native-vector-icons/Ionicons';
-
+import Carousel from './Carousel.js';
 // Keyboard Avoiding View
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 import { Token } from '../components/Token.js';
@@ -14,10 +15,15 @@ import {
   RightIcon, StyledButton, ButtonText, Colors, MessageBox, Line, ExtraText, ExtraView, TextLink, TextLinkContent, WeightModalButton
 } from '../components/styles';
 import { StatusBar } from 'expo-status-bar';
-const { brand, darkLight, primary } = Colors;
 
+
+const { brand, darkLight, primary } = Colors;
+const StatusBarHeight = Constants.statusBarHeight;
+const height = Dimensions.get('window').height;
+const width = Dimensions.get('window').width;
 // Formik
 import { Formik, Field } from 'formik';
+
 
 
 const UpdateProfile = ({ navigation, route }) => {
@@ -30,7 +36,7 @@ const UpdateProfile = ({ navigation, route }) => {
   });
   const [message, setMessage] = useState();
   const [messageType, setMessageType] = useState();
-
+  const [profileImage, setProfileImage] = useState("avatar1");
   const {tokenValue} = useContext(Token);
 
   useEffect(() => {
@@ -54,6 +60,7 @@ const UpdateProfile = ({ navigation, route }) => {
 
   const handleUpdate = (credentials, setSubmitting) => {
     handleMessage(null);
+    console.log(credentials.image)
     const url = `http://${ip}:8000/child-profiles/${name.toLowerCase()}`;
     const token = tokenValue;
   
@@ -69,6 +76,7 @@ const UpdateProfile = ({ navigation, route }) => {
   
         handleMessage(message, "SUCCESS");
         setSubmitting(false);
+        navigation.navigate("ChildInfo", { name: name });
       })
       .catch((error) => {
         console.log(error);
@@ -83,18 +91,15 @@ const UpdateProfile = ({ navigation, route }) => {
   };
 
   return (
-
-<KeyboardAvoidingWrapper>
-<StyledContainer>
+<View style={styles.container}>
     <StatusBar style="dark" />  
-    <InnerContainer>
-        <PageTitle style={{ color: "black", marginBottom: 10 }}>Updating Profile</PageTitle>
+        <PageTitle style={{ color: "black"}}>Updating Profile</PageTitle>
 
         {/* INSERT THE CAROUSEL HERE */}
-        <PageLogo resizeMode="cover" source={require('../assets/img/peds-logo.png')} />
-        
-        <Formik
-            initialValues={{ weight: childInfo?.weight || '', name: childInfo?.name || '', age: childInfo?.age || '' }}
+        <Carousel setImage = {setProfileImage}/>
+        <KeyboardAvoidingWrapper>
+        <Formik 
+            initialValues={{ weight: childInfo?.weight || '', name: childInfo?.name || '', age: childInfo?.age || '', image: profileImage}}
             enableReinitialize
             onSubmit={(values, {setSubmitting}) => {
                 if (values.weight == '' || values.name == '' || values.age == '') {
@@ -111,12 +116,13 @@ const UpdateProfile = ({ navigation, route }) => {
                 }
                 else {
                     values.name = values.name.toLowerCase();
+                    values.image = profileImage;// Convert age to months
                     handleUpdate(values, setSubmitting);
                 }
             }}
         >
             {({handleChange, handleBlur, handleSubmit, values, isSubmitting}) => 
-                <StyledFormArea>
+                <View style = {{width:width, paddingHorizontal: 0.1*width}}>
 
                     <MyFormikTextInput
                       label="Name"
@@ -130,7 +136,7 @@ const UpdateProfile = ({ navigation, route }) => {
                     />
 
                     <MyFormikTextInput
-                      label="Age (years)"
+                      label="Age (months)"
                       icon="balloon-outline"
                       name="age"
                       placeholder="6"
@@ -163,14 +169,11 @@ const UpdateProfile = ({ navigation, route }) => {
                         </StyledButton> 
                     }
 
-                </StyledFormArea>
+                </View>
             }
         </Formik>
-
-    </InnerContainer>
-
-</StyledContainer>
-</KeyboardAvoidingWrapper>
+        </KeyboardAvoidingWrapper>
+</View>
 
   );
 };
@@ -196,5 +199,15 @@ const MyFormikTextInput = ({ label, icon, isPassword, value, onChange, onBlur, .
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: StatusBarHeight,
+    backgroundColor: "white",
+    height: height,
+    overflow: "visible",
+  },});
 export default UpdateProfile;
 

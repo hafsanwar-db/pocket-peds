@@ -8,6 +8,7 @@ import ip from './ip.js';
 import {Token} from '../components/Token';
 import axios from 'axios';
 import ChangeWeightModal from '../components/modal/ChangeWeightModal';
+import { useIsFocused } from '@react-navigation/native'
 
 const { darkLight, primary, grey } = Colors;
 
@@ -17,6 +18,7 @@ const ChildInfo = ({ route, navigation }) => {
   const [medications, setMedications] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const {tokenValue, updateChild} = useContext(Token);
+  const isFocused = useIsFocused();
 
   const imagePaths = {
     avatar1: require('../assets/img/avatar1.png'),
@@ -31,11 +33,12 @@ const ChildInfo = ({ route, navigation }) => {
   // Fetch child info and medications on component mount
   useEffect(() => {
     fetchChildInfo();
-  }, []);
+  }, [isFocused]);
 
   // Fetch child info from the API
   const fetchChildInfo = async () => {
     try {
+      console.log("useEffect runs for chidlInfo")
       const token = tokenValue //await getAccessToken(); // Implement the logic to get the access token
       const response = await axios.get(`http://${ip}:8000/child-profiles/${name.toLowerCase()}`, {
         headers: {
@@ -117,7 +120,12 @@ const ChildInfo = ({ route, navigation }) => {
       <>
         <ChangeWeightModal navigation={navigation} name={name} />
         <View style={styles.childInfoContainer}>
+          <TouchableOpacity onPress = {() =>{
+            navigation.navigate('UpdateProfile', {name: name});
+          
+          }}>
           <Image source={imagePaths[childInfo.image]} style={styles.profileImage} />
+          </TouchableOpacity>
           <View style={styles.childInfoTextContainer}>
             <Text style={styles.childName}>{name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
             <Text style={styles.childAge}>{years} years {months} {months>1 ? 'months' : 'month'}</Text>
@@ -178,11 +186,11 @@ const formatDate = (dateString) => {
       <InnerContainer>
         {renderChildInfo()}
         {renderMedications()}
-        {!isEditing && (
-          <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfile}>
+        {/* {!isEditing && (
+          <TouchableOpacity style={styles.editProfileButton} onPress={(handleEditProfile)}>
             <Text style={styles.editProfileButtonText}>Edit Profile</Text>
           </TouchableOpacity>
-        )}
+        )} */}
       </InnerContainer>
     </StyledContainer>
   );
