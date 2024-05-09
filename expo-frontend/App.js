@@ -31,6 +31,7 @@ Notifications.setNotificationHandler({
 export default function App() {
   const [appReady, setAppReady] = useState(false);
   const [storedCredentials, setStoredCredentials] = useState("");
+  
   // Load login info, hide splash screen when done
   useEffect(() => {
     const checkLoginCredentials = async () => {
@@ -51,21 +52,22 @@ export default function App() {
   }, []);
 
   useLocalNotification();
-  const [reminderInterval, setReminderInterval] = useState(8);
+  
+  //const [reminderInterval, setReminderInterval] = useState(8);
   
   //console.log("intervalSEC BEFORE: ",reminderInterval)
-  const handleLocalPushNotification = async (reminderInterval) => {
+  /*const handleLocalPushNotification = async (reminderInterval) => {
     let intervalInSeconds = reminderInterval * 3600;
     //console.log("intervalSEC ",intervalInSeconds);
     await schedulePushNotification(intervalInSeconds);
-  };
+  };*/
   return (
     <CredentialsContext.Provider value={{storedCredentials, setStoredCredentials}}>
       <TokenProvider>
       <RootStack
-        reminderInterval={reminderInterval}
-        setReminderInterval={setReminderInterval}
-        handleLocalPushNotification={handleLocalPushNotification}
+        //reminderInterval={reminderInterval}
+        //setReminderInterval={setReminderInterval}
+        //handleLocalPushNotification={handleLocalPushNotification}
       />
       </TokenProvider>
      </CredentialsContext.Provider>

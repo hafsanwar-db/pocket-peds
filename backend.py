@@ -353,7 +353,22 @@ async def dummy_data():
     return {
         'dosage': 'dosage will go here'
     }
+@app.get('/get-notifications-ids')
+async def get_notifications(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
+    # Retrieve the child profile from the database
+    user_id = get_userID(token)
+    child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': user_id})
 
+    if not child_profile:
+        raise HTTPException(status_code=404, detail='Child profile not found')
+
+    # Update the notifications in the child profile
+    notifications = child_profile['medications'].find_one({'upc': data['medication_upc']})['notifications']
+    notifIDs = []
+    for k,v in notifications:
+        notifIDs.append(v[0])
+
+    return {'notifications': notifIDs}
 @app.get('/process-upc')
 async def process_upc(upc: str):
     # Make a GET request to the given endpoint

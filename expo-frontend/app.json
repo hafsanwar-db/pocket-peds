@@ -31,6 +31,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.expofrontend"
     },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
