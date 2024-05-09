@@ -85,8 +85,7 @@ const AddChild = ({ navigation }) => {
       );
     };
 
-    if (newProfileName.trim() === "" || newDateOfBirth.trim() === "" || newWeight.trim() === "" || sex.trim() === ""
-        || newAllergies.trim() === "" || newMedications.trim() === "" || profileImage.trim() === "" ) {
+    if (newProfileName.trim() === "" || newDateOfBirth.trim() === "" || newWeight.trim() === "" || sex.trim() === "" || profileImage.trim() === "" ) {
       handleMessage("Please fill in all fields.");
     }
 
