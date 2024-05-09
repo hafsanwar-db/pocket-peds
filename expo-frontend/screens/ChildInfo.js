@@ -46,7 +46,7 @@ const ChildInfo = ({ route, navigation }) => {
         },
       });
       console.log("RESPONSE CHILD: ", response.data);
-      updateChild(response.data);
+      updateChild(response.data); //updates the context
       setChildInfo(response.data);
       setMedications(response.data.medications); // Set medications from child info
     } catch (error) {
@@ -99,7 +99,11 @@ const ChildInfo = ({ route, navigation }) => {
       age--;
     }
     const months = (today.getMonth() - birthDate.getMonth() + 12) % 12;
-    return { years: age, months };
+    if(months > 1){
+    return `${age} years ${months} months`;
+    }else{
+      return `${age} years ${months} month`;
+    }
   };
 
   // Handle edit profile button press
@@ -114,7 +118,7 @@ const ChildInfo = ({ route, navigation }) => {
     const { name, date_of_birth, weight, last_updated } = childInfo;
     const { years, months } = calculateAge(date_of_birth);
     const weightInKg = (weight * 0.45359237).toFixed(1);
-    const last_updated_date = new Date(last_updated).toLocaleDateString();
+    // const last_updated_date = new Date(last_updated).toLocaleDateString();
 
     return (
       <>
@@ -127,10 +131,10 @@ const ChildInfo = ({ route, navigation }) => {
           <Image source={imagePaths[childInfo.image]} style={styles.profileImage} />
           </TouchableOpacity>
           <View style={styles.childInfoTextContainer}>
-            <Text style={styles.childName}>{name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
-            <Text style={styles.childAge}>{years} years {months} {months>1 ? 'months' : 'month'}</Text>
-            <Text style={styles.childWeight}>{weight} lbs ({weightInKg} kg)</Text>
-            <Text style={styles.lastUpdated}>Last Updated: {last_updated_date}</Text>
+            <Text style={styles.childName}>{childInfo.name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
+            <Text style={styles.childAge}>{calculateAge(childInfo.date_of_birth)}</Text>
+            <Text style={styles.childWeight}>{childInfo.weight} lbs ({(childInfo.weight * 0.45359237).toFixed(1)} kg)</Text>
+            {/* <Text style={styles.lastUpdated}>Last Updated: {last_updated_date}</Text> */}
           </View>
         </View>
       </>

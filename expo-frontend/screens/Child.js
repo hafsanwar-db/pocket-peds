@@ -11,10 +11,6 @@ import {
   SubTitle,
   Colors,
 } from '../components/styles';
-import {
-  useFonts,
-  Jost_400Regular,
-} from '@expo-google-fonts/jost';
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 import axios from 'axios';
 import ip from './ip.js';
@@ -36,9 +32,6 @@ const Child = ({ navigation }) => {
   const [profiles, setProfiles] = useState([]);
   const {tokenValue} = useContext(Token);
   const isFocused = useIsFocused();
-  const [fonts] = useFonts({
-    Jost_400Regular
-  })
   useEffect(() => {
     fetchProfiles();
   }, [isFocused]); // Empty dependency array ensures the effect runs only once
@@ -138,7 +131,6 @@ const Child = ({ navigation }) => {
           <Text style={{
             textAlign:'left',
             fontSize:26,
-            fontFamily: 'Jost_400Regular',
             marginBottom:0.05*height,
           }}>Who are you dosing for?</Text>
           <ScrollView contentContainerStyle={{ flexGrow: 1 , width: 0.65*width}}>
