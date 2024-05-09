@@ -24,6 +24,7 @@ import ConfirmationScreen from "../screens/ConfirmationScreen";
 import { navigationRef, isReadyRef } from "../NavigationService";
 import UpdateProfile from "../screens/UpdateProfile";
 import { AppState, View, Dimensions } from "react-native";
+import Internet from "../components/modal/Internet.js";
 
 height = Dimensions.get("window").height;
 width = Dimensions.get("window").width;
@@ -124,9 +125,13 @@ const RootStack = ({
   };
 
   return (
+    <>
+    <Internet />
+
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         screenOptions={{
+          headerBackTitleVisible: false,
           headerStyle: {
             backgroundColor: "transparent",
           },
@@ -136,9 +141,9 @@ const RootStack = ({
           headerLeftContainerStyle: {
             paddingLeft: 10,
           },
-          backgroundColor: "white",
+          headerLeft: null
         }}
-        initialRouteName="Login"
+        initialRouteName="UpdateProfile"
       >
         <Stack.Screen name="Login">
           {(props) => (
@@ -260,15 +265,20 @@ const RootStack = ({
           <Footer navigation={props.navigation} />
         </> }
         </Stack.Screen>
-        {/* <Stack.Screen
-                            name="WeightWarning"
-                            component={WeightWarning}
-                            options={{ presentation: 'modal' }}
-                        /> */}
+        
+        <Stack.Screen
+            name="ChangeWeightModal"
+            options={{ presentation: 'modal' }}
+        > 
+          {(props) => <ChangeWeightModal {...props} />}
+        </Stack.Screen>        
+        <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
+
+
       </Stack.Navigator>
       {/*include the component as done in the screens above*/}
-      <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
     </NavigationContainer>
+    </>
   );
 };
 
