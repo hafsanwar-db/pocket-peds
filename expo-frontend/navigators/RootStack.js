@@ -143,7 +143,7 @@ const RootStack = ({
           },
           headerLeft: null
         }}
-        initialRouteName="UpdateProfile"
+        initialRouteName="Login"
       >
         <Stack.Screen name="Login">
           {(props) => (
