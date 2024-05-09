@@ -28,7 +28,7 @@ const Internet = () => {
                 <Text>If you do not provide the application with access to the internet, some operations will not be available.</Text>
                 <Text>Continue without Internet?</Text>
                 <View style={{ flexDirection: "column", justifyContent: "center", marginTop: 20 }}>
-                    <WeightModalButton onPress={() => {unsubscribe(); setVisible(false)}} title="Continue" style={{ backgroundColor: '#9F9F9F' }} >
+                    <WeightModalButton onPress={() => {unsubscribe(); setVisible(false);}} title="Continue" style={{ backgroundColor: '#9F9F9F' }} >
                         <Text style={{ fontSize: 20, color: "white" }}>Continue Offline</Text>
                     </WeightModalButton>
                     <WeightModalButton onPress={() => setVisible(false)} title="Update Weight" style={{ backgroundColor: '#3D85C6' }} >
