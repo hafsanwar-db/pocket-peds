@@ -1,32 +1,15 @@
+
 import React, { useState, useContext, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 // Import formik
-import {TouchableOpacity} from 'react-native';
 import { Formik } from 'formik';
-import Footer from '../components/Footer';
+
 // Import icons
 import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons'; 
-import { footerContainer } from '../components/styles';
+
 import {
-    StyledContainer,
-    InnerContainer,
-    PageLogo,
-    PageTitle,
-    SubTitle,
-    StyledFormArea,
-    LeftIcon,
-    StyledInputLabel,
-    StyledTextInput,
-    RightIcon,
-    StyledButton,
-    ButtonText,
-    Colors,
-    MessageBox,
-    Line,
-    ExtraText,
-    ExtraView,
-    TextLink,
-    TextLinkContent
+    StyledContainer, InnerContainer, PageLogo, PageTitle, SubTitle, StyledFormArea, LeftIcon, StyledInputLabel, StyledTextInput,
+    RightIcon, StyledButton, ButtonText, Colors, MessageBox, Line, ExtraText, ExtraView, TextLink, TextLinkContent
 } from '../components/styles';
 
 // Colors
@@ -41,11 +24,8 @@ import ReminderPickerButton from '../notifications/ReminderPickerButton';
 // Axios
 import axios from 'axios';
 
-// Async storage
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 // Credentials context
-import { CredentialsContext } from '../components/CredentialsContext';
+//import { CredentialsContext } from '../components/CredentialsContext';
 import {Token} from '../components/Token';
 import ip from './ip.js';
 
@@ -56,7 +36,7 @@ const Login = ({setLastRefreshTime, setShouldRefresh, navigation,reminderInterva
     //for JWT tokens, updates whenever the user logs in
     const {updateToken} = useContext(Token);
     // Credentials context
-    const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
+    //const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
     useEffect(() => {
         console.log("does this run");
         setShouldRefresh(false);
@@ -69,13 +49,13 @@ const Login = ({setLastRefreshTime, setShouldRefresh, navigation,reminderInterva
             .post(url, credentials)
             .then((response) => {
                 const result = response.data;
-                const {message, status, data} = result;
+                const {access_token, token_type} = result;
 
-                if (status !== 'SUCCESS') {
-                    handleMessage(message, status);
+                if (access_token !== undefined) {
+                    navigation.navigate('Welcome', { ...result });
                 }
                 else {
-                    persistLogin(...data[0], message, status);
+                    handleMessage("Login failed. Please try again later.");
                 }
                 console.log(result);
                 //updateing the JWT token when the user successfully logs in
@@ -83,7 +63,7 @@ const Login = ({setLastRefreshTime, setShouldRefresh, navigation,reminderInterva
                 setSubmitting(false);
                 setLastRefreshTime(new Date().getTime());
                 setShouldRefresh(true);
-                navigation.navigate('Child');
+                navigation.navigate('Welcome');
             })
             .catch((error) => {
                 console.log(error)
@@ -96,7 +76,7 @@ const Login = ({setLastRefreshTime, setShouldRefresh, navigation,reminderInterva
         setMessage(message);
         setMessageType(type);
     }
-
+    /* 
     const handleGoogleSignIn = () => {
         handleMessage("Google sign in is in progress.", "SUCCESS");
     }
@@ -113,6 +93,7 @@ const Login = ({setLastRefreshTime, setShouldRefresh, navigation,reminderInterva
                 handleMessage("Persisting login failed.");
             });
     }
+    */
 
     return (
         <KeyboardAvoidingWrapper>
@@ -207,7 +188,8 @@ const Login = ({setLastRefreshTime, setShouldRefresh, navigation,reminderInterva
                     }
                 </Formik>
             </InnerContainer>
-           
+            
+
         </StyledContainer>
         
         </KeyboardAvoidingWrapper>

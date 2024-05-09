@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import ip from './ip.js';
 import {Token} from '../components/Token';
 import axios from 'axios';
+import ChangeWeightModal from '../components/modal/ChangeWeightModal';
 
 const { darkLight, primary, grey } = Colors;
 
@@ -112,15 +113,18 @@ const ChildInfo = ({ route, navigation }) => {
     const last_updated_date = new Date(last_updated).toLocaleDateString();
 
     return (
-      <View style={styles.childInfoContainer}>
-        <Image source={imagePaths[childInfo.image]} style={styles.profileImage} />
-        <View style={styles.childInfoTextContainer}>
-          <Text style={styles.childName}>{name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
-          <Text style={styles.childAge}>{years} years {months} {months>1 ? 'months' : 'month'}</Text>
-          <Text style={styles.childWeight}>{weight} lbs ({weightInKg} kg)</Text>
-          <Text style={styles.lastUpdated}>Last Updated: {last_updated_date}</Text>
+      <>
+        <ChangeWeightModal />
+        <View style={styles.childInfoContainer}>
+          <Image source={imagePaths[childInfo.image]} style={styles.profileImage} />
+          <View style={styles.childInfoTextContainer}>
+            <Text style={styles.childName}>{name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
+            <Text style={styles.childAge}>{years} years {months} {months>1 ? 'months' : 'month'}</Text>
+            <Text style={styles.childWeight}>{weight} lbs ({weightInKg} kg)</Text>
+            <Text style={styles.lastUpdated}>Last Updated: {last_updated_date}</Text>
+          </View>
         </View>
-      </View>
+      </>
     );
   };
 
