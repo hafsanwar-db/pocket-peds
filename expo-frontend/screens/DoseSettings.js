@@ -140,11 +140,23 @@ const DoseSettings = ({ route }) => {
       const doseGiven = reminderTimes[i].doseGiven;
       const reminderId = generateUniqueReminderId();
       const scheduledNotificationId = await schedulePushNotification(time, medicineName, dosage, doseGiven,reminderId);
+      const medications = [
+        {
+          name: medicineName,
+          upc: scannedData["upc"],
+          dosage: dosage,
+          notification: {
+            timestamp1: ["action1", "action2"],
+            timestamp2: ["action3", "action4"]
+          }
+        },
+        // Add more medications as needed
+      ];
       // Update the notificationIds object with the new mapping
-      setNotificationIds(prevIds => ({
+      /*setNotificationIds(prevIds => ({
         ...prevIds,
         [reminderId]: scheduledNotificationId
-      }));
+      }));*/
 
       if (doseGiven) {
         const nextDayTime = new Date(time);
@@ -163,7 +175,7 @@ const DoseSettings = ({ route }) => {
    setReminderTimes(newReminderTimes);
  };
  // Function to cancel a notification based on reminder ID
-  const cancelNotification = (reminderId) => {
+  const cancelNotification = (notifId) => {
     const notificationId = notificationIds[reminderId];
     if (notificationId) {
       // Cancel the notification using its ID
