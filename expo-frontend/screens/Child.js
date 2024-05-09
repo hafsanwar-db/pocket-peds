@@ -18,8 +18,7 @@ import {
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
 import axios from 'axios';
 import ip from './ip.js';
-import slides from './slides.js';
-const { primary, darkLight } = Colors;
+
 const {height, width} = Dimensions.get('window');
 
 const imageList = [
@@ -77,7 +76,9 @@ const Child = ({ navigation }) => {
     <TouchableOpacity
       key={item.id}
       style={{ alignItems: 'center', marginBottom: 20 }}
-      onPress={() => navigation.navigate('ChildInfo', { name: item.name })}
+      onPress={() => {
+        navigation.navigate('ChildInfo', { name: item.name })
+      }}
     >
       <View style={{
         width: 80,

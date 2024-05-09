@@ -16,7 +16,7 @@ const ChildInfo = ({ route, navigation }) => {
   const [childInfo, setChildInfo] = useState(null);
   const [medications, setMedications] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const {tokenValue} = useContext(Token);
+  const {tokenValue, updateChild} = useContext(Token);
 
   const imagePaths = {
     avatar1: require('../assets/img/avatar1.png'),
@@ -43,6 +43,7 @@ const ChildInfo = ({ route, navigation }) => {
         },
       });
       console.log("RESPONSE CHILD: ", response.data);
+      updateChild(response.data);
       setChildInfo(response.data);
       setMedications(response.data.medications); // Set medications from child info
     } catch (error) {

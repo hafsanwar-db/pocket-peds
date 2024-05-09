@@ -1,11 +1,14 @@
 // CalculatingScreen.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import ip from './ip.js';
+import {Token} from '../components/Token';
+
 const CalculatingScreen = ({ route }) => {
   const { scannedData } = route.params;
   const navigation = useNavigation();
+  const { child } = useContext(Token);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,8 +22,8 @@ const CalculatingScreen = ({ route }) => {
         },
         body: JSON.stringify({
           upc: encodeURIComponent(scannedData.upc),
-          weight: 35, // replace with the actual weight value
-          age: 2, // replace with the actual age value
+          weight: parseFloat(child.weight), // replace with the actual weight value
+          age: child.age, // replace with the actual age value
         }),
       });
         if (!response.ok) {
