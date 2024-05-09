@@ -114,7 +114,7 @@ const ChildInfo = ({ route, navigation }) => {
 
     return (
       <>
-        <ChangeWeightModal />
+        <ChangeWeightModal navigation={navigation} childInfo={childInfo} />
         <View style={styles.childInfoContainer}>
           <Image source={imagePaths[childInfo.image]} style={styles.profileImage} />
           <View style={styles.childInfoTextContainer}>

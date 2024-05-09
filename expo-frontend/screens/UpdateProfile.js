@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, ActivityIndicator, Text } from 'react-native';
 import axios from 'axios';
 import ip from './ip.js';
@@ -7,6 +7,7 @@ import Iconicons from 'react-native-vector-icons/Ionicons';
 
 // Keyboard Avoiding View
 import KeyboardAvoidingWrapper from '../components/KeyboardAvoidingWrapper';
+import { Token } from '../components/Token.js';
 
 import {
   StyledContainer, InnerContainer, PageLogo, PageTitle, SubTitle, StyledFormArea, LeftIcon, StyledInputLabel, StyledTextInput,
@@ -20,41 +21,57 @@ import { Formik } from 'formik';
 
 
 const UpdateProfile = ({ navigation, route }) => {
-  const { childName } = route.params || {}; // Get child name from navigation params
+  const { childInfo: routeChildInfo } = route.params || {}; // Get child name from navigation params
 
-  const [childInfo, setChildInfo] = useState({ name: '', weight: '', age: ''});
+  const [childInfo, setChildInfo] = useState({
+    name: routeChildInfo?.name || '',
+    weight: routeChildInfo?.weight || '',
+    age: routeChildInfo?.age || '',
+  });
   const [message, setMessage] = useState();
   const [messageType, setMessageType] = useState();
 
+  const {tokenValue} = useContext(Token);
+
   useEffect(() => {
+    const token = tokenValue;
     // Fetch child info using Axios
-    axios.get(`http://${ip}:8000/child-profiles/${childName}`)
+    axios.get(`http://${ip}:8000/child-profiles/${childName}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => {
         setChildInfo(response.data);
       })
       .catch((error) => {
         console.error('Error fetching child info:', error);
       });
-  }, [childName]);
+  }, [childName, tokenValue]);
 
   const handleUpdate = (credentials, setSubmitting) => {
     handleMessage(null);
     const url = `http://${ip}:8000/child-profiles/${childName}`;
-
+    const token = tokenValue;
+  
     axios
-        .post(url, credentials)
-        .then((response) => {
-            const result = response.data;
-            const {message} = result;
-
-            handleMessage(message, "SUCCESS");
-            setSubmitting(false);
-        })
-        .catch((error) => {
-            console.log(error)
-            setSubmitting(false);
-            handleMessage("An error occurred. Please try again.");
-        });
+      .post(url, credentials, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        const result = response.data;
+        const { message } = result;
+  
+        handleMessage(message, "SUCCESS");
+        setSubmitting(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setSubmitting(false);
+        handleMessage("An error occurred. Please try again.");
+      });
   };
 
   const handleMessage = (message, type = 'FAILED') => {

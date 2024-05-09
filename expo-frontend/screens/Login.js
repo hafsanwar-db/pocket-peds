@@ -52,7 +52,7 @@ const Login = ({setLastRefreshTime, setShouldRefresh, navigation,reminderInterva
                 const {access_token, token_type} = result;
 
                 if (access_token !== undefined) {
-                    navigation.navigate('Welcome', { ...result });
+                    navigation.navigate('Child', { ...result });
                 }
                 else {
                     handleMessage("Login failed. Please try again later.");
