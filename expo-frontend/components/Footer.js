@@ -31,7 +31,7 @@ const Footer = ({ navigation }) => {
 
   const handleUserIconPress = () => {
     // Navigate to User page
-    navigation.goBack();
+    navigation.navigate("Child");
   };
   
   const handleScanPress = () =>{
