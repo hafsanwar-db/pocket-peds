@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "./handleNotifications";
 import navigation from '../NavigationService';
-
+import DoseSettings, { toggleReminderTime } from '../screens/DoseSettings';
+import {cancelNotifications} from "../screens/DoseSettings";
 
 //useLocalNotification hook will request a permission from user upon the initial launch of the App
 export const useLocalNotification = () => {
@@ -48,15 +49,20 @@ export const useLocalNotification = () => {
 };
 
 export const handleNotificationResponse = async (response) => {
-  
+  const medicineName = response.notification.request.content.data.medicineName;
+  const dateofNotification = response.notification.request.content.data.date;
   Notifications.getNotificationCategoriesAsync().then((categories) => {
     //console.log("categories", categories);
+    
     if (response.actionIdentifier === 'DOSE_GIVEN') {
+      toggleReminderTime(reminderIndex);
       Notifications.dismissNotificationAsync(response.actionIdentifier);
 //dismissAllNotificationAsync clears notification as soon user clicks on notification in phone
     } else if (response.actionIdentifier === 'NO_LONGER_GIVING') {
         
-        navigation.navigate(('ConfirmationScreen'));
+      Notifications.dismissNotificationAsync(response.actionIdentifier);
+
+
         
       } 
   });
