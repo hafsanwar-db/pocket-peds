@@ -22,8 +22,8 @@ const CalculatingScreen = ({ route }) => {
         },
         body: JSON.stringify({
           upc: encodeURIComponent(scannedData.upc),
-          weight: parseFloat(child.weight), // replace with the actual weight value
-          age: child.age, // replace with the actual age value
+          weight: parseFloat(child.weight), 
+          age: child.age,
         }),
       });
         if (!response.ok) {
