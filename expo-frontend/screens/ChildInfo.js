@@ -115,7 +115,7 @@ const ChildInfo = ({ route, navigation }) => {
   const renderChildInfo = () => {
     if (!childInfo) return null;
 
-    const { name, date_of_birth, weight, last_updated } = childInfo;
+    const { name, date_of_birth, weight, last_updated, image } = childInfo;
     const { years, months } = calculateAge(date_of_birth);
     const weightInKg = (weight * 0.45359237).toFixed(1);
     // const last_updated_date = new Date(last_updated).toLocaleDateString();
@@ -125,7 +125,7 @@ const ChildInfo = ({ route, navigation }) => {
         <ChangeWeightModal navigation={navigation} name={name} />
         <View style={styles.childInfoContainer}>
           <TouchableOpacity onPress = {() =>{
-            navigation.navigate('UpdateProfile', {name: name});
+            navigation.navigate('UpdateProfile', {name: name, image: image});
           
           }}>
           <Image source={imagePaths[childInfo.image]} style={styles.profileImage} />
