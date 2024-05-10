@@ -13,6 +13,7 @@ import { InnerContainer } from "../components/styles";
 import ChangeWeightModal from '../components/modal/ChangeWeightModal';
 import axios from 'axios';
 import ip from './ip.js';
+import { useNavigation } from '@react-navigation/native';
 
 const DoseSettings = ({ route }) => {
   const { scannedData, apiData } = route.params;
@@ -23,6 +24,7 @@ const DoseSettings = ({ route }) => {
   const { child } = useContext(Token);
   const {tokenValue} = useContext(Token);
   const [isIntervalSelected, setIsIntervalSelected] = useState(false);
+  const navigation = useNavigation();
 
   const imagePaths = {
     avatar1: require('../assets/img/avatar1.png'),
