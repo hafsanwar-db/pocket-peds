@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Dimensions, Text, Image, TouchableOpacity, TextInput, StyleSheet, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { StyledContainer, InnerContainer, Colors } from '../components/styles';
+import { StyledContainer, InnerContainer, Colors, WeightModalButton } from '../components/styles';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import ip from './ip.js';
@@ -115,7 +115,7 @@ const ChildInfo = ({ route, navigation }) => {
   const renderChildInfo = () => {
     if (!childInfo) return null;
 
-    const { name, date_of_birth, weight, last_updated } = childInfo;
+    const { name, date_of_birth, weight, last_updated, image } = childInfo;
     const { years, months } = calculateAge(date_of_birth);
     const weightInKg = (weight * 0.45359237).toFixed(1);
     // const last_updated_date = new Date(last_updated).toLocaleDateString();
@@ -125,7 +125,7 @@ const ChildInfo = ({ route, navigation }) => {
         <ChangeWeightModal navigation={navigation} name={name} />
         <View style={styles.childInfoContainer}>
           <TouchableOpacity onPress = {() =>{
-            navigation.navigate('UpdateProfile', {name: name});
+            navigation.navigate('UpdateProfile', {name: name, image: image});
           
           }}>
           <Image source={imagePaths[childInfo.image]} style={styles.profileImage} />
@@ -143,6 +143,30 @@ const ChildInfo = ({ route, navigation }) => {
 
   const handleEditMedication = (medicationData) => {
     navigation.navigate('EditMedication', { medicationData });
+  };
+
+  const handleDeleteMedication = async (medicationData, index) => {
+    try {
+      const token = tokenValue; // await getAccessToken(); // Implement the logic to get the access token
+  
+      const payload = {
+        upc: medicationData.upc,
+        child_name: childInfo.name,
+      };
+  
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+  
+      await axios.post(`http://${ip}:8000/delete-child-medication`, payload, { headers });
+      
+      // Update medications array to remove the deleted medication
+      const updatedMedications = [...medications];
+      updatedMedications.splice(index, 1);
+      setMedications(updatedMedications);
+    } catch (error) {
+      console.error('Error deleting medication:', error);
+    }
   };
 
 // Render the medication list
@@ -171,7 +195,7 @@ const renderMedications = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.hiddenItemButton, styles.deleteButton]}
-            onPress={() => handleDeleteMedication(index)}
+            onPress={() => handleDeleteMedication(item, index)}
           >
             <Icon name="trash" size={20} color="white" />
           </TouchableOpacity>
@@ -199,6 +223,11 @@ const formatDate = (dateString) => {
             <Text style={styles.editProfileButtonText}>Edit Profile</Text>
           </TouchableOpacity>
         )} */}
+
+      <WeightModalButton onPress={() => navigation.navigate('MyCalendar')} title="History" style={{ backgroundColor: '#FEB624', width: "50%" }} >
+          <Text style={{ fontSize: 20, color: "black" }}>History</Text>
+      </WeightModalButton>
+
       </InnerContainer>
     </StyledContainer>
   );

@@ -27,8 +27,8 @@ import { Formik, Field } from 'formik';
 
 
 const UpdateProfile = ({ navigation, route }) => {
-  const { name = '' } = route.params; // Get child name from navigation params
-
+  const { name = '', image = 'avatar1' } = route.params; // Get child name from navigation params
+  console.log("HERE:", image)
   const [childInfo, setChildInfo] = useState({
     name: name,
     weight: '',
@@ -36,7 +36,7 @@ const UpdateProfile = ({ navigation, route }) => {
   });
   const [message, setMessage] = useState();
   const [messageType, setMessageType] = useState();
-  const [profileImage, setProfileImage] = useState("avatar1");
+  const [profileImage, setProfileImage] = useState(image); // Set initial profile images
   const {tokenValue} = useContext(Token);
 
   useEffect(() => {
@@ -96,7 +96,7 @@ const UpdateProfile = ({ navigation, route }) => {
         <PageTitle style={{ color: "black"}}>Updating Profile</PageTitle>
 
         {/* INSERT THE CAROUSEL HERE */}
-        <Carousel setImage = {setProfileImage}/>
+        <Carousel setImage = {setProfileImage} initialImage= {profileImage}/>
         <KeyboardAvoidingWrapper>
         <Formik 
             initialValues={{ weight: childInfo?.weight || '', name: childInfo?.name || '', age: childInfo?.age || '', image: profileImage}}

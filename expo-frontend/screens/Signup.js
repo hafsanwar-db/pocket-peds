@@ -81,7 +81,6 @@ const Signup = ({navigation}) => {
 
     return (
         <>
-        <ChangeWeightModal navigation={navigation}/>
         <KeyboardAvoidingWrapper>
         <StyledContainer>
             <StatusBar style="dark" />
