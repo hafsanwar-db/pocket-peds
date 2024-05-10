@@ -5,7 +5,7 @@ import { Octicons, Ionicons, Fontisto } from '@expo/vector-icons';
 import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
 import { StyledContainer, InnerContainer, PageLogo, PageTitle, SubTitle, StyledButton, ButtonText, Colors, ExtraText, ExtraView, TextLink, TextLinkContent } from '../components/styles';
 import ip from './ip.js';
-const { primary, secondary, tertiary, darkLight, brand, green, red } = Colors;
+
 
 const ScanBarcode = () => {
   const navigation = useNavigation();
@@ -75,11 +75,7 @@ const ScanBarcode = () => {
     const barcodeRegex = /^3\d{4}\d{4}\d{2}\d$/;
     if (barcodeRegex.test(manualInput)) {
       handleBarCodeScanned({ data: manualInput });
-      setBarcodeSegment1('');
-      setBarcodeSegment2('');
-      setBarcodeSegment3('');
       setBarcodeSegment4('');
-      setBarcodeSegment5('');
     } else {
       alert('Invalid barcode format. Please enter a valid barcode.');
     }
@@ -109,58 +105,24 @@ const ScanBarcode = () => {
             )}
           </View>
         )}
+        <View style={{ marginTop: 20, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+          <TextInput
+            style={{ height: 40, width: 200, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5, textAlign: 'center' }}
+            onChangeText={text => setBarcodeSegment4(text)}
+            value={barcodeSegment4}
+            keyboardType="numeric"
+            maxLength={14}
+            placeholder="3XXXXXXXXXXXXX"
+          />
+          </View>
+        <Button  title="Submit" onPress={handleManualInputSubmit}/>
+
         <ExtraView>
           <ExtraText>Don't want to scan? </ExtraText>
           <TextLink onPress={() => navigation.navigate('Login')}>
             <TextLinkContent>Go back to Login</TextLinkContent>
           </TextLink>
         </ExtraView>
-        <View style={{ marginTop: 20, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-          <TextInput
-            style={{ height: 40, width: 30, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5 }}
-            onChangeText={text => setBarcodeSegment1(text)}
-            value={barcodeSegment1}
-            keyboardType="numeric"
-            maxLength={1}
-            placeholder="3"
-          />
-          <TextInput
-            style={{ height: 40, width: 60, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5, textAlign: 'center' }}
-            onChangeText={text => setBarcodeSegment2(text)}
-            value={barcodeSegment2}
-            keyboardType="numeric"
-            maxLength={4}
-            placeholder="XXXX"
-          />
-          <Text>-</Text>
-          <TextInput
-            style={{ height: 40, width: 60, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5, textAlign: 'center' }}
-            onChangeText={text => setBarcodeSegment3(text)}
-            value={barcodeSegment3}
-            keyboardType="numeric"
-            maxLength={4}
-            placeholder="XXXX"
-          />
-          <Text>-</Text>
-          <TextInput
-            style={{ height: 40, width: 50, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, marginRight: 5, textAlign: 'center' }}
-            onChangeText={text => setBarcodeSegment4(text)}
-            value={barcodeSegment4}
-            keyboardType="numeric"
-            maxLength={2}
-            placeholder="XX"
-          />
-          <Text>-</Text>
-          <TextInput
-            style={{ height: 40, width: 30, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 5, textAlign: 'center' }}
-            onChangeText={text => setBarcodeSegment5(text)}
-            value={barcodeSegment5}
-            keyboardType="numeric"
-            maxLength={1}
-            placeholder='X'
-          />
-        </View>
-        <Button title="Submit" onPress={handleManualInputSubmit} />
       </StyledContainer>
     </KeyboardAvoidingView>
   );
