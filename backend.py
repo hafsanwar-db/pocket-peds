@@ -397,8 +397,8 @@ async def update_notifications(data: dict, token: Annotated[str, Depends(oauth2_
     # Update the child profile in the database
     result = child_profiles.update_one({'_id': child_profile['_id']}, {'$set': child_profile})
 
-    if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail='Child profile not found')
+    # if result.modified_count == 0:
+    #     raise HTTPException(status_code=404, detail='Child profile not found')
 
     return {'message': 'Notifications updated successfully'}
 
@@ -464,9 +464,10 @@ async def process_upc(upc: str):
     media = {"media_url": media_url, "name": name, "upc": upc}
     return media
 
-@app.get('/get_medicine/')
+@app.get('/get_medicine')
 async def get_medicine(upc: str):
     # Retrieve the medicine from the database
+    print(upc)
     medicine = medicines.find_one({'upc': upc})
     if not medicine:
         raise HTTPException(status_code=404, detail='Medicine not found')

@@ -16,7 +16,7 @@ export const schedulePushNotification = async ({ time, medicineName, dosage, med
     //identifier: "PocketPeds",
     content: {
       title: "PocketPeds",
-      body: `Time for ${childName.charAt(0).toUpperCase() + childName.slice(1)}'s next dose!\nGive ${dosage} of ${medicineName} to ${childName.charAt(0).toUpperCase() + childName.slice(1)}`,
+      body: `Time for ${childName.charAt(0).toUpperCase() + childName.slice(1)}'s next dose!\nGive ${medicineName} to ${childName.charAt(0).toUpperCase() + childName.slice(1)}`,
       categoryIdentifier: "reminder",
       data: { medicineName: medicineName, date: new Date(time).toString(), medicationUpc: medication_upc.toString(), childName: child.name, parent_id: child.parent_id }
     },
