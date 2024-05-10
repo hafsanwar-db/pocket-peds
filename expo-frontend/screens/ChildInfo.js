@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Dimensions, Text, Image, TouchableOpacity, TextInput, StyleSheet, ScrollView } from 'react-native';
+import { View, AppState, Dimensions, Text, Image, TouchableOpacity, TextInput, StyleSheet, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { StyledContainer, InnerContainer, Colors, WeightModalButton } from '../components/styles';
 import { SwipeListView } from 'react-native-swipe-list-view';
@@ -14,12 +14,15 @@ const { darkLight, primary, grey } = Colors;
 
 const ChildInfo = ({ route, navigation }) => {
   const { name } = route.params;
+  const [appState, setAppState] = useState(AppState.currentState);
   const [childInfo, setChildInfo] = useState(null);
   const [medications, setMedications] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const {tokenValue, updateChild} = useContext(Token);
   const isFocused = useIsFocused();
-
+  const handleAppStateChange = (nextAppState) => {
+    setAppState(nextAppState);
+  };
   const imagePaths = {
     avatar1: require('../assets/img/avatar1.png'),
     avatar2: require('../assets/img/avatar2.png'),
@@ -32,8 +35,18 @@ const ChildInfo = ({ route, navigation }) => {
 
   // Fetch child info and medications on component mount
   useEffect(() => {
-    fetchChildInfo();
-  }, [isFocused]);
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+    if (appState === "active") {
+      fetchChildInfo();
+    }
+      
+    return () => {
+      subscription?.remove();
+    };
+  }, [isFocused, appState]);
 
   // Fetch child info from the API
   const fetchChildInfo = async () => {
@@ -105,6 +118,25 @@ const ChildInfo = ({ route, navigation }) => {
     }
   };
 
+  const calculateAgeFromMonths = (ageInMonths) => {
+    const years = Math.floor(ageInMonths / 12);
+    const months = ageInMonths % 12;
+  
+    if (years === 0) {
+      if (months === 1) {
+        return `${months} month`;
+      } else {
+        return `${months} months`;
+      }
+    } else if (months === 0) {
+      return `${years} years`;
+    } else if (months === 1) {
+      return `${years} years ${months} month`;
+    } else {
+      return `${years} years ${months} months`;
+    }
+  };
+
   // Handle edit profile button press
   const handleEditProfile = () => {
     setIsEditing(true);
@@ -115,7 +147,7 @@ const ChildInfo = ({ route, navigation }) => {
     if (!childInfo) return null;
 
     const { name, date_of_birth, weight, last_updated, image } = childInfo;
-    const { years, months } = calculateAge(date_of_birth);
+    // const { years, months } = calculateAge(date_of_birth);
     const weightInKg = (weight * 0.45359237).toFixed(1);
     // const last_updated_date = new Date(last_updated).toLocaleDateString();
 
@@ -131,7 +163,7 @@ const ChildInfo = ({ route, navigation }) => {
           </TouchableOpacity>
           <View style={styles.childInfoTextContainer}>
             <Text style={styles.childName}>{childInfo.name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
-            <Text style={styles.childAge}>{calculateAge(childInfo.date_of_birth)}</Text>
+            <Text style={styles.childAge}>{calculateAgeFromMonths(childInfo.age)}</Text>
             <Text style={styles.childWeight}>{childInfo.weight} lbs ({(childInfo.weight * 0.45359237).toFixed(1)} kg)</Text>
             {/* <Text style={styles.lastUpdated}>Last Updated: {last_updated_date}</Text> */}
           </View>

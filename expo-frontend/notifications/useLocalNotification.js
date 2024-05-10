@@ -76,12 +76,12 @@ export const handleNotificationResponse = async (response) => {
 //dismissAllNotificationAsync clears notification as soon user clicks on notification in phone
     } else if (response.actionIdentifier === 'NO_LONGER_GIVING') {
       
-      
-      notificationsToDelete = getNotificationInfo(medication_upc, child);
-      for (let i = 0; i < notificationsToDelete.length; i++) {
-        Notifications.cancelScheduledNotificationAsync(notificationsToDelete[i]);
-        Notifications.dismissNotificationAsync(notificationsToDelete[i]);
-      }
+      //delete all scheduled notifications 
+      // notificationsToDelete = getNotificationInfo(medication_upc, child);
+      // for (let i = 0; i < notificationsToDelete.length; i++) {
+      //   Notifications.cancelScheduledNotificationAsync(notificationsToDelete[i]);
+      //   Notifications.dismissNotificationAsync(notificationsToDelete[i]);
+      // }
 
       //now delete from db
       handleNoLongerGiving(medication_upc, child);
@@ -124,13 +124,13 @@ const handleNoLongerGiving = async (medication_upc, child) => {
       medication_upc: encodeURIComponent(medication_upc),
     },
       )
-
-    if (response.ok) {
-      const responseData = await response.json();
-      console.log(responseData);
-    } else {
-      console.error(`Error while handling No Longer Dose Given `);
-    }
+    // console.log(response.ok)
+    // if (response.ok) {
+    //   const responseData = await response.json();
+    //   console.log(responseData);
+    // } else {
+    //   console.error(`Error while handling No Longer Dose Given, response not `);
+    // }
   } catch (error) {
     console.error(`Error while handling No Longer Dose Given `, error);
   }

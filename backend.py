@@ -269,22 +269,21 @@ async def delete_child_medication_notif(data: dict):
     # Retrieve the child profile from the database
     print(data)
     child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': ObjectId(parent_id)})
-
     if not child_profile:
         raise HTTPException(status_code=404, detail='Child profile not found')
 
     # Remove the medication from the child profile
     for medication in child_profile['medications']:
         if medication['upc'] == data['medication_upc']:
-            print(medication)
-            child_profile['medications'].remove(medication)
-    
-    print('changed child_profile: ',child_profile)
+            medication_to_delete = medication
 
-    # child_profile['medications'].remove(medication_to_delete)
+    if not medication_to_delete:
+        raise HTTPException(status_code=404, detail='Medication not found')
+    
+    child_profile['medications'].remove(medication_to_delete)
 
     # Update the child profile in the database
-    result = child_profiles.update_one({'_id': child_profile['_id']}, {'medications': child_profile['medications']})
+    result = child_profiles.update_one({'_id': child_profile['_id']}, {'$set': child_profile})
 
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail='Child profile not found')

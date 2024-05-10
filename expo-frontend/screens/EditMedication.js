@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, AppState} from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from 'axios';
 import ip from './ip.js';
@@ -12,6 +12,7 @@ const { height, width } = Dimensions.get("window");
 
 const EditMedication = ({ route }) => {
   const { tokenValue, child,  } = useContext(Token);
+
   const { medicationData } = route.params;
   const [notificationData, setNotificationData] = useState({});
   const [showTimePicker, setShowTimePicker] = useState(false);
