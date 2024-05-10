@@ -1,6 +1,6 @@
 
 // Import Screens
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext } from 'react';
 import { View } from 'react-native';
 // Async storage
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,9 +17,10 @@ import * as Notifications from "expo-notifications";
 import { schedulePushNotification } from "./notifications/handleNotifications";
 import { Button } from "react-native";
 import ReminderPickerButton from "./notifications/ReminderPickerButton";
-import {TokenProvider} from './components/Token';
+import {Token, TokenProvider} from './components/Token';
 //SplashScreen.preventAutoHideAsync();
 
+// export const AppContext = createContext();
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -31,9 +32,12 @@ Notifications.setNotificationHandler({
 export default function App() {
   const [appReady, setAppReady] = useState(false);
   const [storedCredentials, setStoredCredentials] = useState("");
+  const { tokenValue } = useContext(Token);
+  // console.log("Token value in App.js: ", tokenValue);
   
   // Load login info, hide splash screen when done
   useEffect(() => {
+    // console.log("Token value in App.js: ", tokenValue);
     const checkLoginCredentials = async () => {
       try {
         const value = await AsyncStorage.getItem('userCredentials');
