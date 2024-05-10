@@ -72,7 +72,7 @@ const ScanBarcode = () => {
   // Handle manual input submission
   const handleManualInputSubmit = () => {
     const manualInput = `${barcodeSegment1}${barcodeSegment2}${barcodeSegment3}${barcodeSegment4}${barcodeSegment5}`;
-    const barcodeRegex = /^3\d{4}\d{4}\d{2}\d$/;
+    const barcodeRegex = /^\d{5}\d{4}\d{2}\d$/;
     if (barcodeRegex.test(manualInput)) {
       handleBarCodeScanned({ data: manualInput });
       setBarcodeSegment4('');
@@ -112,7 +112,7 @@ const ScanBarcode = () => {
             value={barcodeSegment4}
             keyboardType="numeric"
             maxLength={14}
-            placeholder="3XXXXXXXXXXXXX"
+            placeholder="XXXXXXXXXXXXXX"
           />
           </View>
         <Button  title="Submit" onPress={handleManualInputSubmit}/>

@@ -187,7 +187,7 @@ const AddChild = ({ navigation }) => {
             onChangeText={setNewWeight}
           />
         </View>
-        <View style={styles.textInputContainer}>
+        {/* <View style={styles.textInputContainer}>
           <Text style={styles.textForInput}>Medications:</Text>
           <TextInput
             style={styles.textInput}
@@ -195,7 +195,7 @@ const AddChild = ({ navigation }) => {
             value={newMedications}
             onChangeText={setNewMedications}
           />
-        </View>
+        </View> */}
         <View style={styles.textInputContainer}>
           <Text style={styles.textForInput}>Allergies:</Text>
           <TextInput

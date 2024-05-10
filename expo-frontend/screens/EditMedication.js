@@ -285,7 +285,7 @@ const EditMedication = ({ route }) => {
           <Text style={styles.reminderButtonText}>8 Hours</Text>
         </TouchableOpacity>
       </View>
-
+<KeyboardAvoidingWrapper>
 <>
       {/* Render reminder times */}
       {reminderTimes.map((item, index) => (
@@ -314,11 +314,12 @@ const EditMedication = ({ route }) => {
       </View>
       
         ))}
-
-
+      </>
+      </KeyboardAvoidingWrapper>
+      {/* Confirm button */}
       {/* Show time picker */}
       {showTimePicker && (
-        <View style= {{flexDirection: 'row', justifyContent:'center', marginBottom: 10}}>
+        <View style= {{flexDirection: 'row', justifyContent:'center', marginBottom: 10, marginTop: 4}}>
         <DateTimePicker
           value={reminderTimes[selectedTimeIndex].time}
           mode="time"
@@ -327,10 +328,6 @@ const EditMedication = ({ route }) => {
           onChange={handleTimeChange}
         /></View>
       )}
-      </>
-
-      {/* Confirm button */}
-      
         <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
           <Text style={styles.confirmButtonText}>Confirm</Text>
         </TouchableOpacity>
@@ -357,6 +354,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: 0.5*width,
     alignSelf: "center",
+    marginBottom:20,
   },
   confirmButtonText: {
     color: "#fff",
@@ -391,6 +389,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingTop: 15,
     marginBottom: 20,
+    paddingHorizontal:5,
   },
   productName: {
     fontSize: 16,
@@ -409,13 +408,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   doseText: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "bold",
     marginBottom: 20,
     color: "#333",
   },
   dosageText: {
-    fontSize: 18,
+    fontSize: 14,
     color: "#FFA500",
     
   },
@@ -424,7 +423,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     alignContent: "center",
-    marginTop: 65,
+    marginTop: 45,
     marginBottom: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,

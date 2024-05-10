@@ -577,6 +577,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: 0.5*width,
     alignSelf: "center",
+    marginBottom:20,
+
   },
   confirmButtonText: {
     color: "#fff",
@@ -629,12 +631,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   doseText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     color: "#333",
   },
   dosageText: {
-    fontSize: 18,
+    fontSize: 14,
     color: "#FFA500",
   },
   upcContainer: {
@@ -642,7 +644,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     alignContent: "center",
-    marginTop: 65,
+    marginTop: 45,
     marginBottom: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
