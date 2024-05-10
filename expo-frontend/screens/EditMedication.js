@@ -69,15 +69,15 @@ const EditMedication = ({ route }) => {
             interval: reminderInterval / (60 * 60 * 1000), // Convert milliseconds to hours
             notification1:  {
                 time: formatTime(reminderTimes[0].time),
-                given: reminderTimes[0].given,
+                given: false,
             },
             notification2: {
                 time: formatTime(reminderTimes[1].time),
-                given: reminderTimes[1].given,
+                given: false,
             },
             notification3: {
                 time: formatTime(reminderTimes[2].time),
-                given: reminderTimes[2].given,
+                given: false,
             },
           },
         },

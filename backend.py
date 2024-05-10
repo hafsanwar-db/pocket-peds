@@ -344,6 +344,14 @@ async def update_notifications_dose(data: dict):
     parent_id = data.get('parent_id')
     print(parent_id)
     print(data)
+    print(data['date'])
+
+    # Convert the string to a datetime object
+    date_object = datetime.strptime(data['date'], "%a %b %d %Y %H:%M:%S GMT%z")
+
+# Extract the time part from the datetime object
+    time = date_object.strftime("%H:%M")
+    
     child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': ObjectId(parent_id)})
 
     if not child_profile:
@@ -351,8 +359,16 @@ async def update_notifications_dose(data: dict):
 
     # Update the notifications in the child profile
     for medication in child_profile['medications']:
-        if medication['upc'] == data['medication']['upc']:
-            medication['notifications'] = data['medication']['notifications']
+        if medication['upc'] == data['medication_upc']:
+            notifications = medication['notifications']
+            for notification in notifications.keys():
+                if notification == 'interval':
+                    continue
+                if notifications[notification]['time'] == time:
+                    notifications[notification]['given'] = True
+                    medication['notifications'] = notifications
+                    break
+
 
     # Update the child profile in the database
     result = child_profiles.update_one({'_id': child_profile['_id']}, {'$set': child_profile})

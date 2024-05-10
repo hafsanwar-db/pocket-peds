@@ -152,9 +152,9 @@ const handleDoseGiven = async (medication_upc, dateofNotification, child) => {
     },
       )
 
-    if (response.ok) {
-      const responseData = await response.json();
-      console.log(responseData);
+    if (response.status == 200) {
+      // const responseData = await response.json();
+      // console.log(responseData);
     } else {
       console.error(`Error while handling Dose Given `);
     }

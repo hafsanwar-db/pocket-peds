@@ -48,7 +48,7 @@ const ScanBarcode = () => {
     try {
       // Make API call to process scanned data
       console.log('Making API call for barcode:', data); // Add this line to check if the function is triggered
-      const url = `http://${ip}:8000/get_medicine?upc=${encodeURIComponent(data)}`;
+      const url = `http://${ip}:8000/get_medicine?upc=0${encodeURIComponent(data)}`;
       const response = await fetch(url, {
         method: 'GET',
         headers: {
