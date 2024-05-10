@@ -60,13 +60,16 @@ export const handleNotificationResponse = async (response) => {
   const medicineName = response.notification.request.content.data.medicineName;
   const dateofNotification = response.notification.request.content.data.date;
   const medication_upc = response.notification.request.content.data.medicationUpc;
+  const childName = response.notification.request.content.data.childName;
+  const parent_id = response.notification.request.content.data.parent_id;
+  const child = {name: childName, parent_id: parent_id};
   Notifications.getNotificationCategoriesAsync().then((categories) => {
     //console.log("categories", categories);
     
     if (response.actionIdentifier === 'DOSE_GIVEN') {
       //change doseGiven to True
       //toggleReminderTime(reminderIndex);
-      handleDoseGiven(medication_upc, dateofNotification);
+      handleDoseGiven(medication_upc, dateofNotification, child);
 
       //call api with notifId notification from this child
       Notifications.dismissNotificationAsync(response.actionIdentifier);
@@ -74,14 +77,14 @@ export const handleNotificationResponse = async (response) => {
     } else if (response.actionIdentifier === 'NO_LONGER_GIVING') {
       
       
-      notificationsToDelete = getNotificationInfo(medication_upc);
+      notificationsToDelete = getNotificationInfo(medication_upc, child);
       for (let i = 0; i < notificationsToDelete.length; i++) {
         Notifications.cancelScheduledNotificationAsync(notificationsToDelete[i]);
         Notifications.dismissNotificationAsync(notificationsToDelete[i]);
       }
 
       //now delete from db
-      handleNoLongerGiving(medication_upc, dateofNotification);
+      handleNoLongerGiving(medication_upc, child);
 
 
         
@@ -108,24 +111,19 @@ export const setupNotificationCategories = async () => {
   ]);
 };
 
-const handleNoLongerGiving = async (medication_upc) => {
+const handleNoLongerGiving = async (medication_upc, child) => {
   console.log('No Longer Dose Given'); // Add this line to check if the function is triggered
-  
 
   try {
     // Make API call to process scanned data
     console.log('Making API call for No Longer Dose Given:'); // Add this line to check if the function is triggered
-    const url = `http://${ip}:8000/delete-child-medication`;
-    const response = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${tokenValue}`,
-        body: JSON.stringify({
-          child_name: childName,
-          medication_upc: encodeURIComponent(medication_upc),
-        })
-      },
-      
-    })
+    const url = `http://${ip}:8000/delete-child-medication-notif`;
+    const response = await axios.post(url, {
+      child_name: child.name,
+      parent_id: child.parent_id,
+      medication_upc: encodeURIComponent(medication_upc),
+    },
+      )
 
     if (response.ok) {
       const responseData = await response.json();
@@ -138,29 +136,21 @@ const handleNoLongerGiving = async (medication_upc) => {
   }
 };
 
-const handleDoseGiven = async (medication_upc, dateofNotification) => {
+const handleDoseGiven = async (medication_upc, dateofNotification, child) => {
   console.log('Handling dose Given of '); // Add this line to check if the function is triggered
-  
+  childName = child.name;
 
   try {
     // Make API call to process scanned data
     console.log('Making API call for handlingDoseGiven:'); // Add this line to check if the function is triggered
     const url = `http://${ip}:8000/handle-dose-given`;
-    const response = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${tokenValue}`,
-        body: JSON.stringify({
-          child_name: childName,
-          medication_upc: encodeURIComponent(medication_upc),
-          notifications: {
-            medication_upc: medication_upc,
-            child_name: childName,
-            date: dateofNotification,
-          }
-        })
-      },
-      
-    })
+    const response = await axios.post(url, {
+      child_name: childName,
+      parent_id: child.parent_id,
+      medication_upc: encodeURIComponent(medication_upc),
+      date: dateofNotification,
+    },
+      )
 
     if (response.ok) {
       const responseData = await response.json();
@@ -204,18 +194,18 @@ const handleRemoveNotificationInfo = async (medication_upc) => {
   }
 };
 
-export const getNotificationInfo = async (medication_upc, token) => {
+export const getNotificationInfo = async (medication_upc, child) => {
    // Add this line to check if the function is triggered
-  const {tokenValue, child} = token;
+  // const {tokenValue, child} = token;
   console.log('All data of notifications for child: ', child);
   try {
     // Make API call to process scanned data
     console.log('Making API call for getting info for notification:'); // Add this line to check if the function is triggered
     const url = `http://${ip}:8000/get-notifications-ids`;
     const response = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${tokenValue}`,
-      },
+      // headers: {
+      //   Authorization: `Bearer ${tokenValue}`,
+      // },
       body: JSON.stringify({
         data: {child_name: child.name,
         parent_id: child.parent_id,

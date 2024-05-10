@@ -36,6 +36,15 @@ const RootStack = ({
   setReminderInterval,
   handleLocalPushNotification,
 }) => {
+  // Notifications.setNotificationHandler({
+  //   handleNotification: async () => ({
+  //     shouldShowAlert: true,
+  //     shouldPlaySound: false,
+  //     shouldSetBadge: false
+  //   })
+  // });
+
+
   // all these states and contexts are for JWT tokens
   const [appState, setAppState] = useState(AppState.currentState);
   const [shouldRefresh, setShouldRefresh] = useState(false);

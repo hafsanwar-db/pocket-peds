@@ -7,7 +7,7 @@ import { useContext } from "react";
 
 //use these functions to get user permissions and trigger the notification process.
 
-export const schedulePushNotification = async ({ time, medicineName, dosage, medicationUpc, child }) => {
+export const schedulePushNotification = async ({ time, medicineName, dosage, medication_upc, child }) => {
   // const {child} = useContext(Token)
   const childName = child.name;
   console.log("Scheduling notification for: ", time);
@@ -18,7 +18,7 @@ export const schedulePushNotification = async ({ time, medicineName, dosage, med
       title: "PocketPeds",
       body: `Time for ${childName} next dose!\nGive ${dosage} of ${medicineName} to ${childName}`,
       categoryIdentifier: "reminder",
-      data: { medicineName: medicineName, date: time, medicationUpc: medicationUpc }
+      data: { medicineName: medicineName, date: new Date(time).toString(), medicationUpc: medication_upc.toString(), childName: child.name, parent_id: child.parent_id }
     },
     trigger: { date: time },
     //trigger: { seconds: 4 },
