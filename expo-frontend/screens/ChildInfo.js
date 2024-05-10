@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Dimensions, Text, Image, TouchableOpacity, TextInput, StyleSheet, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { StyledContainer, InnerContainer, Colors } from '../components/styles';
+import { StyledContainer, InnerContainer, Colors, WeightModalButton } from '../components/styles';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import ip from './ip.js';
@@ -223,6 +223,11 @@ const formatDate = (dateString) => {
             <Text style={styles.editProfileButtonText}>Edit Profile</Text>
           </TouchableOpacity>
         )} */}
+
+      <WeightModalButton onPress={() => navigation.navigate('MyCalendar')} title="History" style={{ backgroundColor: '#FEB624', width: "50%" }} >
+          <Text style={{ fontSize: 20, color: "black" }}>History</Text>
+      </WeightModalButton>
+
       </InnerContainer>
     </StyledContainer>
   );
