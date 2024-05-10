@@ -32,9 +32,29 @@ const Child = ({ navigation }) => {
   const [profiles, setProfiles] = useState([]);
   const {tokenValue} = useContext(Token);
   const isFocused = useIsFocused();
+  const [name, setName] = useState('');
+
   useEffect(() => {
     fetchProfiles();
   }, [isFocused]); // Empty dependency array ensures the effect runs only once
+
+  useEffect(() => {
+    const token = tokenValue;
+    // Fetch child info using Axios
+
+    axios.get(`http://${ip}:8000/user-profile/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        console.log("get name: ", response.data);
+        setName(response.data.username);
+      })
+      .catch((error) => {
+        console.error('Error fetching user profile:', error);
+      });
+  }, [tokenValue]);
   
   // Fetch and format the data
   const fetchProfiles = async () => {
@@ -127,12 +147,21 @@ const Child = ({ navigation }) => {
       <StyledContainer>
         <StatusBar style="dark" />
         <InnerContainer>
-          <PageTitle>Child Screen</PageTitle>
+          
+        <View style={{ textAlign: 'left' }}>
+          <Text style={{
+            fontWeight: "bold",
+            color: "#0070CA",
+            fontSize: 30,
+            marginBottom: 5,
+          }}>{name},</Text>
+
           <Text style={{
             textAlign:'left',
             fontSize:26,
             marginBottom:0.05*height,
           }}>Who are you dosing for?</Text>
+        </View>
           <ScrollView contentContainerStyle={{ flexGrow: 1 , width: 0.65*width}}>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', columnGap: 0.2*width}}>
               {profiles.map((item) => renderProfileItem(item))}
