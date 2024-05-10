@@ -1,22 +1,33 @@
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
+import { Platform, } from "react-native";
+import { Token } from "../components/Token";
+import { useContext } from "react";
+
 
 //use these functions to get user permissions and trigger the notification process.
 
-export const schedulePushNotification = async (intervalInSeconds) => {
+export const schedulePushNotification = async ({ time, medicineName, dosage, medication_upc, child }) => {
+  // const {child} = useContext(Token)
+  const childName = child.name;
+  console.log("Scheduling notification for: ", time);
+
   await Notifications.scheduleNotificationAsync({
     //identifier: "PocketPeds",
     content: {
       title: "PocketPeds",
-      
-      body: "Time for Lily's next dose!\nGive 5.75mL of Children's Motrin",
-      categoryIdentifier: "reminder"
+      body: `Time for ${childName} next dose!\nGive ${dosage} of ${medicineName} to ${childName}`,
+      categoryIdentifier: "reminder",
+      data: { medicineName: medicineName, date: new Date(time).toString(), medicationUpc: medication_upc.toString(), childName: child.name, parent_id: child.parent_id }
     },
-    trigger: {
-      seconds: intervalInSeconds,
-      //repeats: true,
-    }
+    trigger: { date: time },
+    //trigger: { seconds: 4 },
+  })
+  .then((response) => {
+    console.log("Notification scheduled successfully:", response);
+  })
+  .catch((error) => {
+    console.log("Failed to schedule notification:", error);
   });
 };
 

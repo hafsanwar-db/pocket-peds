@@ -2,7 +2,8 @@ import { React, useState, useEffect, useContext } from "react";
 import Footer from "../components/Footer.js";
 import { Colors } from "../components/styles";
 const tertiary = Colors.tertiary; // Import the missing tertiary variable
-import ip from "../screens/ip.js"; // Import the missing ip variable
+import ip from "../screens/ip.js";
+import useLocalNotification from "../notifications/useLocalNotification.js"; // Import the missing ip variable
 // React navigation
 import Carousel from "../screens/Carousel";
 import AddChild from "../screens/AddChild";
@@ -35,6 +36,15 @@ const RootStack = ({
   setReminderInterval,
   handleLocalPushNotification,
 }) => {
+  // Notifications.setNotificationHandler({
+  //   handleNotification: async () => ({
+  //     shouldShowAlert: true,
+  //     shouldPlaySound: false,
+  //     shouldSetBadge: false
+  //   })
+  // });
+
+
   // all these states and contexts are for JWT tokens
   const [appState, setAppState] = useState(AppState.currentState);
   const [shouldRefresh, setShouldRefresh] = useState(false);
@@ -214,7 +224,7 @@ const RootStack = ({
         <Stack.Screen name="DoseSettings">
           {(props) => <>
           <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
-          <DoseSettings {...props} />
+          <DoseSettings navigation={props.navigation} {...props} />
           </View>
           <Footer navigation={props.navigation} />
         </>}
@@ -290,7 +300,13 @@ const RootStack = ({
           <Footer navigation={props.navigation} />
         </> }
         </Stack.Screen>
-
+        <Stack.Screen name="useLocalNotification">
+          {(props) => <>
+          <View style={{ height: 0.9 * height, backgroundColor: "white" }}>
+          <useLocalNotification {...props} />
+          </View>
+        </> }
+        </Stack.Screen>
       </Stack.Navigator>
       {/*include the component as done in the screens above*/}
     </NavigationContainer>

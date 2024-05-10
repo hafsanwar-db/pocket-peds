@@ -262,6 +262,35 @@ async def delete_child_profile(child_name: str, token: Annotated[str, Depends(oa
 
     return {'message': 'Child profile deleted successfully'}
 
+#api endpoint swastik, you cant use token here
+@app.post('/delete-child-medication-notif')
+async def delete_child_medication_notif(data: dict):
+    parent_id = data.get('parent_id')
+    # Retrieve the child profile from the database
+    print(data)
+    child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': ObjectId(parent_id)})
+
+    if not child_profile:
+        raise HTTPException(status_code=404, detail='Child profile not found')
+
+    # Remove the medication from the child profile
+    for medication in child_profile['medications']:
+        if medication['upc'] == data['medication_upc']:
+            print(medication)
+            child_profile['medications'].remove(medication)
+    
+    print('changed child_profile: ',child_profile)
+
+    # child_profile['medications'].remove(medication_to_delete)
+
+    # Update the child profile in the database
+    result = child_profiles.update_one({'_id': child_profile['_id']}, {'medications': child_profile['medications']})
+
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail='Child profile not found')
+
+    return {'message': 'Medication deleted successfully'}
+
 @app.post('/delete-child-medication')
 async def delete_child_medication(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
     user_id = get_userID(token)
@@ -309,6 +338,31 @@ async def add_child_medication(data: dict, token: Annotated[str, Depends(oauth2_
 
     return {'message': 'Medication added successfully'}
 
+#currently being used 
+@app.post('/handle-dose-given')
+async def update_notifications(data: dict):
+    # Retrieve the child profile from the database
+    parent_id = data.get('parent_id')
+    print(parent_id)
+    print(data)
+    child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': ObjectId(parent_id)})
+
+    if not child_profile:
+        raise HTTPException(status_code=404, detail='Child profile not found')
+
+    # Update the notifications in the child profile
+    for medication in child_profile['medications']:
+        if medication['upc'] == data['medication']['upc']:
+            medication['notifications'] = data['medication']['notifications']
+
+    # Update the child profile in the database
+    result = child_profiles.update_one({'_id': child_profile['_id']}, {'$set': child_profile})
+
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail='Child profile not found')
+
+    return {'message': 'Notifications updated successfully'}
+
 @app.post('/update_notifications')
 async def update_notifications(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
     # Retrieve the child profile from the database
@@ -355,6 +409,23 @@ async def dummy_data():
     return {
         'dosage': 'dosage will go here'
     }
+
+@app.post('/get-notifications-ids')
+async def get_notifications(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
+    # Retrieve the child profile from the database
+    user_id = get_userID(token)
+    child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': user_id})
+
+    if not child_profile:
+        raise HTTPException(status_code=404, detail='Child profile not found')
+
+    # Update the notifications in the child profile
+    notifications = child_profile['medications'].find_one({'upc': data['medication_upc']})['notifications']
+    notifIDs = []
+    for k,v in notifications:
+        notifIDs.append(v[0])
+
+    return {'notifications': notifIDs}
 
 @app.get('/process-upc')
 async def process_upc(upc: str):

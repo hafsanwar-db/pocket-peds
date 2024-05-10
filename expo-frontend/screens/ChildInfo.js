@@ -38,14 +38,13 @@ const ChildInfo = ({ route, navigation }) => {
   // Fetch child info from the API
   const fetchChildInfo = async () => {
     try {
-      console.log("useEffect runs for chidlInfo")
       const token = tokenValue //await getAccessToken(); // Implement the logic to get the access token
       const response = await axios.get(`http://${ip}:8000/child-profiles/${name.toLowerCase()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("RESPONSE CHILD: ", response.data);
+      // console.log("RESPONSE CHILD: ", response.data);
       updateChild(response.data); //updates the context
       setChildInfo(response.data);
       setMedications(response.data.medications); // Set medications from child info
@@ -175,16 +174,20 @@ const renderMedications = () => {
     <SwipeListView
       data={medications}
       keyExtractor={(item, index) => index.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.medicationItemContainer}>
+      renderItem={({ item }) => {
+        if(item.upc != ""){
+        return(<View style={styles.medicationItemContainer}>
           <Image source={{ uri: item.image }} style={styles.medicationImage} />
           <View style={styles.medicationTextContainer}>
             <Text style={styles.medicationName}>{item.name.toLowerCase().replace(/\b(\s\w|^\w)/g, function (txt) { return txt.toUpperCase(); })}</Text>
             <Text style={styles.medicationUPC}>UPC: {item.upc}</Text>
             <Text style={styles.medicationDosage}>Dose: {item.dosage}</Text>
           </View>
-        </View>
-      )}
+        </View>)}
+        else{
+          return(<View></View>)
+        }
+      }}
       renderHiddenItem={({ item, index }) => (
         <View style={styles.hiddenItemContainer}>
           <TouchableOpacity
