@@ -340,7 +340,7 @@ async def add_child_medication(data: dict, token: Annotated[str, Depends(oauth2_
 
 #currently being used 
 @app.post('/handle-dose-given')
-async def update_notifications(data: dict):
+async def update_notifications_dose(data: dict):
     # Retrieve the child profile from the database
     parent_id = data.get('parent_id')
     print(parent_id)
@@ -371,8 +371,8 @@ async def update_notifications(data: dict, token: Annotated[str, Depends(oauth2_
     print(data)
     child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': user_id})
 
-    if not child_profile:
-        raise HTTPException(status_code=404, detail='Child profile not found')
+    # if not child_profile:
+    #     raise HTTPException(status_code=404, detail='Child profile not found')
 
     # Update the notifications in the child profile
     for medication in child_profile['medications']:

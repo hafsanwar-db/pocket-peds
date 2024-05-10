@@ -60,7 +60,7 @@ const DoseSettings = ({ navigation, route }) => {
   const { child } = useContext(Token);
   const { tokenValue } = useContext(Token);
   const [isIntervalSelected, setIsIntervalSelected] = useState(false);
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   const childName = child.name || " ";
 
   // console.log(apiData);
@@ -305,6 +305,7 @@ const DoseSettings = ({ navigation, route }) => {
       image:
         "https://dailymed.nlm.nih.gov/dailymed/image.cfm?setid=808f4790-cadd-42…",
       notification: allNotificationInfo,
+      
     };
 
     // Update the notificationIds object with the new mapping
@@ -724,7 +725,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
     paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingVertical: 5,
     backgroundColor: "#f0f0f0",
     borderRadius: 10,
   },

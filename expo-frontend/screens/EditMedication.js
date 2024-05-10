@@ -7,7 +7,7 @@ import { Token } from "../components/Token";
 import { InnerContainer } from "../components/styles";
 import { useNavigation } from '@react-navigation/native';
 import KeyboardAvoidingWrapper from "../components/KeyboardAvoidingWrapper.js";
-
+import { schedulePushNotification } from "../notifications/handleNotifications";
 const { height, width } = Dimensions.get("window");
 
 const EditMedication = ({ route }) => {
@@ -18,6 +18,7 @@ const EditMedication = ({ route }) => {
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(null);
   const [reminderTimes, setReminderTimes] = useState([]);
   const [reminderInterval, setReminderInterval] = useState(null);
+  const [isIntervalSelected, setIsIntervalSelected] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -48,7 +49,8 @@ const EditMedication = ({ route }) => {
     try {
       // Retrieve the access token
       const token = tokenValue;
-
+      // notificationData = await handleLocalPushNotification();
+      console.log(notificationData);
       // Prepare the headers
       const headers = {
         Authorization: `Bearer ${token}`
@@ -66,15 +68,15 @@ const EditMedication = ({ route }) => {
             interval: reminderInterval / (60 * 60 * 1000), // Convert milliseconds to hours
             notification1:  {
                 time: formatTime(reminderTimes[0].time),
-                given: false,
+                given: reminderTimes[0].given,
             },
             notification2: {
                 time: formatTime(reminderTimes[1].time),
-                given: false,
+                given: reminderTimes[1].given,
             },
             notification3: {
                 time: formatTime(reminderTimes[2].time),
-                given: false,
+                given: reminderTimes[2].given,
             },
           },
         },
@@ -155,7 +157,9 @@ const EditMedication = ({ route }) => {
       }
     
       setReminderTimes(newReminderTimes);
-      setShowTimePicker(false);
+      if (event.type === 'dismissed') {
+        setShowTimePicker(false);
+      }
     } else {
       setShowTimePicker(false);
     }
@@ -180,7 +184,7 @@ const EditMedication = ({ route }) => {
 
   const handleReminderIntervalSelect = (interval) => {
     setReminderInterval(interval);
-  
+   
     // Calculate new reminder times based on the first time
     const newReminderTimes = [...reminderTimes];
     const firstTime = reminderTimes[0].time;
@@ -192,6 +196,7 @@ const EditMedication = ({ route }) => {
   
     // Update state with new reminder times
     setReminderTimes(newReminderTimes);
+    setIsIntervalSelected(true);
   };  
 
   const fetchNotificationData = async () => {
@@ -239,26 +244,24 @@ const EditMedication = ({ route }) => {
         <View style={styles.imageContainer}>
           <Image source={{ uri: medicationData.image }} style={styles.image} />
         </View>
-        <View style={styles.infoContainer}>
-          {renderChildInfo()}
-        </View>
-      </View>
-      <View style={styles.productContainer}>
-        <Text style={styles.productName}>
-          {medicationData.name
-            .toLowerCase()
-            .split(' ')
-            .slice(0, 2)
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ')
-          }...
-        </Text>
-      </View>
-      <InnerContainer>
+        <View style={{ flex:1,flexDirection: "column" }}>
+          <View style={styles.infoContainer}>{renderChildInfo()}</View>
+          <View style={styles.productContainer}>
+            <Text style={styles.productName}>
+              {medicationData.name
+                .toLowerCase()
+                .split(" ")
+                .slice(0, 2)
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}
+              ...
+            </Text>
         <Text style={styles.doseText}>
           Dose: <Text style={styles.dosageText}>{medicationData.dosage}</Text>{" "}
         </Text>
-      </InnerContainer>
+          </View>
+        </View>
+      </View>
 
     {/* Interval selection buttons */}
     <View style={styles.reminderButtonContainer}>
@@ -281,7 +284,7 @@ const EditMedication = ({ route }) => {
           <Text style={styles.reminderButtonText}>8 Hours</Text>
         </TouchableOpacity>
       </View>
-<KeyboardAvoidingWrapper>
+
 <>
       {/* Render reminder times */}
       {reminderTimes.map((item, index) => (
@@ -314,20 +317,22 @@ const EditMedication = ({ route }) => {
 
       {/* Show time picker */}
       {showTimePicker && (
+        <View style= {{flexDirection: 'row', justifyContent:'center', marginBottom: 10}}>
         <DateTimePicker
           value={reminderTimes[selectedTimeIndex].time}
           mode="time"
           is24Hour={true}
           display="default"
           onChange={handleTimeChange}
-        />
+        /></View>
       )}
       </>
-</KeyboardAvoidingWrapper>
+
       {/* Confirm button */}
-      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-        <Text style={styles.confirmButtonText}>Confirm</Text>
-      </TouchableOpacity>
+      
+        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+          <Text style={styles.confirmButtonText}>Confirm</Text>
+        </TouchableOpacity>
     </View>
   );
 };
@@ -341,7 +346,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+
   },
   confirmButton: {
     backgroundColor: "#FFA500",
@@ -349,7 +354,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 15,
     borderRadius: 5,
-    marginTop: 20,
+    width: 0.5*width,
+    alignSelf: "center",
   },
   confirmButtonText: {
     color: "#fff",
@@ -357,18 +363,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   imageContainer: {
-    flex: 0.75,
+    flex: 0.55,
+    height: 0.25*height,
     alignItems: "center",
   },
   infoContainer: {
-    flex: 1,
     marginLeft: 20,
   },
   upc: {
     fontSize: 16,
-    color: "#F5F5F5",
+    color: "white",
+    paddingVertical: 5,
     textAlign: "center",
-    marginBottom: 10,
   },
   image: {
     width: 0.3*width,
@@ -376,11 +382,17 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   productContainer: {
+    flexDirection: "column",
     alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: '#e0f2ff',
+    marginLeft:20,
+    borderRadius: 10,
+    paddingTop: 15,
     marginBottom: 20,
   },
   productName: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
   },
@@ -396,13 +408,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   doseText: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "bold",
     marginBottom: 20,
     color: "#333",
   },
   dosageText: {
-    fontSize: 22,
+    fontSize: 18,
     color: "#FFA500",
     
   },
@@ -412,7 +424,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignContent: "center",
     marginTop: 65,
-    marginBottom: 30,
+    marginBottom: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
     backgroundColor: "#C9DAF8",
@@ -422,7 +434,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     width: "80%",
-    marginBottom: 10,
+    marginBottom: 20,
     alignSelf: "center",
   },
   reminderButton: {
@@ -441,6 +453,8 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   reminderTimeContainer: {
+    width: 0.75*width,   
+    alignSelf: "center",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -513,16 +527,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   childName: {
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
   },
   childAge: {
-    fontSize: 10,
+    fontSize: 14,
     marginBottom: 5,
   },
   childWeight: {
-    fontSize: 10,
+    fontSize: 14,
     marginBottom: 5,
   },
   lastUpdated: {

@@ -151,6 +151,7 @@ const UpdateProfile = ({ navigation, route }) => {
                       icon="scale-outline"
                       name="weight"
                       placeholder="45"
+                      value = {values.weight}
                       keyboardType="numeric"
                       onChange={handleChange('weight')}
                       onBlur={handleBlur('weight')}
