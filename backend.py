@@ -1,4 +1,3 @@
-#fastAPI and MongoDB dependencies
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
@@ -11,6 +10,7 @@ from bson import ObjectId
 import psycopg2
 from psycopg2 import sql, pool
 import uvicorn
+from fastapi.responses import RedirectResponse
 
 #miscellaneous dependencies
 from datetime import datetime, timedelta, timezone
@@ -64,6 +64,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 #to authorize the user for different endpoints
 def get_userID(token: str) -> ObjectId:
+    print(token)
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -221,19 +222,19 @@ async def update_child_profile(child_name: str, data: dict, token: Annotated[str
         raise HTTPException(status_code=404, detail='Child profile not found')
     
     # appending allergies and medications
-    allergies = data.get('allergies', [])
-    data['allergies'] = []
-    for i in allergies: 
-        if i not in child_profile['allergies']:
-            data['allergies'].append(i)
-    data['allergies'].extend(child_profile['allergies'])
-    medications = data.get('medications', [])
-    data['medications'] = []
-    for i in medications: 
-        if i not in child_profile['medications']:
-            data['medications'].append(i)
-    data['medications'].extend(child_profile['medications'])
-
+    # allergies = data.get('allergies', [])
+    # data['allergies'] = []
+    # for i in allergies: 
+    #     if i not in child_profile['allergies']:
+    #         data['allergies'].append(i)
+    # data['allergies'].extend(child_profile['allergies'])
+    # medications = data.get('medications', [])
+    # data['medications'] = []
+    # for i in medications: 
+    #     if i not in child_profile['medications']:
+    #         data['medications'].append(i)
+    # data['medications'].extend(child_profile['medications'])
+    print(data.get("image"))
     # Update the child profile in the database
     result = child_profiles.update_one({'_id': child_profile['_id']}, {'$set': data})
 
@@ -262,8 +263,9 @@ async def delete_child_profile(child_name: str, token: Annotated[str, Depends(oa
 
 @app.post('/delete-child-medication')
 async def delete_child_medication(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
+    user_id = get_userID(token)
     # Retrieve the child profile from the database
-    child_profile = child_profiles.find_one({'name': data['child_name']})
+    child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': user_id})
 
     if not child_profile:
         raise HTTPException(status_code=404, detail='Child profile not found')
@@ -287,7 +289,8 @@ async def delete_child_medication(data: dict, token: Annotated[str, Depends(oaut
 @app.post('/add-child-medication')
 async def add_child_medication(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
     # Retrieve the child profile from the database
-    child_profile = child_profiles.find_one({'name': data['child_name']})
+    user_id = get_userID(token)
+    child_profile = child_profiles.find_one({'name': data['child_name'],'parent_id': user_id})
 
     if not child_profile:
         raise HTTPException(status_code=404, detail='Child profile not found')
@@ -306,13 +309,18 @@ async def add_child_medication(data: dict, token: Annotated[str, Depends(oauth2_
 @app.post('/update_notifications')
 async def update_notifications(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
     # Retrieve the child profile from the database
-    child_profile = child_profiles.find_one({'name': data['child_name']})
+    user_id = get_userID(token)
+
+    print(data)
+    child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': user_id})
 
     if not child_profile:
         raise HTTPException(status_code=404, detail='Child profile not found')
 
     # Update the notifications in the child profile
-    child_profile['medications'].find_one({'upc': data['medication_upc']})['notifications'] = data['notifications']
+    for medication in child_profile['medications']:
+        if medication['upc'] == data['medication']['upc']:
+            medication['notifications'] = data['medication']['notifications']
 
     # Update the child profile in the database
     result = child_profiles.update_one({'_id': child_profile['_id']}, {'$set': child_profile})
@@ -322,27 +330,29 @@ async def update_notifications(data: dict, token: Annotated[str, Depends(oauth2_
 
     return {'message': 'Notifications updated successfully'}
 
-@app.get('/dummy-data')
-async def dummy_data():
-    return {
-        'dosage': 'dosage will go here'
-    }
-@app.get('/get-notifications-ids')
+@app.post('/get_notifications')
 async def get_notifications(data: dict, token: Annotated[str, Depends(oauth2_scheme)]):
     # Retrieve the child profile from the database
+    print(token)
     user_id = get_userID(token)
     child_profile = child_profiles.find_one({'name': data['child_name'], 'parent_id': user_id})
 
     if not child_profile:
         raise HTTPException(status_code=404, detail='Child profile not found')
 
-    # Update the notifications in the child profile
-    notifications = child_profile['medications'].find_one({'upc': data['medication_upc']})['notifications']
-    notifIDs = []
-    for k,v in notifications:
-        notifIDs.append(v[0])
+    # Retrieve the notifications from the child profile
+    for medication in child_profile['medications']:
+        if medication['upc'] == data['upc']:
+            notifications = medication['notifications']
 
-    return {'notifications': notifIDs}
+    return notifications
+
+@app.get('/dummy-data')
+async def dummy_data():
+    return {
+        'dosage': 'dosage will go here'
+    }
+
 @app.get('/process-upc')
 async def process_upc(upc: str):
     # Make a GET request to the given endpoint
@@ -445,7 +455,8 @@ async def get_medicine_dosage(data:dict):
     
     dosage = medicine['dosage']
     weight = data['weight']
-    age = data['age']
+    age = float(data['age'])/12.0
+    print(age)
     dose = {}
     for key in dosage.keys():
         if key is not None:

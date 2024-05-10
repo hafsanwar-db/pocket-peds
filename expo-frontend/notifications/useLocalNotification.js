@@ -1,19 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef,useContext } from "react";
 import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "./handleNotifications";
 import navigation from '../NavigationService';
 import DoseSettings, { toggleReminderTime } from '../screens/DoseSettings';
 import {cancelNotifications} from "../screens/DoseSettings";
 import {Token} from '../components/Token';
+import ip from '../screens/ip.js';
 
-//this should be in the component you are working with 
-const {child} = useContext(Token)
-const childName = child.name
-const {tokenValue} = useContext(Token);
+
 
 //useLocalNotification hook will request a permission from user upon the initial launch of the App
 export const useLocalNotification = () => {
   const [expoPushToken, setExpoPushToken] = useState("");
+    //this should be in the component you are working with 
   
   const [notification, setNotification] = useState({});
   const notificationListener = useRef();
@@ -108,12 +107,14 @@ export const setupNotificationCategories = async () => {
 
 const handleNoLongerGiving = async (medication_upc) => {
   console.log('No Longer Dose Given'); // Add this line to check if the function is triggered
-  
+  const {child} = useContext(Token);
+  const childName = child.name;
+  const {tokenValue} = useContext(Token);
 
   try {
     // Make API call to process scanned data
     console.log('Making API call for No Longer Dose Given:'); // Add this line to check if the function is triggered
-    const url = `http://128.8.74.2:8000/delete-child-medication`;
+    const url = `http://${ip}:8000/delete-child-medication`;
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${tokenValue}`,
@@ -139,11 +140,13 @@ const handleNoLongerGiving = async (medication_upc) => {
 const handleDoseGiven = async (medication_upc, dateofNotification) => {
   console.log('Handling dose Given of '); // Add this line to check if the function is triggered
   
-
+  const {child} = useContext(Token);
+  const childName = child.name;
+  const {tokenValue} = useContext(Token);
   try {
     // Make API call to process scanned data
     console.log('Making API call for handlingDoseGiven:'); // Add this line to check if the function is triggered
-    const url = `http://128.8.74.2:8000/handle-dose-given`;
+    const url = `http://${ip}:8000/handle-dose-given`;
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${tokenValue}`,
@@ -171,45 +174,18 @@ const handleDoseGiven = async (medication_upc, dateofNotification) => {
   }
 };
 
-const handleRemoveNotificationInfo = async (medication_upc) => {
-  console.log('All data of notifications'); // Add this line to check if the function is triggered
-  
 
-  try {
-    // Make API call to process scanned data
-    console.log('Making API call for inserting info for notification:'); // Add this line to check if the function is triggered
-    const url = `http://128.8.74.2:8000/update_notifications`;
-    const response = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${tokenValue}`,
-        body: JSON.stringify({
-          child_name: childName,
-          medication_upc: encodeURIComponent(medication_upc),
-          notifications: "None"
-        })
-      },
-      
-    })
-
-    if (response.ok) {
-      const responseData = await response.json();
-      console.log(responseData);
-    } else {
-      console.error(`Error while removing notification info `);
-    }
-  } catch (error) {
-    console.error(`Error while removing notification info: `, error);
-  }
-};
 
 const getNotificationInfo = async (medication_upc) => {
   console.log('All data of notifications', data); // Add this line to check if the function is triggered
-  
+  const {child} = useContext(Token);
+  const childName = child.name;
+  const {tokenValue} = useContext(Token);
 
   try {
     // Make API call to process scanned data
     console.log('Making API call for getting info for notification:', data); // Add this line to check if the function is triggered
-    const url = `http://128.8.74.2:8000/get-notifications-ids`;
+    const url = `http://${ip}:8000/get-notifications-ids`;
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${tokenValue}`,
