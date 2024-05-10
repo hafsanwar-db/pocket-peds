@@ -14,7 +14,7 @@ const CalculatingScreen = ({ route }) => {
     const fetchData = async () => {
       try {
         console.log(`http://128.8.74.2:8000/dummy-data`)
-      const url = `http://128.8.74.2:8000/get_medicine_dosage`;
+      const url = `http://${ip}:8000/get_medicine_dosage`;
       const response = await fetch(url, {
         method: 'POST',
         headers: {

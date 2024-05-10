@@ -1,4 +1,10 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Token } from "../components/Token";
+import ChangeWeightModal from "../components/modal/ChangeWeightModal";
+import axios from "axios";
+import ip from "./ip.js";
+
 import {
   View,
   Text,
@@ -6,25 +12,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  Modal,
+  Dimensions
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { Token } from "../components/Token";
-import { InnerContainer } from "../components/styles";
-import ChangeWeightModal from '../components/modal/ChangeWeightModal';
-import axios from 'axios';
-import ip from './ip.js';
-
-import { View, Text, Image, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { schedulePushNotification } from '../notifications/handleNotifications';
-import {Token} from '../components/Token';
-import {getNotificationInfo} from '../notifications/useLocalNotification';
-
-//this should be in the component you are working with 
-
-const {child} = useContext(Token)
-const childName = child.name
-const {tokenValue} = useContext(Token);
+import { schedulePushNotification } from "../notifications/handleNotifications";
+import { getNotificationInfo } from "../notifications/useLocalNotification";
 import {
   StyledContainer,
   InnerContainer,
@@ -44,31 +36,34 @@ import {
   ExtraText,
   ExtraView,
   TextLink,
-  TextLinkContent
-} from '../components/styles';
+  TextLinkContent,
+} from "../components/styles";
 
-const DoseSettings = ({ route }) => {
+const imagePaths = {
+  avatar1: require("../assets/img/avatar1.png"),
+  avatar2: require("../assets/img/avatar2.png"),
+  avatar3: require("../assets/img/avatar3.png"),
+  avatar4: require("../assets/img/avatar4.png"),
+  avatar5: require("../assets/img/avatar5.png"),
+  avatar6: require("../assets/img/avatar6.png"),
+  // Add more images as needed
+};
+const {height, width} = Dimensions.get("window");
+const DoseSettings = ({ navigation, route }) => {
+  //apiData is the medicine data received from the API
+  //scannedData is the data retrieve from the barcode scanner after making an api call to the backend
   const { scannedData, apiData } = route.params;
   const [reminderInterval, setReminderInterval] = useState(null);
   const [reminderTimes, setReminderTimes] = useState([]);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(null);
   const { child } = useContext(Token);
-  const {tokenValue} = useContext(Token);
+  const { tokenValue } = useContext(Token);
   const [isIntervalSelected, setIsIntervalSelected] = useState(false);
+  const childName = child.name || " ";
 
-  const imagePaths = {
-    avatar1: require('../assets/img/avatar1.png'),
-    avatar2: require('../assets/img/avatar2.png'),
-    avatar3: require('../assets/img/avatar3.png'),
-    avatar4: require('../assets/img/avatar4.png'),
-    avatar5: require('../assets/img/avatar5.png'),
-    avatar6: require('../assets/img/avatar6.png'),
-    // Add more images as needed
-  };
-
-  console.log(apiData);
-  console.log(child);
+  // console.log(apiData);
+  // console.log(child);
   useEffect(() => {
     if (reminderInterval) {
       const newReminderTimes = Array.from({ length: 3 }, (_, index) => {
@@ -77,8 +72,16 @@ const DoseSettings = ({ route }) => {
         // Set default times based on interval
         if (reminderInterval === 8 * 60 * 60 * 1000) {
           // For 8-hour interval
-          reminderTimes.push({time: currentTime.setHours(10, 0, 0, 0), selected: false,doseGiven: false  }); // 10:00 AM
-          reminderTimes.push({ time: currentTime.setHours(18, 0, 0, 0), selected: false,doseGiven: false }); // 6:00 PM
+          reminderTimes.push({
+            time: currentTime.setHours(10, 0, 0, 0),
+            selected: false,
+            doseGiven: false,
+          }); // 10:00 AM
+          reminderTimes.push({
+            time: currentTime.setHours(18, 0, 0, 0),
+            selected: false,
+            doseGiven: false,
+          }); // 6:00 PM
           switch (index) {
             case 0:
               currentTime.setHours(10, 0, 0, 0);
@@ -88,8 +91,12 @@ const DoseSettings = ({ route }) => {
               break;
             case 2:
               currentTime.setDate(currentTime.getDate() + 1); // Next day for 2 am
-              
-              reminderTimes.push({time:  currentTime.setHours(2, 0, 0, 0), selected: false,doseGiven: false  }); // Next day 2:00 AM
+
+              reminderTimes.push({
+                time: currentTime.setHours(2, 0, 0, 0),
+                selected: false,
+                doseGiven: false,
+              }); // Next day 2:00 AM
 
               break;
             default:
@@ -97,9 +104,24 @@ const DoseSettings = ({ route }) => {
           }
         } else if (reminderInterval === 6 * 60 * 60 * 1000) {
           // For 6-hour interval
-          reminderTimes.push({ selected: false,time: currentTime.setHours(9, 0, 0, 0), selected: false,doseGiven: false }); // 9:00 AM
-          reminderTimes.push({ selected: false,time: currentTime.setHours(15, 0, 0, 0), selected: false,doseGiven: false  }); // 3:00 PM
-          reminderTimes.push({ selected: false,time: currentTime.setHours(21, 0, 0, 0), selected: false,doseGiven: false  }); // 9:00 PM
+          reminderTimes.push({
+            selected: false,
+            time: currentTime.setHours(9, 0, 0, 0),
+            selected: false,
+            doseGiven: false,
+          }); // 9:00 AM
+          reminderTimes.push({
+            selected: false,
+            time: currentTime.setHours(15, 0, 0, 0),
+            selected: false,
+            doseGiven: false,
+          }); // 3:00 PM
+          reminderTimes.push({
+            selected: false,
+            time: currentTime.setHours(21, 0, 0, 0),
+            selected: false,
+            doseGiven: false,
+          }); // 9:00 PM
           switch (index) {
             case 0:
               currentTime.setHours(9, 0, 0, 0);
@@ -114,8 +136,8 @@ const DoseSettings = ({ route }) => {
               break;
           }
         }
-        
-        return { time: currentTime, selected: false,doseGiven: false };
+
+        return { time: currentTime, selected: false, doseGiven: false };
       });
 
       setReminderTimes(newReminderTimes);
@@ -128,18 +150,18 @@ const DoseSettings = ({ route }) => {
   };
 
   const formatTime = (time) => {
-    const hours = time.getHours().toString().padStart(2, '0');
-    const minutes = time.getMinutes().toString().padStart(2, '0');
+    const hours = time.getHours().toString().padStart(2, "0");
+    const minutes = time.getMinutes().toString().padStart(2, "0");
     return `${hours}:${minutes}`;
-  };      
- 
-//  const toggleReminderTime = (index) => {
-//   //setSelectedTimeIndex(index);
-//   //setShowTimePicker(true);
-//   const newReminderTimes = [...reminderTimes];
-//   newReminderTimes[index].doseGiven = !newReminderTimes[index].doseGiven;
-//   setReminderTimes(newReminderTimes);
-// }
+  };
+
+  //  const toggleReminderTime = (index) => {
+  //   //setSelectedTimeIndex(index);
+  //   //setShowTimePicker(true);
+  //   const newReminderTimes = [...reminderTimes];
+  //   newReminderTimes[index].doseGiven = !newReminderTimes[index].doseGiven;
+  //   setReminderTimes(newReminderTimes);
+  // }
 
   const handleConfirm = async () => {
     try {
@@ -147,12 +169,13 @@ const DoseSettings = ({ route }) => {
       if (isIntervalSelected) {
         // Retrieve the access token
         const token = tokenValue;
-  
+        //scheduling all push notifications
+        handleLocalPushNotification();
         // Prepare the headers
         const headers = {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         };
-  
+
         // Prepare the payload
         const payload = {
           child_name: child.name,
@@ -162,7 +185,7 @@ const DoseSettings = ({ route }) => {
             upc: scannedData.upc,
             image: scannedData.image,
             notifications: {
-              interval: (reminderInterval / (60*60*1000)),
+              interval: reminderInterval / (60 * 60 * 1000),
               notification1: {
                 time: formatTime(reminderTimes[0].time),
                 given: false,
@@ -176,20 +199,24 @@ const DoseSettings = ({ route }) => {
                 given: false,
               },
             },
-          }
+          },
         };
-        console.log('Update notifications payload:', payload);
+        // console.log("Update notifications payload:", payload);
         // Make the API call using Axios with headers
-        const response = await axios.post(`http://${ip}:8000/add-child-medication`, payload, { headers });
-  
-        // Handle successful response
-        console.log('Update notifications response:', response.data);
+        const response = await axios.post(
+          `http://${ip}:8000/add-child-medication`,
+          payload,
+          { headers }
+        );
 
-        navigation.navigate("ChildInfo", {name: child.name})
+        // Handle successful response
+        // console.log("Update notifications response:", response.data);
+
+        navigation.navigate("ChildInfo", { name: child.name });
       }
     } catch (error) {
       // Handle error
-      console.error('Error updating notifications:', error);
+      console.error("Error updating notifications:", error);
     }
   };
 
@@ -203,12 +230,15 @@ const DoseSettings = ({ route }) => {
       const newReminderTimes = [...reminderTimes];
       newReminderTimes[selectedTimeIndex].time = selectedTime;
 
-      notificationsToDelete = getNotificationInfo(medication_upc);
-      for (let i = 0; i < notificationsToDelete.length; i++) {
-        Notifications.cancelScheduledNotificationAsync(notificationsToDelete[i]);
-        Notifications.dismissNotificationAsync(notificationsToDelete[i]);
-      }
-      
+      //I don't see why you have to delete notifications right now
+      // notificationsToDelete = getNotificationInfo(scannedData.upc, {tokenValue, child});
+      // for (let i = 0; i < notificationsToDelete.length; i++) {
+      //   Notifications.cancelScheduledNotificationAsync(
+      //     notificationsToDelete[i]
+      //   );
+      //   Notifications.dismissNotificationAsync(notificationsToDelete[i]);
+      // }
+
       // Update times in previous boxes if not the first box
       if (selectedTimeIndex > 0) {
         const interval =
@@ -229,37 +259,58 @@ const DoseSettings = ({ route }) => {
           newReminderTimes[1].time.getTime() -
             newReminderTimes[0].time.getTime();
         for (let i = selectedTimeIndex + 1; i < newReminderTimes.length; i++) {
-          newReminderTimes[i].time = new Date(newReminderTimes[i - 1].time.getTime() + interval);
-          
+          newReminderTimes[i].time = new Date(
+            newReminderTimes[i - 1].time.getTime() + interval
+          );
         }
       }
 
       setReminderTimes(newReminderTimes);
-      setShowTimePicker(false);
-      handleLocalPushNotification();
+      if (event.type === 'dismissed') {
+        setShowTimePicker(false);
+      }
+      // handleLocalPushNotification();
     } else {
-      setShowTimePicker(false);
+      // setShowTimePicker(false);
     }
   };
-  
-  
+
   const handleLocalPushNotification = async () => {
     const medicineName = scannedData["name"];
     const dosage = apiData["dosage"];
     const medication_upc = scannedData["upc"];
-    const allNotificationInfo = {}
+    const allNotificationInfo = {};
     for (let i = 0; i < reminderTimes.length; i++) {
       const time = reminderTimes[i].time;
       const doseGiven = reminderTimes[i].doseGiven;
       //const reminderId = generateUniqueReminderId();
-      const scheduledNotificationId = await schedulePushNotification(time, medicineName, dosage, doseGiven,medication_upc);
-      allNotificationInfo[time] = [scheduledNotificationId,false]
-      
-      // Update the notificationIds object with the new mapping
-      /*setNotificationIds(prevIds => ({
+      // console.log("child info before sending to schedule", child)
+      const scheduledNotificationId = await schedulePushNotification({
+        time,
+        medicineName,
+        dosage,
+        doseGiven,
+        medication_upc,
+        child,
+      });
+      allNotificationInfo[time] = [scheduledNotificationId, false];
+    }
+
+    const notificationInfo = {
+      child_name: childName,
+      medicineName: medicineName,
+      medication_upc: medication_upc,
+      dosage: dosage,
+      image:
+        "https://dailymed.nlm.nih.gov/dailymed/image.cfm?setid=808f4790-cadd-42…",
+      notification: allNotificationInfo,
+    };
+
+    // Update the notificationIds object with the new mapping
+    /*setNotificationIds(prevIds => ({
         ...prevIds,
-        [reminderId]: scheduledNotificationId
-      }));*/
+        [reminderId]: scheduledNotificationId*/
+  };
 
   const toggleTimeSelection = (index) => {
     const newReminderTimes = [...reminderTimes];
@@ -272,21 +323,58 @@ const DoseSettings = ({ route }) => {
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
     const months = (today.getMonth() - birthDate.getMonth() + 12) % 12;
     return { years: age, months };
   };
 
+  // handleConfirm(); // this was uncommented, nish's work
+
+  // const toggleTimeSelection = (index) => {
+  //   const newReminderTimes = [...reminderTimes];
+  //   newReminderTimes[index].selected = !newReminderTimes[index].selected;
+  //   setReminderTimes(newReminderTimes);
+  // };
+  // Function to cancel a notification based on reminder ID
+
+  const handleAddNotificationInfo = async ({ data }) => {
+    console.log("All data of notifications", data); // Add this line to check if the function is triggered
+
+    try {
+      // Make API call to process scanned data
+      console.log("Making API call for inserting info for notification:", data); // Add this line to check if the function is triggered
+      const url = `http://${ip}:8000/update_notifications`;
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${tokenValue}`,
+          body: data,
+        },
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log(responseData);
+      } else {
+        console.error(`Error while adding notification info ${data}`);
+      }
+    } catch (error) {
+      console.error(`Error while adding notification info ${data}:`, error);
+    }
+  };
+
   const renderChildInfo = () => {
     if (!child) return null;
-  
+
     const { name, date_of_birth, weight, last_updated } = child;
     const { years, months } = calculateAge(date_of_birth);
     const weightInKg = (weight * 0.45359237).toFixed(1);
-    const last_updated_date = new Date(last_updated).toLocaleDateString();
-  
+    // const last_updated_date = new Date(last_updated).toLocaleDateString();
+
     return (
       <View style={styles.childInfoContainer}>
         <Image source={imagePaths[child.image]} style={styles.profileImage} />
@@ -307,83 +395,35 @@ const DoseSettings = ({ route }) => {
     );
   };
 
-      
-    }
-    const notificationInfo = {
-      child_name: childName, 
-      medicineName: medicineName,
-      medication_upc: medication_upc,
-      dosage: dosage,
-      image: "https://dailymed.nlm.nih.gov/dailymed/image.cfm?setid=808f4790-cadd-42…",
-      notification: allNotificationInfo
-    }
-     
-    handleAddNotificationInfo(notificationInfo);
-  };
-  
-  
- const toggleTimeSelection = (index) => {
-   const newReminderTimes = [...reminderTimes];
-   newReminderTimes[index].selected = !newReminderTimes[index].selected;
-   setReminderTimes(newReminderTimes);
- };
- // Function to cancel a notification based on reminder ID
-  
-  const handleAddNotificationInfo = async ({ data }) => {
-    console.log('All data of notifications', data); // Add this line to check if the function is triggered
-    
-  
-    try {
-      // Make API call to process scanned data
-      console.log('Making API call for inserting info for notification:', data); // Add this line to check if the function is triggered
-      const url = `http://128.8.74.2:8000/update_notifications`;
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${tokenValue}`,
-          body: data
-        },
-      });
-  
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log(responseData);
-      } else {
-        console.error(`Error while adding notification info ${data}`);
-      }
-    } catch (error) {
-      console.error(`Error while adding notification info ${data}:`, error);
-    }
-  };
-    
   return (
     <View style={styles.container}>
       <View style={styles.upcContainer}>
-      <Text style={styles.upc}>UPC: {scannedData.upc}</Text>
+        <Text style={styles.upc}>UPC: {scannedData.upc}</Text>
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.imageContainer}>
           <Image source={{ uri: scannedData.image }} style={styles.image} />
         </View>
-        <View style={styles.infoContainer}>
-          {renderChildInfo()}
-        </View>
-      </View>
-      <View style={styles.productContainer}>
-      <Text style={styles.productName}>
-          {scannedData.name
-            .toLowerCase()
-            .split(' ')
-            .slice(0, 2)
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ')
-          }...
-        </Text>
-      </View>
-      <InnerContainer>
+        <View style={{ flex:1,flexDirection: "column" }}>
+          <View style={styles.infoContainer}>{renderChildInfo()}</View>
+          <View style={styles.productContainer}>
+            <Text style={styles.productName}>
+              {scannedData.name
+                .toLowerCase()
+                .split(" ")
+                .slice(0, 2)
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}
+              ...
+            </Text>
         <Text style={styles.doseText}>
           Dose: <Text style={styles.dosageText}>{apiData.dose}</Text>{" "}
         </Text>
-      </InnerContainer>
+          </View>
+        </View>
+      </View>
+
+     
 
       <View style={styles.reminderButtonContainer}>
         <TouchableOpacity
@@ -434,6 +474,7 @@ const DoseSettings = ({ route }) => {
         </View>
       ))}
       {showTimePicker && (
+        <View style= {{flexDirection: 'row', justifyContent:'center', marginBottom: 10}}>
         <DateTimePicker
           value={reminderTimes[selectedTimeIndex].time}
           mode="time"
@@ -441,8 +482,8 @@ const DoseSettings = ({ route }) => {
           display="default"
           onChange={handleTimeChange}
         />
+        </View>
       )}
-
       {isIntervalSelected && (
         <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
           <Text style={styles.confirmButtonText}>Confirm</Text>
@@ -450,7 +491,9 @@ const DoseSettings = ({ route }) => {
       )}
     </View>
   );
-      }
+  //this was GUI's
+  // handleAddNotificationInfo(notificationInfo);
+};
 //  return (
 //    <View style={styles.container}>
 //      <Text style={styles.upc}>{scannedData.upc}</Text>
@@ -484,9 +527,9 @@ const DoseSettings = ({ route }) => {
 //        <View key={index} style={[styles.reminderTimeContainer]}>
 //          <TouchableOpacity
 //            style={[styles.checkbox, item.selected ? styles.checkboxSelected : styles.checkboxUnselected]}
-//            //onPress={() => toggleTimeSelection(index)}
+//           //  onPress={() => toggleTimeSelection(index)}
 //          >
-          
+
 //          </TouchableOpacity>
 //          <TouchableOpacity
 //            style={styles.reminderTimeTextContainer}
@@ -523,7 +566,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
   },
   confirmButton: {
     backgroundColor: "#FFA500",
@@ -531,7 +573,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 15,
     borderRadius: 5,
-    marginTop: 20,
+    width: 0.5*width,
+    alignSelf: "center",
   },
   confirmButtonText: {
     color: "#fff",
@@ -539,18 +582,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   imageContainer: {
-    flex: 0.75,
+    flex: 0.55,
+    height: 0.25*height,
     alignItems: "center",
   },
   infoContainer: {
-    flex: 1,
     marginLeft: 20,
   },
   upc: {
     fontSize: 16,
-    color: "#F5F5F5",
+    color: "white",
+    paddingVertical: 5,
     textAlign: "center", // Center the text horizontally
-    marginBottom: 10,
   },
   image: {
     width: 200,
@@ -558,11 +601,17 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   productContainer: {
+    flexDirection: "column",
     alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: '#e0f2ff',
+    marginLeft:20,
+    borderRadius: 10,
+    paddingVertical: 15,
     marginBottom: 20,
   },
   productName: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
   },
@@ -578,13 +627,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   doseText: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 20,
     color: "#333",
   },
   dosageText: {
-    fontSize: 22,
+    fontSize: 18,
     color: "#FFA500",
   },
   upcContainer: {
@@ -593,11 +641,12 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignContent: "center",
     marginTop: 65,
-    marginBottom: 30,
+    marginBottom: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
     backgroundColor: "#C9DAF8",
     borderRadius: 30,
+   
   },
   reminderButtonContainer: {
     flexDirection: "row",
@@ -622,6 +671,8 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   reminderTimeContainer: {
+    width: 0.75*width,
+    alignSelf: "center",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -672,7 +723,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 10,
     backgroundColor: "#f0f0f0",
     borderRadius: 10,
   },
@@ -686,16 +737,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   childName: {
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
   },
   childAge: {
-    fontSize: 10,
+    fontSize: 14,
     marginBottom: 5,
   },
   childWeight: {
-    fontSize: 10,
+    fontSize: 14,
     marginBottom: 5,
   },
   lastUpdated: {
