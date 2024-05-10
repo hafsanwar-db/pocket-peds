@@ -145,6 +145,30 @@ const ChildInfo = ({ route, navigation }) => {
     navigation.navigate('EditMedication', { medicationData });
   };
 
+  const handleDeleteMedication = async (medicationData, index) => {
+    try {
+      const token = tokenValue; // await getAccessToken(); // Implement the logic to get the access token
+  
+      const payload = {
+        upc: medicationData.upc,
+        child_name: childInfo.name,
+      };
+  
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+  
+      await axios.post(`http://${ip}:8000/delete-child-medication`, payload, { headers });
+      
+      // Update medications array to remove the deleted medication
+      const updatedMedications = [...medications];
+      updatedMedications.splice(index, 1);
+      setMedications(updatedMedications);
+    } catch (error) {
+      console.error('Error deleting medication:', error);
+    }
+  };
+
 // Render the medication list
 const renderMedications = () => {
   return (
@@ -171,7 +195,7 @@ const renderMedications = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.hiddenItemButton, styles.deleteButton]}
-            onPress={() => handleDeleteMedication(index)}
+            onPress={() => handleDeleteMedication(item, index)}
           >
             <Icon name="trash" size={20} color="white" />
           </TouchableOpacity>

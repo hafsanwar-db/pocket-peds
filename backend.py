@@ -272,7 +272,9 @@ async def delete_child_medication(data: dict, token: Annotated[str, Depends(oaut
         raise HTTPException(status_code=404, detail='Child profile not found')
 
     # Remove the medication from the child profile
-    medication_to_delete = child_profile['medications'].find_one({'upc': data['medication_upc']})
+    for medication in child_profile['medications']:
+        if medication['upc'] == data['upc']:
+            medication_to_delete = medication
 
     if not medication_to_delete:
         raise HTTPException(status_code=404, detail='Medication not found')
