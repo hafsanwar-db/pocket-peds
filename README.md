@@ -10,4 +10,4 @@ weight and/or body surface area, and chronic disease status or clinical conditio
 
 
 # note for devs 
-To run the backend, add in any python packages in requirements.txt and create a .env with a MongoDB `connection_string`.
+In order to run the backend, first install the Python packages in requirements.txt and create a .env with a MongoDB `connection_string`.
