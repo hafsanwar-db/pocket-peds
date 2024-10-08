@@ -2,7 +2,7 @@ import psycopg2
 from psycopg2 import sql
 from datetime import datetime, timedelta
 import random
-
+#user= password=[YOUR-PASSWORD] host=aws-0-ap-southeast-1.pooler.supabase.com port=6543 dbname=postgres
 #Schema: 
 #   history (sid INTEGER PRIMARY KEY, 
 #            childid VARCHAR(24),
@@ -11,10 +11,10 @@ import random
 #            UPC BIGINT)
 engine = psycopg2.connect(
         database="postgres",
-        user="mcersi",
-        password="pocketpeds123",
-        host="pocket-peds.c10qkoguai68.us-east-2.rds.amazonaws.com",
-        port='5432'
+        user="postgres.ygdkqftijdifdikkmvrc",
+        password="g!dq24ztgq!WmvX",
+        host="aws-0-ap-southeast-1.pooler.supabase.com",
+        port='6543'
     )
 cursor = engine.cursor()
 def connetSQL():
@@ -77,5 +77,5 @@ def add_sample_data():
     engine.commit()
     print("Sample data added successfully")
 
-# connetSQL()
+connetSQL()
 add_sample_data()

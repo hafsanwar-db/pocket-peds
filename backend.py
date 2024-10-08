@@ -36,15 +36,21 @@ child_profiles = db['child_profiles2']
 user_profiles = db['user_profiles']
 medicines = db['medicines']
 
-#loading the SQL database
+# engine = psycopg2.connect(
+#         database="postgres",
+#         user="postgres.ygdkqftijdifdikkmvrc",
+#         password="g!dq24ztgq!WmvX",
+#         host="aws-0-ap-southeast-1.pooler.supabase.com",
+#         port='6543'
+#     )
 engine = pool.SimpleConnectionPool(
     5,
         10,
         database="postgres",
-        user="mcersi",
-        password="pocketpeds123",
-        host="pocket-peds.c10qkoguai68.us-east-2.rds.amazonaws.com",
-        port='5432',
+        user="postgres.ygdkqftijdifdikkmvrc",
+        password="g!dq24ztgq!WmvX",
+        host="aws-0-ap-southeast-1.pooler.supabase.com",
+        port='6543'
     )
 
 class User(BaseModel):
@@ -483,6 +489,7 @@ async def get_medicine(upc: str):
 @app.get('/medication-history-all/{childID}')
 async def process_upc(childID: str):
     #the times come in as "January 2022", "December 2019", etc
+    print('this runs')
     try: 
         connection = engine.getconn()
         cursor = connection.cursor()
@@ -497,8 +504,6 @@ async def process_upc(childID: str):
             if data.get(formattedDate):
                 data[formattedDate].append({'startingDay':True, 'endingDay': True, 'color': '#FDB623', 'dosage': row[0], 'upc': row[1], 'name': row[3], "time": formattedTime})
             else: data[formattedDate] = [{'startingDay':True, 'endingDay': True, 'color': '#FDB623', 'dosage': row[0], 'upc': row[1], 'name': row[3], "time": formattedTime}]
-        print(data['2024-05-16'])
-        
         return data
     except (Exception, psycopg2.Error) as error:
         print("Error executing SQL:", error)
